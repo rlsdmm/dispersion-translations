@@ -35,7 +35,17 @@ const resposta = (corpo, status, headers) =>
     status, headers: { "Content-Type": "application/json; charset=utf-8", ...headers },
   });
 
+// comparação em tempo constante (pra chave de envio do script local)
+function iguais(a, b) {
+  if (!a || !b || a.length !== b.length) return false;
+  let d = 0;
+  for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return d === 0;
+}
+
 async function ehMembro(env, auth) {
+  // script de importação no PC do admin (chave guardada como segredo do Worker)
+  if (auth && auth.startsWith("Chave ") && env.CHAVE_ENVIO) return iguais(auth.slice(6), env.CHAVE_ENVIO);
   if (!auth || !auth.startsWith("Bearer ")) return false;
   const agora = Date.now();
   const c = conferidos.get(auth);
