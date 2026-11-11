@@ -55,6 +55,7 @@
 
       <div class="abas">
         <button data-aba="enviar" class="on">Enviar capítulo</button>
+        <button data-aba="importar">Importar em lote</button>
         <button data-aba="capitulos">Capítulos</button>
         <button data-aba="obras">Obras</button>
       </div>
@@ -86,6 +87,32 @@
           </div>
           <p class="msg" id="capMsg"></p>
         </form>
+      </section>
+
+      <!-- IMPORTAR EM LOTE -->
+      <section class="aba" id="aba-importar" hidden>
+        <div class="painel-card">
+          <div class="campos">
+            <label class="largo">Obra <select id="impSerie"></select></label>
+            <label>Data de publicação <input type="date" id="impData" /></label>
+          </div>
+          <div class="soltar" id="impSoltar">
+            <input type="file" id="impArquivos" accept=".zip,.cbz" multiple hidden />
+            <p><b>Arraste os .zip dos capítulos aqui</b> ou <button type="button" class="link" id="impEscolher">escolha os arquivos</button></p>
+            <p class="sub">Um .zip (ou .cbz) por capítulo. O número do capítulo vem do nome do arquivo e pode ser corrigido na lista.</p>
+          </div>
+          <label class="check"><input type="checkbox" id="impPular" checked /> Pular capítulos que já estão no site</label>
+          <label class="check"><input type="checkbox" id="impComprimir" checked /> Converter pra WebP e reduzir o tamanho (recomendado)</label>
+          <p class="sub" id="impResumo"></p>
+          <div class="tabela" id="impTabela"></div>
+          <div class="acoes">
+            <button class="btn pri" type="button" id="impIniciar" disabled>Importar</button>
+            <button class="btn" type="button" id="impParar" hidden>Parar</button>
+            <button class="btn" type="button" id="impLimpar" hidden>Limpar lista</button>
+          </div>
+          <p class="msg" id="impMsg"></p>
+          <p class="sub">Deixe esta aba aberta enquanto importa. Se fechar no meio, os capítulos já publicados ficam no site e o resto é só importar de novo.</p>
+        </div>
       </section>
 
       <!-- CAPÍTULOS -->
@@ -130,6 +157,7 @@
   <div id="rodape"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>

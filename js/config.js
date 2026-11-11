@@ -18,4 +18,9 @@ window.DT_CONFIG = {
   // Supabase (Authentication → Sign In / Providers) antes de colocar aqui.
   // Ex: provedores: ["discord", "google"],
   provedores: ["discord"],
+
+  // Onde ficam as imagens. Vazio = Supabase Storage (1 GB grátis).
+  // Com Cloudflare R2: envio = endereço do Worker (pasta worker/), publico = domínio público do bucket.
+  // Ex: imagens: { envio: "https://dispersion-imagens.SEU.workers.dev", publico: "https://pub-XXXX.r2.dev" },
+  imagens: null,
 };
