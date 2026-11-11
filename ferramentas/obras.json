@@ -1,12 +1,487 @@
 [
   {
+    "pasta": "Hinowa ga Yuku!",
     "id": "hinowa-ga-yuku",
     "titulo": "Hinowa ga Yuku!",
     "titulo_original": "ヒノワが征く！",
-    "autor": "Takahiro",
-    "generos": ["Ação", "Aventura", "Fantasia", "Drama", "Samurai", "Militar"],
+    "autor": "Takahiro, Strelka",
+    "generos": [
+      "Ação",
+      "Aventura",
+      "Fantasia",
+      "Drama",
+      "Samurai",
+      "Militar"
+    ],
     "status": "Completo",
     "sinopse": "Na ilha de Wakoku, a guerra civil não escolhe origem: qualquer um que sobreviva às fileiras do exército pode virar herói. Hinowa, uma jovem de habilidades fora do comum, quer exatamente isso. Mas o caminho até a glória é bem mais sangrento do que ela imaginava, e uma batalha desastrosa do passado ainda lança sombra sobre tudo.",
     "capa": "https://uploads.mangadex.org/covers/6b476ff4-a0d2-4caa-9ee0-1d768c164dc2/5c3f5b86-569c-4814-bbcb-25c6f21be9cb.jpg"
+  },
+  {
+    "pasta": "Akame ga Kill! Zero",
+    "id": "akame-ga-kill-zero",
+    "titulo": "Akame ga Kill! Zero",
+    "titulo_original": "アカメが斬る！零",
+    "autor": "Takahiro, Toru Kei",
+    "generos": [
+      "Ação",
+      "Fantasia",
+      "Drama",
+      "Terror",
+      "Tragédia"
+    ],
+    "status": "Completo",
+    "sinopse": "Muito antes de entrar para a Night Raid, Akame era só uma criança vendida ao Império. Criada junto com outros órfãos para virar assassina, ela aprendeu que matar era o jeito de proteger quem amava. Este prelúdio de Akame ga Kill! mostra o treinamento brutal, as missões e as perdas que moldaram a espadachim mais perigosa da história.",
+    "capa": "https://uploads.mangadex.org/covers/334fcfdf-5c15-4fc6-b974-e86f5ca636f9/a0b63eeb-3c3b-4cb7-bd93-ae761b7cdd68.jpg"
+  },
+  {
+    "pasta": "Akuyaku Reijo wa Shomin ni Tatsugitai!!",
+    "id": "akuyaku-reijo-wa-shomin-ni-totsugitai",
+    "titulo": "Akuyaku Reijo wa Shomin ni Totsugitai!!",
+    "titulo_original": "悪役令嬢は、庶民に嫁ぎたい！！",
+    "autor": "Anzutei Riko, Nabiko",
+    "generos": [
+      "Romance",
+      "Comédia",
+      "Fantasia",
+      "Isekai",
+      "Reencarnação"
+    ],
+    "status": "Cancelado",
+    "sinopse": "Isabella acorda dentro do otome game que jogava na vida passada, só que no papel da vilã destinada à execução. Os príncipes e nobres do jogo não a interessam nem um pouco: o que ela quer é casar com o simpático plebeu que era só um personagem de fundo. Agora ela precisa fugir do final trágico e conquistar o NPC dos seus sonhos.",
+    "capa": "https://uploads.mangadex.org/covers/787c0327-c98e-4b18-a3f8-d2988904fdb1/3c2e4007-13fe-4637-97ff-6b056797214d.jpg"
+  },
+  {
+    "pasta": "Boku no Kokoro no Yabai Yatsu",
+    "id": "boku-no-kokoro-no-yabai-yatsu",
+    "titulo": "Boku no Kokoro no Yabai Yatsu",
+    "titulo_original": "僕の心のヤバイやつ",
+    "autor": "Sakurai Norio",
+    "generos": [
+      "Romance",
+      "Comédia",
+      "Escolar",
+      "Slice of Life"
+    ],
+    "status": "Completo",
+    "sinopse": "Ichikawa Kyoutarou se acha o personagem sombrio da turma e passa as aulas imaginando coisas terríveis sobre os colegas, principalmente sobre Yamada Anna, a garota popular e modelo da sala. Só que, de perto, Yamada é desajeitada, comilona e muito mais divertida do que parece. Aos poucos, o garoto 'perigoso' descobre que o que bate no peito dele é outra coisa.",
+    "capa": "https://uploads.mangadex.org/covers/3df1a9a3-a1be-47a3-9e90-9b3e55b1d0ac/0594a53a-1fc3-43fc-bd24-f793bdc114d7.jpg"
+  },
+  {
+    "pasta": "Brave New World",
+    "id": "brave-new-world",
+    "titulo": "Brave New World",
+    "autor": "Vários autores (Naver Webtoon)",
+    "generos": [
+      "Ficção Científica",
+      "Drama",
+      "Filosófico",
+      "Antologia"
+    ],
+    "status": "Completo",
+    "sinopse": "Uma coletânea de histórias curtas criadas por vários artistas do Naver Webtoon, todas imaginando o futuro da tecnologia e o que ele pode custar. Androides, memórias artificiais, justiça automatizada e velhice num mundo que não precisa mais de gente: cada capítulo é uma distopia diferente, às vezes assustadora, às vezes comovente.",
+    "capa": "https://uploads.mangadex.org/covers/b54b8b56-7c36-44fc-84ba-5b2bb274ecbe/5f4c1392-2ef9-404a-be24-a76a8f24e1a5.jpg"
+  },
+  {
+    "pasta": "Fox Spirit Matchmaker",
+    "id": "fox-spirit-matchmaker",
+    "titulo": "Fox Spirit Matchmaker",
+    "titulo_original": "狐妖小红娘",
+    "autor": "Xiao Xin, Pan Si Da Xian",
+    "generos": [
+      "Ação",
+      "Romance",
+      "Comédia",
+      "Fantasia",
+      "Sobrenatural",
+      "Wuxia"
+    ],
+    "status": "Em andamento",
+    "sinopse": "Num mundo onde humanos e youkais convivem, as raposas espirituais trabalham como casamenteiras: unem casais separados por vidas passadas. Tushan Susu é uma raposinha atrapalhada nesse ofício, e Bai Yuechu é um taoísta que diz não acreditar no amor. Quando os dois se cruzam, começa uma aventura cheia de lutas, segredos antigos e muita confusão.",
+    "capa": "https://uploads.mangadex.org/covers/28d96cb5-e826-48b7-9951-7df7f76c30a0/5c02f748-f078-4c12-ad36-a58d9f212f5f.jpg"
+  },
+  {
+    "pasta": "Honzuki no Gekokujou",
+    "id": "honzuki-no-gekokujou",
+    "titulo": "Honzuki no Gekokujou",
+    "titulo_original": "本好きの下剋上",
+    "autor": "Kazuki Miya, Suzuka",
+    "generos": [
+      "Fantasia",
+      "Isekai",
+      "Reencarnação",
+      "Drama",
+      "Slice of Life"
+    ],
+    "status": "Completo",
+    "sinopse": "Urano era apaixonada por livros e tinha acabado de conseguir o emprego dos sonhos numa biblioteca quando morreu num acidente. Ela renasce como Myne, a filha doente de um soldado, num mundo onde quase ninguém sabe ler e livros são luxo de nobre. Sem nada para ler, Myne decide resolver do jeito mais teimoso possível: se não existem livros, ela mesma vai fabricá-los.",
+    "capa": "https://uploads.mangadex.org/covers/c0ad8919-4646-4a61-adf9-0fd6d8612efa/c7ffc4c0-ed35-4cfb-b8bf-15803e832b90.jpg"
+  },
+  {
+    "pasta": "Ichikawa Haruko Sakuhinshuu",
+    "id": "ichikawa-haruko-sakuhinshuu",
+    "titulo": "Ichikawa Haruko Sakuhinshuu",
+    "titulo_original": "市川春子作品集",
+    "autor": "Ichikawa Haruko",
+    "generos": [
+      "Sobrenatural",
+      "Mistério",
+      "Psicológico",
+      "Oneshot"
+    ],
+    "status": "Completo",
+    "sinopse": "Coletânea de contos da autora de Houseki no Kuni. São histórias curtas, estranhas e delicadas, em que o fantástico aparece no meio do cotidiano: um tio que de repente tem uma 'filha', um jogador machucado que volta para casa e encontra algo impossível, um cientista que cria novos insetos. Cada conto deixa uma pergunta no ar.",
+    "capa": "https://uploads.mangadex.org/covers/e89c85d5-3131-4fd8-bf4f-3985ef63be83/9b50b48b-2f34-4313-934f-e61f6a3cdf4a.jpg"
+  },
+  {
+    "pasta": "Initial D",
+    "id": "initial-d",
+    "titulo": "Initial D",
+    "titulo_original": "頭文字Ｄ",
+    "autor": "Shigeno Shuuichi",
+    "generos": [
+      "Ação",
+      "Esporte",
+      "Corrida",
+      "Drama"
+    ],
+    "status": "Completo",
+    "sinopse": "Takumi Fujiwara passa as madrugadas entregando tofu montanha abaixo no Toyota AE86 do pai, sem fazer ideia de que isso o transformou num piloto fora de série. Quando as equipes de racha do Monte Akina descobrem o misterioso 'fantasma' que derrota qualquer um nas curvas, Takumi é puxado para o mundo das corridas de rua, um desafio de cada vez.",
+    "capa": "https://uploads.mangadex.org/covers/21f54bc1-aefd-4be1-8284-5858b1df0e55/b1ebedfd-1c01-477c-bc6b-9893f5476bd9.jpg"
+  },
+  {
+    "pasta": "Kasane to Subaru",
+    "id": "kasane-to-subaru",
+    "titulo": "Kasane to Subaru",
+    "titulo_original": "かさねと昴",
+    "autor": "Yamada Kintetsu",
+    "generos": [
+      "Romance",
+      "Comédia",
+      "Escritório",
+      "Slice of Life"
+    ],
+    "status": "Completo",
+    "sinopse": "Kasane, designer numa empresa de brinquedos, comete o maior vacilo da vida: apalpa sem querer o colega de trabalho Subaru, e ainda percebe que a sensação lembra seu bichinho de pelúcia favorito da infância. Morta de vergonha e decidida a se redimir, ela acaba se aproximando dele. Uma comédia romântica leve, entre duas pessoas sinceras demais.",
+    "capa": "https://uploads.mangadex.org/covers/4a086028-7977-4da6-a4c2-b659a4de29c6/b54e49b6-bfa1-4add-8363-c0a79ebcf886.jpg"
+  },
+  {
+    "pasta": "Lumine",
+    "id": "lumine",
+    "titulo": "Lumine",
+    "autor": "Emma Krogell",
+    "generos": [
+      "Ação",
+      "Drama",
+      "Sobrenatural",
+      "Mistério"
+    ],
+    "status": "Completo",
+    "sinopse": "Lumine é um lobisomem fugitivo que aceita trabalhar como guarda-costas de Kody, um jovem bruxo nada simpático. Lumine quer porque quer virar amigo do patrão; Kody faz de tudo para manter distância. Quando uma tragédia deixa os dois por conta própria, eles vão ter que confiar um no outro para sobreviver.",
+    "capa": "https://uploads.mangadex.org/covers/50357c52-bbe7-447e-bfd9-6f38dcf4d160/67274337-64cd-498f-b9a7-486731713a12.png"
+  },
+  {
+    "pasta": "Maou-sama Retry",
+    "id": "maou-sama-retry",
+    "titulo": "Maou-sama, Retry!",
+    "titulo_original": "魔王様、リトライ!",
+    "autor": "Kanzaki Kurone, Minotake Amaru",
+    "generos": [
+      "Ação",
+      "Comédia",
+      "Fantasia",
+      "Isekai",
+      "Demônios"
+    ],
+    "status": "Completo",
+    "sinopse": "Oono Akira administrava um jogo online e, logado com o personagem do Lorde Demônio, foi parar dentro de outro mundo, com o mesmo visual assustador e um poder absurdo. Por dentro ele continua sendo um sujeito comum, mas ninguém acredita. Viajando ao lado de uma garotinha que salvou, ele vai deixando reinos, santos e aventureiros em pânico, num mal-entendido atrás do outro.",
+    "capa": "https://uploads.mangadex.org/covers/ff2beee0-7ba8-4661-ad80-f5e85337b540/bb210161-4353-4e29-bfe9-1f6451cad60f.jpg"
+  },
+  {
+    "pasta": "Maou-sama Retry! R",
+    "id": "maou-sama-retry-r",
+    "titulo": "Maou-sama, Retry! R",
+    "titulo_original": "魔王様、リトライ！R",
+    "autor": "Kanzaki Kurone, Minotake Amaru",
+    "generos": [
+      "Ação",
+      "Comédia",
+      "Fantasia",
+      "Isekai",
+      "Demônios"
+    ],
+    "status": "Em andamento",
+    "sinopse": "Nova fase das aventuras de Oono Akira, o 'Lorde Demônio' que só queria uma vida tranquila. Depois do encontro no fundo da masmorra com quem parece ter criado aquele mundo, o grupo segue para o território dos demônios, onde facções rivais disputam o poder. Com uma colegial animadíssima no grupo, os mal-entendidos ficam ainda maiores.",
+    "capa": "https://uploads.mangadex.org/covers/546bfea8-8134-40e1-9676-fe21da8622dc/e88dd9aa-e409-44ec-9228-ee976912949a.jpg"
+  },
+  {
+    "pasta": "MF Ghost",
+    "id": "mf-ghost",
+    "titulo": "MF Ghost",
+    "titulo_original": "ＭＦゴースト",
+    "autor": "Shigeno Shuuichi",
+    "generos": [
+      "Ação",
+      "Esporte",
+      "Corrida"
+    ],
+    "status": "Completo",
+    "sinopse": "Num futuro próximo em que quase todo carro é elétrico e autônomo, o MFG é o último grande campeonato de carros a combustão, disputado nas estradas do Japão. Kanata Rivington, metade inglês e metade japonês, chega como novato com um carro modesto e o estilo de pilotagem de um mestre lendário. Do mesmo autor de Initial D.",
+    "capa": "https://uploads.mangadex.org/covers/c96f1bf8-a100-40bb-98ef-c240b9b7cf96/fe396faa-bdd9-4e66-8bbb-b8973234477a.jpg"
+  },
+  {
+    "pasta": "Nekomusume Shoukougun",
+    "id": "nekomusume-shoukougun",
+    "titulo": "Nekomusume Shoukougun",
+    "titulo_original": "ねこむすめ症候群",
+    "autor": "Nekotarou",
+    "generos": [
+      "Comédia",
+      "Yuri",
+      "Escolar",
+      "Slice of Life"
+    ],
+    "status": "Completo",
+    "sinopse": "Existe uma 'doença' que faz algumas garotas ganharem orelhas, rabo e manias de gato. A ciência só tem duas certezas sobre ela: as meninas ficam fofas demais, e elas costumam se apaixonar por outras garotas. Historinhas curtas e açucaradas sobre colegas de escola lidando com os novos instintos felinos.",
+    "capa": "https://uploads.mangadex.org/covers/20fd49ae-0e6f-451d-94ca-00aa780f3897/d64cf4ef-bd30-487f-b2a8-cadaf02afe47.jpg"
+  },
+  {
+    "pasta": "O Heróizinho Delinquente da Takasugi",
+    "id": "takasugi-san-no-chibiyan-hero",
+    "titulo": "O Heróizinho Delinquente da Takasugi",
+    "titulo_original": "高杉さんのチビヤンヒーロー",
+    "autor": "Tomisa",
+    "generos": [
+      "Romance",
+      "Comédia",
+      "Escolar",
+      "Delinquentes"
+    ],
+    "status": "Completo",
+    "sinopse": "Takasugi Koyuki tem 1,80 m, é tímida e vive de cabeça baixa. Komaeda Masakatsu é baixinho, tem pose de delinquente e um coração enorme. Ela gosta dele em segredo, mas a diferença de altura e de personalidade parece um abismo. Uma comédia romântica fofa sobre encurtar distâncias.",
+    "capa": "https://uploads.mangadex.org/covers/04680398-7650-487f-b3dd-ddc381797a49/9b1d668d-7997-4360-8623-132099a4850d.jpg"
+  },
+  {
+    "pasta": "Otome Game no Hametsu Flag shika nai Akuyaku Reijo ni Tensei shite shimatta.",
+    "id": "hamefura",
+    "titulo": "Otome Game no Hametsu Flag shika nai Akuyaku Reijou ni Tensei shite shimatta...",
+    "titulo_original": "乙女ゲームの破滅フラグしかない悪役令嬢に転生してしまった…",
+    "autor": "Yamaguchi Satoru, Hidaka Nami",
+    "generos": [
+      "Romance",
+      "Comédia",
+      "Fantasia",
+      "Isekai",
+      "Reencarnação"
+    ],
+    "status": "Em andamento",
+    "sinopse": "Aos oito anos, Katarina Claes bate a cabeça e lembra da vida passada: ela renasceu como a vilã de um otome game, e todos os finais dela terminam em exílio ou morte. Para escapar, ela treina esgrima, cultiva uma horta e tenta ser gentil com todo mundo. O plano funciona até demais, porque agora meio mundo está apaixonado por ela, e ela nem percebe.",
+    "capa": "https://uploads.mangadex.org/covers/c6bbbeca-f4fd-4595-9d4d-4ba31370d08c/146fa3e4-a671-433c-b667-4a2e9e3e537f.jpg"
+  },
+  {
+    "pasta": "Over Rev!",
+    "id": "over-rev",
+    "titulo": "Over Rev!",
+    "titulo_original": "オーバーレブ！",
+    "autor": "Yamaguchi Katsumi",
+    "generos": [
+      "Ação",
+      "Esporte",
+      "Corrida"
+    ],
+    "status": "Completo",
+    "sinopse": "Ryouko era atleta de corrida até uma lesão no tornozelo acabar com tudo. Sem rumo depois da formatura, ela descobre por acaso o mundo dos rachas de rua e se apaixona pela velocidade atrás do volante. Com um carro simples e muita teimosia, ela começa a encarar pilotos bem mais experientes.",
+    "capa": "https://uploads.mangadex.org/covers/5603f107-81fa-455a-973f-5bedf4ea1d7e/19f505c9-ed9d-4114-b87d-9761da0514a3.jpg"
+  },
+  {
+    "pasta": "Shark Girl",
+    "id": "shark-girl",
+    "titulo": "Shark Girl",
+    "titulo_original": "サメガール",
+    "autor": "Yukimoto Shuuji",
+    "generos": [
+      "Ação",
+      "Comédia",
+      "Romance",
+      "Monstros"
+    ],
+    "status": "Completo",
+    "sinopse": "Os animais marinhos começaram a crescer até virar monstros gigantes que atacam a cidade. Quem enfrenta essas criaturas é a misteriosa 'Shark Girl', uma colegial com poderes de tubarão. Natsuzo, um estudante comum, é o único que sabe quem ela é de verdade.",
+    "capa": "https://uploads.mangadex.org/covers/26b0e3e5-d08d-466e-87ff-8ea474b223ab/e2411a8f-eb84-4eaf-9ea7-61f706a501c4.png"
+  },
+  {
+    "pasta": "Suki x Suki",
+    "id": "suki-x-suki",
+    "titulo": "Suki x Suki",
+    "titulo_original": "好き×透き",
+    "autor": "Hibaru Shunsuke",
+    "generos": [
+      "Romance",
+      "Comédia",
+      "Escolar",
+      "Sobrenatural"
+    ],
+    "status": "Completo",
+    "sinopse": "Aizuki Touka é invisível: ninguém consegue vê-la, a não ser Mimori Ryoutarou. Ela pode até ser transparente, mas o que sente por ele está na cara. Uma comédia romântica escolar sobre a única pessoa que te enxerga de verdade.",
+    "capa": "https://uploads.mangadex.org/covers/cca37289-bd8c-450d-817c-b8b98ba54336/d4548025-6554-40ba-a091-e7ad3bb6fecf.jpg"
+  },
+  {
+    "pasta": "Toaru Bakappuru no Himitsu Jijou",
+    "id": "toaru-bakappuru-no-himitsu-jijou",
+    "titulo": "Toaru Bakappuru no Himitsu Jijou.",
+    "titulo_original": "とあるバカップルのヒミツ事情。",
+    "autor": "Hoshida Kana",
+    "generos": [
+      "Romance",
+      "Comédia"
+    ],
+    "status": "Em andamento",
+    "sinopse": "Eles são aquele casal grudento que faz todo mundo revirar os olhos. O detalhe é que cada um esconde um segredo do outro, e nenhum dos dois faz ideia de que o parceiro também está escondendo alguma coisa.",
+    "capa": "https://uploads.mangadex.org/covers/d56f3199-4859-4cd3-b99f-f58b93e18e7a/397e1f79-411b-4336-8cd7-bac0a06ecf73.jpg"
+  },
+  {
+    "pasta": "Toji no Miko",
+    "id": "toji-no-miko",
+    "titulo": "Toji no Miko",
+    "titulo_original": "刀使の巫女",
+    "autor": "Saitoh Sakae",
+    "generos": [
+      "Ação",
+      "Fantasia",
+      "Artes Marciais",
+      "Escolar"
+    ],
+    "status": "Completo",
+    "sinopse": "Desde tempos antigos, criaturas chamadas Aratama ameaçam o mundo, e quem as enfrenta são as Toji, garotas que lutam com espadas sagradas. Hoje elas estudam em escolas especiais e trabalham para a polícia, equilibrando a rotina de colegiais com batalhas de vida ou morte.",
+    "capa": "https://uploads.mangadex.org/covers/6b500c76-c78c-4c78-b973-0dfbae7c6980/784371fd-4fd2-46d6-92d6-a6cac41416ef.png"
+  },
+  {
+    "pasta": "Trap Heroine",
+    "id": "trap-heroine",
+    "titulo": "Trap Heroine",
+    "titulo_original": "トラップヒロイン",
+    "autor": "Tomiki Kou",
+    "generos": [
+      "Romance",
+      "Comédia",
+      "Escolar",
+      "Crossdressing"
+    ],
+    "status": "Completo",
+    "sinopse": "Chiroda Taishi tem um problema curioso: as 'armadilhas' da vida sempre caem em cima dele. Rodeado de garotos que parecem garotas, ele tenta entender o próprio coração no meio de uma comédia escolar cheia de confusões e surpresas.",
+    "capa": "https://uploads.mangadex.org/covers/5b8e38d3-e0db-46f6-8fdc-b1acd8b167c8/1964a164-7183-4548-8089-55422835aa62.jpg"
+  },
+  {
+    "pasta": "Tsubasa to Hotaru",
+    "id": "tsubasa-to-hotaru",
+    "titulo": "Tsubasa to Hotaru",
+    "titulo_original": "つばさとホタル",
+    "autor": "Haruta Nana",
+    "generos": [
+      "Romance",
+      "Comédia",
+      "Esporte",
+      "Escolar",
+      "Shoujo"
+    ],
+    "status": "Completo",
+    "sinopse": "No começo do colegial, Tsubasa se apaixona pelo veterano que a ajudou quando passou mal na estação, mas é dispensada com um seco 'você é irritante'. Para piorar, ela acaba substituindo a melhor amiga como gerente do time masculino de basquete, justamente o time dele. Um shoujo animado sobre insistência, amizade e primeiro amor.",
+    "capa": "https://uploads.mangadex.org/covers/fe3becef-dd07-4dfd-840a-617c8c97b9a4/e553d629-ad25-4890-bd4e-31d4f6222eed.jpg"
+  },
+  {
+    "pasta": "Wangan Midnight",
+    "id": "wangan-midnight",
+    "titulo": "Wangan Midnight",
+    "titulo_original": "湾岸ミッドナイト",
+    "autor": "Kusunoki Michiharu",
+    "generos": [
+      "Esporte",
+      "Corrida",
+      "Drama"
+    ],
+    "status": "Completo",
+    "sinopse": "Depois de perder um racha para o Porsche apelidado de 'Blackbird', o estudante Akio Asakura encontra num ferro-velho um Fairlady Z azul envenenado com mais de 600 cavalos. O carro tem fama de amaldiçoado, e todos os donos anteriores sofreram acidentes. Com o 'Devil Z', Akio entra numa rivalidade perigosa nas rodovias de Tóquio.",
+    "capa": "https://uploads.mangadex.org/covers/68669554-88ef-43ac-966b-e41d56682290/3792d9b4-2024-4226-a33d-b6f3f2950023.jpg"
+  },
+  {
+    "pasta": "Wangpai Yushi",
+    "id": "wangpai-yushi",
+    "titulo": "Wangpai Yushi",
+    "titulo_original": "王牌御史",
+    "autor": "Tong Yao",
+    "generos": [
+      "Ação",
+      "Comédia",
+      "Sobrenatural",
+      "Escolar"
+    ],
+    "status": "Em andamento",
+    "sinopse": "O equilíbrio entre yin e yang se rompeu, o dia se misturou com a noite e agora humanos e monstros dividem o mesmo mundo. Os 'censores' são os encarregados de manter a ordem e enfrentar os monstros que não aceitam a convivência. Uma história leve e engraçada sobre esses agentes esforçados.",
+    "capa": "https://uploads.mangadex.org/covers/2e47ec72-7d7c-4090-9540-a50680bdd138/69505596-4e94-4675-977d-d53fb6639de7.jpg"
+  },
+  {
+    "pasta": "Yesterday wo Utatte",
+    "id": "yesterday-wo-utatte",
+    "titulo": "Yesterday wo Utatte",
+    "titulo_original": "イエスタデイをうたって",
+    "autor": "Toume Kei",
+    "generos": [
+      "Romance",
+      "Drama",
+      "Slice of Life",
+      "Seinen"
+    ],
+    "status": "Completo",
+    "sinopse": "Rikuo terminou a faculdade sem saber o que fazer da vida e foi trabalhar numa loja de conveniência. Os dias passam iguais até ele reencontrar a antiga paixão da época de estudante e, ao mesmo tempo, conhecer Haru, uma garota excêntrica que anda por aí com um corvo. Um romance adulto e melancólico sobre seguir em frente.",
+    "capa": "https://uploads.mangadex.org/covers/fdb6bc71-0e22-413c-afc8-eb46fe11a6df/638997a3-833d-4a98-9f44-6252b7b4518c.jpg"
+  },
+  {
+    "pasta": "Yuusha ga Shinda!",
+    "id": "yuusha-ga-shinda",
+    "titulo": "Yuusha ga Shinda!",
+    "titulo_original": "勇者が死んだ!",
+    "autor": "Subaruichi",
+    "generos": [
+      "Ação",
+      "Comédia",
+      "Fantasia",
+      "Aventura",
+      "Ecchi"
+    ],
+    "status": "Completo",
+    "sinopse": "Touka é um fazendeiro de rabanete que cavou um buraco-armadilha para proteger a vila dos monstros. Só que quem caiu nele foi o Herói, que morreu na hora. Para encobrir a besteira, Touka acaba revivido no corpo do Herói por uma necromante nada confiável, e agora precisa salvar o mundo no lugar dele.",
+    "capa": "https://uploads.mangadex.org/covers/d0c3d778-d28d-4e3a-be75-d92149438fff/f347ff58-1700-4dac-b52f-c63830eebc91.jpg"
+  },
+  {
+    "pasta": "Yuusha ga Shinda! - Kami no Kuni-hen",
+    "id": "yuusha-ga-shinda-kami-no-kuni-hen",
+    "titulo": "Yuusha ga Shinda! - Kami no Kuni-hen",
+    "titulo_original": "勇者が死んだ! 神の国編",
+    "autor": "Subaruichi",
+    "generos": [
+      "Ação",
+      "Comédia",
+      "Fantasia",
+      "Aventura"
+    ],
+    "status": "Completo",
+    "sinopse": "Um ano e meio depois, o grupo finalmente reencontra o lendário herói Zion, que todos davam como morto, e reúne de novo a equipe mais forte do mundo. O próximo destino é o misterioso 'Reino dos Deuses'. Continuação direta de Yuusha ga Shinda!.",
+    "capa": "https://uploads.mangadex.org/covers/8b641daa-9c5f-45a0-a3f8-1b9cece117f0/0dddd716-3121-4de0-b903-89267d8dce5a.jpg"
+  },
+  {
+    "pasta": "Zettai Karen Children",
+    "id": "zettai-karen-children",
+    "titulo": "Zettai Karen Children",
+    "titulo_original": "絶対可憐チルドレン",
+    "autor": "Shiina Takashi",
+    "generos": [
+      "Ação",
+      "Comédia",
+      "Ficção Científica",
+      "Superpoderes"
+    ],
+    "status": "Completo",
+    "sinopse": "No século 21, os ESPers, pessoas com poderes psíquicos, decidem o rumo de guerras, diplomacia e política. Só três têm nível 7, o mais alto de todos: Kaoru, Aoi e Shiho, três garotas de dez anos que trabalham para a agência B.A.B.E.L. Cabe a Kouichi, um gênio de vinte anos, a missão quase impossível de supervisionar essas pestinhas superpoderosas.",
+    "capa": "https://uploads.mangadex.org/covers/8265ac42-6962-416c-bcb9-cc30915d5856/0af4743f-d8e5-4ba8-a6af-d5d95e2ea487.jpg"
   }
 ]

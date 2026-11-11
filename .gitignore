@@ -4,3 +4,4 @@ node_modules/
 .chave-envio
 __pycache__/
 supabase/importar/
+supabase/importacao.sql

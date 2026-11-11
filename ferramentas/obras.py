@@ -14,7 +14,7 @@ import io, json, pathlib, sys, time, urllib.request
 from PIL import Image
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from importar import RAIZ, chave, enviar, sql_texto  # noqa: E402
+from importar import RAIZ, chave, enviar, importar_lote, sql_texto  # noqa: E402
 
 
 def baixar(origem):
@@ -46,6 +46,8 @@ def main():
         capa_url = None
         if o.get("capa"):
             capa_url = enviar(f"capas/{o['id']}-{int(time.time())}.webp", capa_webp(baixar(o["capa"])), "webp", k)
+        importar_lote(series=[{**{c: o.get(c) for c in ("id", "titulo", "titulo_original", "autor", "generos", "status", "sinopse")},
+                               "capa_url": capa_url}])
         arr = "array[" + ",".join(sql_texto(g) for g in o.get("generos", [])) + "]::text[]"
         nulo = lambda v: sql_texto(v) if v else "null"  # noqa: E731
         valores.append(f"({sql_texto(o['id'])}, {sql_texto(o['titulo'])}, {nulo(o.get('titulo_original'))}, {nulo(o.get('autor'))}, "

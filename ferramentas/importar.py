@@ -23,7 +23,7 @@ import argparse, concurrent.futures as cf, datetime as dt, io, json, pathlib, re
 from PIL import Image
 
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
-CFG = (RAIZ / "js" / "config.js").read_text(encoding="utf-8")
+CFG = re.sub(r"(?m)^\s*//.*$", "", (RAIZ / "js" / "config.js").read_text(encoding="utf-8"))  # sem comentários
 SUPABASE_URL = re.search(r'supabaseUrl:\s*"([^"]+)"', CFG).group(1)
 ANON = re.search(r'supabaseAnonKey:\s*"([^"]+)"', CFG).group(1)
 ENVIO = re.search(r'envio:\s*"([^"]+)"', CFG).group(1).rstrip("/")
@@ -145,7 +145,8 @@ def enviar(caminho, dados, ext, k):
     for tentativa in range(1, 5):
         try:
             req = urllib.request.Request(f"{ENVIO}/{caminho}", data=dados, method="PUT",
-                                         headers={"Authorization": "Chave " + k, "Content-Type": TIPOS.get(ext, "application/octet-stream")})
+                                         headers={"Authorization": "Chave " + k, "Content-Type": TIPOS.get(ext, "application/octet-stream"),
+                                                  "User-Agent": "DispersionTranslations-importador/1.0"})
             with urllib.request.urlopen(req, timeout=120) as r:
                 if r.status == 200:
                     return f"{PUBLICO}/{caminho}"
@@ -165,6 +166,23 @@ def ja_publicados(obra):
                                  headers={"apikey": ANON, "Authorization": "Bearer " + ANON})
     with urllib.request.urlopen(req, timeout=30) as r:
         return {float(x["numero"]) for x in json.load(r)}
+
+
+def importar_lote(series=(), capitulos=()):
+    """Grava obras/capítulos no Supabase pela função importar_lote (protegida pela chave)."""
+    corpo = json.dumps({"p_chave": chave(), "p_series": list(series), "p_capitulos": list(capitulos)}).encode()
+    for tentativa in range(1, 4):
+        try:
+            req = urllib.request.Request(f"{SUPABASE_URL}/rest/v1/rpc/importar_lote", data=corpo, method="POST",
+                                         headers={"apikey": ANON, "Authorization": "Bearer " + ANON, "Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return json.load(r)
+        except urllib.error.HTTPError as e:
+            raise RuntimeError("Supabase: " + e.read().decode("utf-8", "replace"))
+        except Exception:
+            if tentativa == 3:
+                raise
+            time.sleep(3)
 
 
 def sql_texto(s):
@@ -236,11 +254,13 @@ def main():
                 "insert into public.capitulos (serie_id, numero, data, paginas) values\n" + ",\n".join(linhas_sql) +
                 "\non conflict (serie_id, numero) do update set paginas = excluded.paginas, data = excluded.data;\n",
                 encoding="utf-8")
+            # publica no site na hora
+            importar_lote(capitulos=[{"serie_id": a.obra, "numero": n, "data": d, "paginas": urls}])
             print(f"  cap {num_str(n)}: {len(urls)} páginas, {tam / 1048576:.1f} MB  ({time.time() - t0:.0f}s)")
 
-    print(f"\nPronto: {len(linhas_sql)} capítulos, {total_bytes / 1048576:.1f} MB enviados.")
+    print(f"\nPronto: {len(linhas_sql)} capítulos publicados, {total_bytes / 1048576:.1f} MB enviados.")
     if linhas_sql:
-        print(f"Agora rode no Supabase (SQL Editor): {arq_sql}")
+        print(f"(cópia do SQL em {arq_sql})")
 
 
 if __name__ == "__main__":
