@@ -43,6 +43,13 @@ returns boolean language sql stable security definer set search_path = public as
   select exists (select 1 from public.membros where user_id = auth.uid());
 $$;
 
+-- Acesso pela API do site (as regras RLS abaixo decidem o que cada um pode fazer)
+grant usage on schema public to anon, authenticated;
+grant select on public.series, public.capitulos to anon, authenticated;
+grant insert, update, delete on public.series, public.capitulos to authenticated;
+grant select on public.membros to authenticated;
+grant execute on function public.is_membro() to anon, authenticated;
+
 -- ---------- Regras de acesso (RLS) ----------
 alter table public.membros   enable row level security;
 alter table public.series    enable row level security;

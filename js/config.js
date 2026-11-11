@@ -11,6 +11,6 @@
  * Enquanto estiver vazio, o site mostra as obras de exemplo do js/data.js.
  */
 window.DT_CONFIG = {
-  supabaseUrl: "",
-  supabaseAnonKey: "",
+  supabaseUrl: "https://mslgqtpvieewxqebajzv.supabase.co",
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zbGdxdHB2aWVld3hxZWJhanp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0MTg1MjUsImV4cCI6MjEwOTk5NDUyNX0.ME2TJsuHyFRM8OKzKIprfCmgwCJ8aLdQ06v5ke_HPIs",
 };
