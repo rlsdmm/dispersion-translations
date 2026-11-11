@@ -17,5 +17,5 @@ window.DT_CONFIG = {
   // Botões de login social na página "Minha conta". Ative o provedor no
   // Supabase (Authentication → Sign In / Providers) antes de colocar aqui.
   // Ex: provedores: ["discord", "google"],
-  provedores: [],
+  provedores: ["discord"],
 };
