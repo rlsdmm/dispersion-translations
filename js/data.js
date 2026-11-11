@@ -1,8 +1,14 @@
 /*
  * ============================================================
- *  CATÁLOGO DA DISPERSION TRANSLATIONS
+ *  DADOS DO GRUPO + OBRAS DE EXEMPLO
  * ============================================================
- *  É aqui que vocês adicionam séries e capítulos novos.
+ *  "grupo": nome, descrição e links que aparecem no site — edite à vontade.
+ *
+ *  "series": SÓ É USADO enquanto o Supabase não estiver configurado
+ *  (js/config.js vazio). Depois de configurar, obras e capítulos
+ *  são cadastrados pela Área do grupo (admin.html) e esta lista é ignorada.
+ *
+ *  --- modo sem Supabase (manual) ---
  *
  *  Como adicionar um capítulo:
  *   1. Coloque as páginas em:  capitulos/<id-da-serie>/<numero>/

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Área do grupo · Dispersion Translations</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="topo"></div>
+
+  <main class="wrap admin">
+    <!-- aviso: Supabase não configurado -->
+    <div class="painel-card" id="semConfig" hidden>
+      <h1>Área do grupo</h1>
+      <p>O Supabase ainda não foi configurado. Siga o guia em <code>LEIA-ME.md</code> e preencha o arquivo <code>js/config.js</code>.</p>
+    </div>
+
+    <!-- login -->
+    <form class="painel-card login" id="formLogin" hidden>
+      <h1>Área do grupo</h1>
+      <p class="sub">Entre com a conta que o admin criou pra você.</p>
+      <label>E-mail <input type="email" id="loginEmail" required autocomplete="username" /></label>
+      <label>Senha <input type="password" id="loginSenha" required autocomplete="current-password" /></label>
+      <button class="btn pri" type="submit">Entrar</button>
+      <button class="link" type="button" id="esqueci">Esqueci minha senha</button>
+      <p class="msg" id="loginMsg"></p>
+    </form>
+
+    <!-- nova senha (link de recuperação / convite) -->
+    <form class="painel-card login" id="formSenha" hidden>
+      <h1>Criar nova senha</h1>
+      <label>Nova senha <input type="password" id="novaSenha" minlength="8" required autocomplete="new-password" /></label>
+      <button class="btn pri" type="submit">Salvar senha</button>
+      <p class="msg" id="senhaMsg"></p>
+    </form>
+
+    <!-- sem permissão -->
+    <div class="painel-card" id="semPermissao" hidden>
+      <h1>Sem permissão</h1>
+      <p>Você entrou como <b id="emailSemPerm"></b>, mas essa conta ainda não é membro do grupo. Peça pro admin te liberar.</p>
+      <button class="btn" data-sair>Sair</button>
+    </div>
+
+    <!-- painel -->
+    <div id="painel" hidden>
+      <div class="painel-topo">
+        <div>
+          <h1>Olá, <span id="nomeMembro"></span>!</h1>
+          <p class="sub" id="emailMembro"></p>
+        </div>
+        <button class="btn" data-sair>Sair</button>
+      </div>
+
+      <div class="abas">
+        <button data-aba="enviar" class="on">Enviar capítulo</button>
+        <button data-aba="capitulos">Capítulos</button>
+        <button data-aba="obras">Obras</button>
+      </div>
+
+      <!-- ENVIAR -->
+      <section class="aba" id="aba-enviar">
+        <form class="painel-card" id="formCap">
+          <div class="campos">
+            <label class="largo">Obra <select id="capSerie" required></select></label>
+            <label>Número <input type="number" id="capNumero" step="any" min="0" required placeholder="ex: 12 ou 12.5" /></label>
+            <label>Data <input type="date" id="capData" required /></label>
+            <label class="largo">Título do capítulo <input type="text" id="capTitulo" placeholder="opcional" /></label>
+          </div>
+
+          <div class="soltar" id="soltar">
+            <input type="file" id="capArquivos" accept="image/*" multiple hidden />
+            <p><b>Arraste as páginas aqui</b> ou <button type="button" class="link" id="escolher">escolha os arquivos</button></p>
+            <p class="sub">Ficam em ordem pelo nome do arquivo. Arraste as miniaturas pra reordenar.</p>
+          </div>
+          <div class="miniaturas" id="miniaturas"></div>
+
+          <label class="check"><input type="checkbox" id="capComprimir" checked /> Converter pra WebP e reduzir o tamanho (recomendado)</label>
+          <p class="sub" id="dicaEditar" hidden>Editando um capítulo existente: se não escolher páginas novas, as páginas atuais são mantidas.</p>
+
+          <div class="barra-envio" id="barraEnvio" hidden><div></div><span></span></div>
+          <div class="acoes">
+            <button class="btn pri" type="submit" id="btnEnviar">Publicar capítulo</button>
+            <button class="btn" type="button" id="btnLimpar">Limpar</button>
+          </div>
+          <p class="msg" id="capMsg"></p>
+        </form>
+      </section>
+
+      <!-- CAPÍTULOS -->
+      <section class="aba" id="aba-capitulos" hidden>
+        <div class="painel-card">
+          <label>Obra <select id="listaSerie"></select></label>
+          <div class="tabela" id="tabelaCaps"></div>
+        </div>
+      </section>
+
+      <!-- OBRAS -->
+      <section class="aba" id="aba-obras" hidden>
+        <form class="painel-card" id="formObra">
+          <h2 id="tituloFormObra">Nova obra</h2>
+          <div class="campos">
+            <label class="largo">Título <input type="text" id="obraTitulo" required /></label>
+            <label class="largo">Endereço (id) <input type="text" id="obraId" required pattern="[a-z0-9\-]+" title="só letras minúsculas, números e hífen" /></label>
+            <label>Título original <input type="text" id="obraOriginal" /></label>
+            <label>Autor(a) <input type="text" id="obraAutor" /></label>
+            <label>Gêneros <input type="text" id="obraGeneros" placeholder="Ação, Fantasia, Drama" /></label>
+            <label>Status
+              <select id="obraStatus">
+                <option>Em andamento</option><option>Completo</option><option>Hiato</option><option>Pausado pelo grupo</option><option>Cancelado</option>
+              </select>
+            </label>
+            <label class="largo">Sinopse <textarea id="obraSinopse" rows="4"></textarea></label>
+            <label class="largo">Capa <input type="file" id="obraCapa" accept="image/*" /></label>
+          </div>
+          <img id="obraCapaPrev" class="capa-prev" alt="" hidden />
+          <div class="acoes">
+            <button class="btn pri" type="submit">Salvar obra</button>
+            <button class="btn" type="button" id="obraNova">Nova obra</button>
+            <button class="btn perigo" type="button" id="obraExcluir" hidden>Excluir obra</button>
+          </div>
+          <p class="msg" id="obraMsg"></p>
+        </form>
+        <div class="grade" id="gradeObras"></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="rodape"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

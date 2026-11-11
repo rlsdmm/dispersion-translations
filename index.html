@@ -51,6 +51,8 @@
 
   <div id="rodape"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
   <script>
@@ -62,6 +64,7 @@
     document.getElementById("links").innerHTML = D.grupo.links
       .map((l) => `<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.nome)} →</a>`).join("");
 
+    DT.iniciar(() => {
     // capas no destaque
     document.getElementById("heroCapas").innerHTML = D.series.slice(0, 3)
       .map((s) => `<img src="${capa(s)}" alt="${esc(s.titulo)}" />`).join("");
@@ -98,6 +101,8 @@
     }
     renderGrade();
     document.getElementById("busca").addEventListener("input", (e) => renderGrade(e.target.value));
+    if (!D.series.length) document.getElementById("listaLanc").innerHTML = `<p class="vazio">Nenhum capítulo publicado ainda.</p>`;
+    });
   </script>
 </body>
 </html>

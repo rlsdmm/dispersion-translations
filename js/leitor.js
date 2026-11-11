@@ -1,5 +1,5 @@
 /* Leitor de capítulos — modo vertical (rolagem) e paginado */
-(function () {
+DT.iniciar(function () {
   const { esc, serie, capsOrdenados, paginas, lidos, store } = DT;
   const $ = (id) => document.getElementById(id);
 
@@ -164,4 +164,4 @@
   }, { passive: true });
 
   aplicarPref();
-})();
+}, { paginas: true });

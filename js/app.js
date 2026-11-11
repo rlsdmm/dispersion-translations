@@ -14,6 +14,53 @@
     },
   };
 
+  /* ---------- Supabase ---------- */
+  const cfg = window.DT_CONFIG || {};
+  const sb = cfg.supabaseUrl && cfg.supabaseAnonKey && window.supabase
+    ? window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey)
+    : null;
+
+  const PALETAS = [["#ff5e62", "#7b2ff7"], ["#43cea2", "#185a9d"], ["#f7971e", "#3a1c71"], ["#ee0979", "#ff6a00"], ["#00c6ff", "#0072ff"], ["#8e2de2", "#4a00e0"], ["#11998e", "#38ef7d"], ["#fc466b", "#3f5efb"]];
+  function coresDe(id) {
+    let h = 0; for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return PALETAS[h % PALETAS.length];
+  }
+
+  /* Carrega obras e capítulos. Sem Supabase configurado, usa os exemplos do data.js */
+  async function carregar({ paginas = false } = {}) {
+    if (!sb) return D.series;
+    const campos = "serie_id,numero,titulo,data" + (paginas ? ",paginas" : "");
+    const [r1, r2] = await Promise.all([
+      sb.from("series").select("*").order("titulo"),
+      sb.from("capitulos").select(campos),
+    ]);
+    if (r1.error) throw r1.error;
+    if (r2.error) throw r2.error;
+    D.series = r1.data.map((s) => ({
+      id: s.id,
+      titulo: s.titulo,
+      tituloOriginal: s.titulo_original,
+      autor: s.autor,
+      generos: s.generos || [],
+      status: s.status,
+      sinopse: s.sinopse,
+      capa: s.capa_url,
+      cores: s.cores && s.cores.length === 2 ? s.cores : coresDe(s.id),
+      capitulos: r2.data.filter((c) => c.serie_id === s.id).map((c) => ({
+        numero: Number(c.numero), titulo: c.titulo, data: c.data, urls: c.paginas,
+      })),
+    }));
+    return D.series;
+  }
+
+  function iniciar(fn, opts) {
+    return carregar(opts).then(fn).catch((e) => {
+      console.error(e);
+      document.body.insertAdjacentHTML("beforeend",
+        `<p class="erro-pag">Não foi possível carregar as obras agora. Tente recarregar a página.</p>`);
+    });
+  }
+
   function serie(id) { return D.series.find((s) => s.id === id); }
 
   function capsOrdenados(s) { return [...s.capitulos].sort((a, b) => a.numero - b.numero); }
@@ -68,6 +115,7 @@
 
   /* Lista de URLs das páginas de um capítulo */
   function paginas(s, cap) {
+    if (cap.urls) return cap.urls;
     if (s.demo) {
       const n = typeof cap.paginas === "number" ? cap.paginas : cap.paginas.length;
       return Array.from({ length: n }, (_, i) => paginaDemo(s, cap, i + 1, n));
@@ -122,8 +170,9 @@
     return `<footer class="rodape">
       <p><b>${esc(D.grupo.nome)}</b> — ${esc(D.grupo.slogan)}</p>
       <p class="aviso">Projeto de fãs, sem fins lucrativos. Todos os direitos das obras pertencem aos seus autores e editoras. Apoie o lançamento oficial quando disponível.</p>
+      <p class="aviso"><a href="admin.html">Área do grupo</a></p>
     </footer>`;
   }
 
-  window.DT = { D, esc, store, serie, capsOrdenados, ultimoCap, dataBR, tempoRelativo, capa, paginas, lidos, header, footer };
+  window.DT = { D, sb, carregar, iniciar, coresDe, esc, store, serie, capsOrdenados, ultimoCap, dataBR, tempoRelativo, capa, paginas, lidos, header, footer };
 })();
