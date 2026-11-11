@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dispersion Translations</title>
+  <meta name="description" content="Dispersion Translations — traduções de mangás feitas por fãs." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="topo"></div>
+
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <h1>Mangás traduzidos com <span>carinho</span>, capítulo a capítulo.</h1>
+        <p id="slogan"></p>
+        <div class="botoes">
+          <a class="btn pri" href="#lancamentos">Últimos lançamentos</a>
+          <a class="btn" href="#obras">Ver todas as obras</a>
+        </div>
+      </div>
+      <div class="hero-capas" id="heroCapas"></div>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section id="lancamentos">
+      <div class="titulo-sec"><h2>Últimos lançamentos</h2></div>
+      <div class="lancamentos" id="listaLanc"></div>
+    </section>
+
+    <section id="obras">
+      <div class="titulo-sec">
+        <h2>Obras</h2>
+        <input class="busca" id="busca" type="search" placeholder="Buscar por título ou gênero…" />
+      </div>
+      <div class="grade" id="grade"></div>
+    </section>
+
+    <section id="sobre">
+      <div class="sobre">
+        <div>
+          <h2>Sobre o grupo</h2>
+          <p id="descricao"></p>
+        </div>
+        <div class="links" id="links"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="rodape"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const { D, esc, capa, capsOrdenados, ultimoCap, tempoRelativo, header, footer } = DT;
+    document.getElementById("topo").innerHTML = header("inicio");
+    document.getElementById("rodape").innerHTML = footer();
+    document.getElementById("slogan").textContent = D.grupo.slogan + " Leia online, direto no navegador, no PC ou no celular.";
+    document.getElementById("descricao").textContent = D.grupo.descricao;
+    document.getElementById("links").innerHTML = D.grupo.links
+      .map((l) => `<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.nome)} →</a>`).join("");
+
+    // capas no destaque
+    document.getElementById("heroCapas").innerHTML = D.series.slice(0, 3)
+      .map((s) => `<img src="${capa(s)}" alt="${esc(s.titulo)}" />`).join("");
+
+    // últimos lançamentos (todos os capítulos de todas as séries, mais novos primeiro)
+    const todos = D.series.flatMap((s) => s.capitulos.map((c) => ({ s, c })))
+      .sort((a, b) => (b.c.data || "").localeCompare(a.c.data || "") || b.c.numero - a.c.numero)
+      .slice(0, 8);
+    document.getElementById("listaLanc").innerHTML = todos.map(({ s, c }) => {
+      const novo = (Date.now() - new Date(c.data + "T12:00:00")) / 864e5 < 7;
+      return `<a class="lanc" href="ler.html?s=${encodeURIComponent(s.id)}&c=${c.numero}">
+        <img src="${capa(s)}" alt="" loading="lazy" />
+        <div class="info">
+          <h3>${esc(s.titulo)}</h3>
+          <span class="cap">Capítulo ${c.numero}${novo ? '<span class="novo">NOVO</span>' : ""}</span>
+          <span class="quando">${esc(c.titulo || "")} · ${tempoRelativo(c.data)}</span>
+        </div></a>`;
+    }).join("");
+
+    // grade de obras com busca
+    function renderGrade(filtro = "") {
+      const f = filtro.trim().toLowerCase();
+      const lista = D.series.filter((s) => !f ||
+        [s.titulo, s.tituloOriginal, s.autor, ...(s.generos || [])].join(" ").toLowerCase().includes(f));
+      document.getElementById("grade").innerHTML = lista.length ? lista.map((s) => {
+        const u = ultimoCap(s);
+        return `<a class="obra" href="serie.html?s=${encodeURIComponent(s.id)}">
+          <div class="capa"><img src="${capa(s)}" alt="${esc(s.titulo)}" loading="lazy" />
+            <span class="selo ${s.status === "Completo" ? "completo" : ""}">${esc(s.status)}</span></div>
+          <h3>${esc(s.titulo)}</h3>
+          <div class="meta">${u ? "Cap. " + u.numero : "Em breve"} · ${esc((s.generos || [])[0] || "")}</div>
+        </a>`;
+      }).join("") : `<p class="vazio">Nenhuma obra encontrada.</p>`;
+    }
+    renderGrade();
+    document.getElementById("busca").addEventListener("input", (e) => renderGrade(e.target.value));
+  </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leitor · Dispersion Translations</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="leitor">
+  <div class="barra-leitor" id="barra">
+    <a class="voltar" id="voltar" href="index.html">
+      <span class="seta">←</span>
+      <div><strong id="tituloSerie">Carregando…</strong><small id="tituloCap"></small></div>
+    </a>
+    <div class="ctrl">
+      <button id="ant" title="Capítulo anterior (Q)">‹ Ant.</button>
+      <select id="selCap" title="Escolher capítulo"></select>
+      <button id="prox" title="Próximo capítulo (E)">Próx. ›</button>
+    </div>
+    <div class="ctrl">
+      <button id="btnModo" title="Alternar modo de leitura (M)"></button>
+      <button id="btnLargura" class="so-desk" title="Largura das páginas"></button>
+      <button id="btnDirecao" title="Direção da leitura no modo paginado"></button>
+    </div>
+  </div>
+
+  <div class="paginas" id="paginas"></div>
+
+  <div class="fim-cap" id="fimCap"></div>
+  <div class="contador" id="contador"></div>
+  <div class="progresso" id="progresso"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/leitor.js"></script>
+</body>
+</html>
