@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacidade · Dispersion Translations</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="topo"></div>
+
+  <main class="wrap texto-legal">
+    <h1>Política de privacidade</h1>
+    <p class="sub">Versão curta e sem juridiquês. Atualizada em 11/11/2026.</p>
+
+    <h2>Quem somos</h2>
+    <p>A Dispersion Translations é um grupo de fãs que traduz mangás, sem fins lucrativos. Não vendemos nada, não mostramos anúncios e não usamos rastreadores de publicidade.</p>
+
+    <h2>O que guardamos</h2>
+    <p><b>Sem conta:</b> nada sai do seu aparelho. Capítulos lidos e preferências do leitor ficam só no armazenamento do seu navegador.</p>
+    <p><b>Com conta:</b></p>
+    <ul>
+      <li>seu <b>e-mail</b> (ou os dados básicos do Discord/Google, se entrar por eles) e uma senha criptografada, pra você poder entrar;</li>
+      <li>seu <b>apelido</b>, que aparece nos comentários;</li>
+      <li>suas <b>obras favoritas</b>, seu <b>histórico de leitura</b> (capítulos e página onde parou) e as <b>preferências do leitor</b>;</li>
+      <li>os <b>comentários</b> que você publicar, que ficam visíveis pra todo mundo.</li>
+    </ul>
+
+    <h2>Pra que usamos</h2>
+    <p>Só pra fazer a sua conta funcionar: sincronizar biblioteca e histórico entre aparelhos, avisar de capítulos novos e mostrar seus comentários. Também vemos números gerais (ex: quantas pessoas leram ou favoritaram uma obra), sem identificar ninguém.</p>
+
+    <h2>Com quem compartilhamos</h2>
+    <p>Com ninguém. Os dados ficam guardados no <a class="link" href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase</a>, o serviço que usamos como banco de dados e login, e o site é hospedado no GitHub Pages.</p>
+
+    <h2>Seus direitos (LGPD)</h2>
+    <p>Na página <a class="link" href="conta.html">Minha conta</a> você pode, a qualquer momento:</p>
+    <ul>
+      <li>mudar seu apelido;</li>
+      <li>baixar uma cópia de todos os seus dados;</li>
+      <li>apagar seu histórico na biblioteca;</li>
+      <li><b>excluir sua conta</b>. Isso apaga na hora seu perfil, favoritos, histórico e comentários.</li>
+    </ul>
+    <p>Moderadores podem apagar comentários e bloquear contas que desrespeitem outras pessoas.</p>
+
+    <h2>Contato</h2>
+    <p>Dúvidas ou pedidos sobre seus dados: fale com a gente no <a class="link" id="discord" target="_blank" rel="noopener">Discord</a>.</p>
+  </main>
+
+  <div id="rodape"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.getElementById("topo").innerHTML = DT.header();
+    document.getElementById("rodape").innerHTML = DT.footer();
+    document.getElementById("discord").href = DT.D.grupo.discord;
+  </script>
+</body>
+</html>

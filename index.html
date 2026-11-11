@@ -25,6 +25,11 @@
   </div>
 
   <main class="wrap">
+    <section id="continuarSec" hidden>
+      <div class="titulo-sec"><h2>Continuar lendo</h2><a class="sub" href="biblioteca.html">Minha biblioteca →</a></div>
+      <div class="lancamentos" id="listaCont"></div>
+    </section>
+
     <section id="lancamentos">
       <div class="titulo-sec"><h2>Últimos lançamentos</h2></div>
       <div class="lancamentos" id="listaLanc"></div>
@@ -65,6 +70,28 @@
       .map((l) => `<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.nome)} →</a>`).join("");
 
     DT.iniciar(() => {
+    // continuar lendo (com conta: ordem do histórico; sem conta: o que está no navegador)
+    const ordem = [...new Set(DT.conta.historico.map((h) => h.serie_id))];
+    const emAndamento = D.series
+      .filter((s) => DT.lidos.ultimo(s.id) != null)
+      .map((s) => ({ s, c: DT.continuar(s) }))
+      .filter(({ s, c }) => c && !(c.cap === ultimoCap(s) && DT.lidos.foiLido(s.id, c.cap.numero)))
+      .sort((a, b) => (ordem.indexOf(a.s.id) + 1 || 1e9) - (ordem.indexOf(b.s.id) + 1 || 1e9))
+      .slice(0, 4);
+    if (emAndamento.length) {
+      document.getElementById("continuarSec").hidden = false;
+      document.getElementById("listaCont").innerHTML = emAndamento.map(({ s, c }) => {
+        const novos = DT.novosDesde(s).length;
+        return `<a class="lanc" href="ler.html?s=${encodeURIComponent(s.id)}&c=${c.cap.numero}">
+          <img src="${capa(s)}" alt="" loading="lazy" />
+          <div class="info">
+            <h3>${esc(s.titulo)}</h3>
+            <span class="cap">${esc(c.rotulo)}${novos ? `<span class="novo">${novos} ${novos === 1 ? "NOVO" : "NOVOS"}</span>` : ""}</span>
+            <span class="quando">${(DT.lidos.todos()[s.id] || []).length} de ${s.capitulos.length} lidos</span>
+          </div></a>`;
+      }).join("");
+    }
+
     // capas no destaque
     document.getElementById("heroCapas").innerHTML = D.series.slice(0, 3)
       .map((s) => `<img src="${capa(s)}" alt="${esc(s.titulo)}" />`).join("");

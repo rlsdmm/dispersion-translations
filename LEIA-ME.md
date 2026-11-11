@@ -6,6 +6,9 @@ Site estático (GitHub Pages) + Supabase (login, banco de dados e imagens).
 - `serie.html` — página da obra
 - `ler.html` — leitor
 - `admin.html` — **Área do grupo** (login, envio de capítulos, cadastro de obras)
+- `conta.html` — conta do leitor (entrar, criar conta, perfil, excluir conta)
+- `biblioteca.html` — favoritos, continuar lendo e histórico do leitor
+- `privacidade.html` — política de privacidade (LGPD)
 
 ---
 
@@ -17,14 +20,21 @@ Site estático (GitHub Pages) + Supabase (login, banco de dados e imagens).
 2. **Criar as tabelas** — no projeto, vá em **SQL Editor → New query**, cole todo o conteúdo de
    `supabase/schema.sql` e clique em **Run**.
 
-3. **Bloquear cadastro público** — em **Authentication → Sign In / Providers**, desligue
-   **"Allow new users to sign up"**. Assim só entra quem você criar.
-   (Mesmo se alguém conseguisse criar conta, não conseguiria enviar nada sem ser membro.)
+3. **Contas de leitores** — rode também `supabase/leitores.sql` no SQL Editor. Depois, em
+   **Authentication → Sign In / Providers**:
+   - ligue **"Allow new users to sign up"** (pra leitores criarem conta);
+   - desligue **"Confirm email"**: o e-mail grátis do Supabase só manda poucas mensagens por hora,
+     então com confirmação ligada o cadastro trava. Pra religar, configure um SMTP próprio
+     (ex: Resend, grátis até 3.000/mês) em **Authentication → Emails → SMTP Settings**.
+
+   Leitor com conta **não** consegue enviar nem editar nada: isso continua só pra quem está na
+   tabela `membros`.
 
 4. **Endereço do site** — em **Authentication → URL Configuration**:
    - *Site URL*: `https://rlsdmm.github.io/dispersion-translations/admin.html`
-   - *Redirect URLs*: adicione o mesmo endereço (e `http://localhost:5173/admin.html` se for testar no PC).
-   Isso faz os links de "esqueci a senha" e de convite voltarem pro painel.
+   - *Redirect URLs*: adicione o mesmo endereço, `https://rlsdmm.github.io/dispersion-translations/*`
+     (pras páginas de leitor) e `http://localhost:5173/*` se for testar no PC.
+   Isso faz os links de "esqueci a senha" e de convite voltarem pro site.
 
 5. **Criar as contas do grupo** — em **Authentication → Users → Add user**:
    - *Create new user*: você define e-mail e senha e passa pra pessoa; ou
@@ -65,6 +75,24 @@ Pronto: o site passa a mostrar as obras do Supabase (começa vazio) e a Área do
   Com "Converter pra WebP" ligado, as imagens ficam bem menores sem perder qualidade visível.
   Enviar um número que já existe substitui as páginas daquele capítulo.
 - **Capítulos** — ler, editar título/data, trocar páginas ou excluir.
+
+## Contas de leitores
+
+- **Favoritos** (♡ na página da obra) e **Minha biblioteca** com aviso de capítulo novo.
+- **Histórico e "continuar lendo"** sincronizados entre aparelhos, voltando na página exata.
+- **Preferências do leitor** (vertical/paginado, largura, direção) salvas na conta.
+- **Comentários** no fim de cada capítulo. Membros do grupo veem "apagar" em qualquer comentário
+  e "bloquear usuário" (apaga os comentários da pessoa e impede novos). Pra desbloquear:
+  `update public.perfis set banido = false where apelido = 'Fulano';`
+- Contador de leitores e favoritos na página da obra.
+- O leitor pode baixar os próprios dados e excluir a conta em **Minha conta**.
+
+### Login com Discord ou Google (opcional)
+
+1. Crie um app em https://discord.com/developers/applications (ou no Google Cloud Console).
+   Em *Redirect*, use `https://mslgqtpvieewxqebajzv.supabase.co/auth/v1/callback`.
+2. No Supabase, **Authentication → Sign In / Providers → Discord**: ligue e cole Client ID e Secret.
+3. Em `js/config.js`, coloque `provedores: ["discord"]` (ou `["discord", "google"]`) e publique.
 
 ## Limites do plano grátis do Supabase
 

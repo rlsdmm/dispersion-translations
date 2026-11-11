@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Minha biblioteca · Dispersion Translations</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="topo"></div>
+
+  <main class="wrap biblioteca">
+    <div class="painel-card login" id="deslogado" hidden>
+      <h1>Sua biblioteca</h1>
+      <p class="sub">Crie uma conta grátis pra favoritar obras, ser avisado de capítulos novos e continuar de onde parou no PC ou no celular.</p>
+      <a class="btn pri" href="conta.html?volta=biblioteca.html">Entrar ou criar conta</a>
+    </div>
+
+    <div id="logado" hidden>
+      <div class="titulo-sec"><h2>Minha biblioteca</h2></div>
+      <div class="abas">
+        <button data-aba="favoritos" class="on">Favoritos</button>
+        <button data-aba="continuar">Continuar lendo</button>
+        <button data-aba="historico">Histórico</button>
+      </div>
+      <section class="aba" id="aba-favoritos"></section>
+      <section class="aba" id="aba-continuar" hidden></section>
+      <section class="aba" id="aba-historico" hidden></section>
+    </div>
+  </main>
+
+  <div id="rodape"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const { D, esc, capa, serie, capsOrdenados, lidos, conta, continuar, novosDesde, header, footer, store } = DT;
+    const $ = (id) => document.getElementById(id);
+    $("topo").innerHTML = header("biblioteca");
+    $("rodape").innerHTML = footer();
+    const link = (s, n) => `ler.html?s=${encodeURIComponent(s.id)}&c=${n}`;
+
+    DT.iniciar(() => {
+      if (!conta.user) { $("deslogado").hidden = false; return; }
+      $("logado").hidden = false;
+
+      document.querySelectorAll(".abas button").forEach((b) => (b.onclick = () => abrir(b.dataset.aba)));
+      function abrir(nome) {
+        store.set("abaBib", nome);
+        document.querySelectorAll(".abas button").forEach((x) => x.classList.toggle("on", x.dataset.aba === nome));
+        document.querySelectorAll(".aba").forEach((x) => (x.hidden = x.id !== "aba-" + nome));
+      }
+
+      /* ---- favoritos ---- */
+      function renderFavoritos() {
+        const favs = D.series.filter((s) => conta.favoritos.has(s.id))
+          .map((s) => ({ s, novos: novosDesde(s).length }))
+          .sort((a, b) => b.novos - a.novos || a.s.titulo.localeCompare(b.s.titulo));
+        $("aba-favoritos").innerHTML = favs.length ? `<div class="grade">${favs.map(({ s, novos }) => {
+          const c = continuar(s);
+          return `<div class="obra">
+            <a href="serie.html?s=${encodeURIComponent(s.id)}" class="capa"><img src="${capa(s)}" alt="${esc(s.titulo)}" loading="lazy" />
+              ${novos ? `<span class="selo novo-selo">${novos} ${novos === 1 ? "novo" : "novos"}</span>` : ""}</a>
+            <h3><a href="serie.html?s=${encodeURIComponent(s.id)}">${esc(s.titulo)}</a></h3>
+            ${c ? `<a class="meta link-cont" href="${link(s, c.cap.numero)}">${esc(c.rotulo)} →</a>` : `<div class="meta">Em breve</div>`}
+          </div>`;
+        }).join("")}</div>` : `<p class="vazio">Você ainda não favoritou nada. Abra uma obra e clique em <b>♡ Favoritar</b> pra ela aparecer aqui, com aviso de capítulo novo.</p>`;
+      }
+
+      /* ---- continuar lendo ---- */
+      function renderContinuar() {
+        const vistos = new Set(); const itens = [];
+        for (const h of conta.historico) {
+          if (vistos.has(h.serie_id)) continue;
+          vistos.add(h.serie_id);
+          const s = serie(h.serie_id); if (!s) continue;
+          const c = continuar(s); if (!c) continue;
+          const caps = capsOrdenados(s);
+          const emDia = lidos.foiLido(s.id, caps[caps.length - 1].numero) && c.cap === caps[caps.length - 1];
+          const pag = c.cap.numero === h.numero && !h.concluido && h.total ? ` · página ${h.pagina + 1} de ${h.total}` : "";
+          itens.push(`<a class="lanc" href="${emDia ? "serie.html?s=" + encodeURIComponent(s.id) : link(s, c.cap.numero)}">
+            <img src="${capa(s)}" alt="" loading="lazy" />
+            <div class="info">
+              <h3>${esc(s.titulo)}</h3>
+              <span class="cap">${emDia ? "Em dia ✓" : "Capítulo " + c.cap.numero + pag}</span>
+              <span class="quando">${lidos.todos()[s.id]?.length || 0} de ${caps.length} capítulos lidos · ${DT.tempoRelativo(h.lido_em.slice(0, 10))}</span>
+            </div></a>`);
+        }
+        $("aba-continuar").innerHTML = itens.length ? `<div class="lancamentos">${itens.join("")}</div>`
+          : `<p class="vazio">Nada por aqui ainda. Comece a ler alguma obra!</p>`;
+      }
+
+      /* ---- histórico ---- */
+      function renderHistorico() {
+        const itens = conta.historico.filter((h) => serie(h.serie_id)).slice(0, 200);
+        $("aba-historico").innerHTML = itens.length ? `
+          <div class="acoes" style="margin:0 0 14px"><button class="btn perigo mini-btn" id="limparHist">Limpar todo o histórico</button></div>
+          <div class="tabela">${itens.map((h) => {
+            const s = serie(h.serie_id);
+            return `<div class="linha">
+              <a href="${link(s, h.numero)}"><b>${esc(s.titulo)}</b> · Capítulo ${h.numero}
+                <span class="sub">${h.concluido ? "· lido ✓" : h.total ? `· parou na página ${h.pagina + 1} de ${h.total}` : ""}</span></a>
+              <span class="acoes"><span class="sub">${new Date(h.lido_em).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</span>
+              <button class="btn mini-btn" data-rem="${esc(h.serie_id)}|${h.numero}" title="Remover do histórico">✕</button></span>
+            </div>`;
+          }).join("")}</div>` : `<p class="vazio">Seu histórico está vazio.</p>`;
+
+        document.querySelectorAll("[data-rem]").forEach((b) => (b.onclick = async () => {
+          const [sid, n] = b.dataset.rem.split("|"); const num = Number(n);
+          await DT.sb.from("historico").delete().eq("user_id", conta.user.id).eq("serie_id", sid).eq("numero", num);
+          conta.historico = conta.historico.filter((h) => !(h.serie_id === sid && h.numero === num));
+          const t = lidos.todos(); t[sid] = (t[sid] || []).filter((x) => x !== num); store.set("lidos", t);
+          const ult = conta.historico.find((h) => h.serie_id === sid);
+          ult ? store.set("ultimo:" + sid, ult.numero) : lidos.esquecer(sid);
+          tudo();
+        }));
+        const limpar = $("limparHist");
+        if (limpar) limpar.onclick = async () => {
+          if (!confirm("Apagar todo o seu histórico? Os capítulos deixam de aparecer como lidos.")) return;
+          const { error } = await DT.sb.from("historico").delete().eq("user_id", conta.user.id);
+          if (error) return alert("Erro: " + error.message);
+          for (const sid of new Set(conta.historico.map((h) => h.serie_id))) lidos.esquecer(sid);
+          store.set("pos", {});
+          conta.historico = [];
+          tudo();
+        };
+      }
+
+      function tudo() { renderFavoritos(); renderContinuar(); renderHistorico(); }
+      tudo();
+      abrir(store.get("abaBib", "favoritos"));
+    });
+  </script>
+</body>
+</html>

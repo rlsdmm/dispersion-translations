@@ -13,4 +13,9 @@
 window.DT_CONFIG = {
   supabaseUrl: "https://mslgqtpvieewxqebajzv.supabase.co",
   supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zbGdxdHB2aWVld3hxZWJhanp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0MTg1MjUsImV4cCI6MjEwOTk5NDUyNX0.ME2TJsuHyFRM8OKzKIprfCmgwCJ8aLdQ06v5ke_HPIs",
+
+  // Botões de login social na página "Minha conta". Ative o provedor no
+  // Supabase (Authentication → Sign In / Providers) antes de colocar aqui.
+  // Ex: provedores: ["discord", "google"],
+  provedores: [],
 };

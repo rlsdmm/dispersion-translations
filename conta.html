@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Minha conta · Dispersion Translations</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="topo"></div>
+
+  <main class="wrap admin">
+    <div class="painel-card login" id="semConfig" hidden>
+      <h1>Contas indisponíveis</h1>
+      <p class="sub">O login de leitores ainda não foi ativado neste site.</p>
+    </div>
+
+    <!-- entrar / criar conta -->
+    <div class="painel-card login" id="telaEntrar" hidden>
+      <div class="abas">
+        <button data-modo="entrar" class="on">Entrar</button>
+        <button data-modo="criar">Criar conta</button>
+      </div>
+      <div class="sociais" id="sociais"></div>
+      <form id="formEntrar" class="pilha">
+        <label id="campoApelido" hidden>Apelido <input type="text" id="apelido" minlength="2" maxlength="24" autocomplete="nickname" placeholder="como vai aparecer nos comentários" /></label>
+        <label>E-mail <input type="email" id="email" required autocomplete="email" /></label>
+        <label>Senha <input type="password" id="senha" required minlength="8" autocomplete="current-password" /></label>
+        <label class="check" id="campoAceite" hidden><input type="checkbox" id="aceite" /> Li e aceito a <a href="privacidade.html" target="_blank" class="link">política de privacidade</a></label>
+        <button class="btn pri" type="submit" id="btnEntrar">Entrar</button>
+        <button class="link" type="button" id="esqueci">Esqueci minha senha</button>
+        <p class="msg" id="msgEntrar"></p>
+      </form>
+    </div>
+
+    <!-- nova senha (link de recuperação) -->
+    <form class="painel-card login" id="formSenha" hidden>
+      <h1>Criar nova senha</h1>
+      <label>Nova senha <input type="password" id="novaSenha" minlength="8" required autocomplete="new-password" /></label>
+      <button class="btn pri" type="submit">Salvar senha</button>
+      <p class="msg" id="msgSenha"></p>
+    </form>
+
+    <!-- logado -->
+    <div id="telaPerfil" hidden>
+      <div class="perfil-topo">
+        <span id="perfilAvatar"></span>
+        <div>
+          <h1 id="perfilNome"></h1>
+          <p class="sub" id="perfilEmail"></p>
+        </div>
+      </div>
+      <div class="atalhos">
+        <a class="btn pri" href="biblioteca.html">📚 Minha biblioteca</a>
+        <a class="btn" href="admin.html" id="linkAdmin" hidden>⚙ Área do grupo</a>
+        <button class="btn" id="sair">Sair</button>
+      </div>
+
+      <form class="painel-card" id="formPerfil">
+        <h2>Perfil</h2>
+        <label>Apelido <input type="text" id="novoApelido" minlength="2" maxlength="24" required /></label>
+        <div class="acoes"><button class="btn pri" type="submit">Salvar</button></div>
+        <p class="msg" id="msgPerfil"></p>
+      </form>
+
+      <form class="painel-card" id="formTrocaSenha">
+        <h2>Trocar senha</h2>
+        <label>Nova senha <input type="password" id="trocaSenha" minlength="8" required autocomplete="new-password" /></label>
+        <div class="acoes"><button class="btn" type="submit">Trocar senha</button></div>
+        <p class="msg" id="msgTroca"></p>
+      </form>
+
+      <div class="painel-card">
+        <h2>Seus dados</h2>
+        <p class="sub">Guardamos só o necessário pra sua conta funcionar: e-mail, apelido, favoritos, histórico de leitura, preferências do leitor e seus comentários. <a class="link" href="privacidade.html">Saiba mais</a>.</p>
+        <div class="acoes">
+          <button class="btn" id="baixarDados">Baixar meus dados</button>
+          <button class="btn perigo" id="excluirConta">Excluir minha conta</button>
+        </div>
+        <p class="msg" id="msgDados"></p>
+      </div>
+    </div>
+  </main>
+
+  <div id="rodape"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/conta.js"></script>
+</body>
+</html>
