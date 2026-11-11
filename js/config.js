@@ -22,5 +22,8 @@ window.DT_CONFIG = {
   // Onde ficam as imagens. Vazio = Supabase Storage (1 GB grátis).
   // Com Cloudflare R2: envio = endereço do Worker (pasta worker/), publico = domínio público do bucket.
   // Ex: imagens: { envio: "https://dispersion-imagens.SEU.workers.dev", publico: "https://pub-XXXX.r2.dev" },
-  imagens: null,
+  imagens: {
+    envio: "https://dispersion-imagens.meu-streamable.workers.dev",
+    publico: "https://pub-bc9c4e78097e4918a8310d50836a68c8.r2.dev",
+  },
 };
