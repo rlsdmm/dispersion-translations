@@ -30,9 +30,19 @@
   async function carregar({ paginas = false } = {}) {
     if (!sb) return D.series;
     const campos = "serie_id,numero,titulo,data" + (paginas ? ",paginas" : "");
+    // o Supabase devolve no máximo 1000 linhas por pedido: busca os capítulos em blocos
+    async function todosCaps() {
+      const N = 1000, total = [];
+      for (let de = 0; ; de += N) {
+        const r = await sb.from("capitulos").select(campos).order("serie_id").order("numero").range(de, de + N - 1);
+        if (r.error) return r;
+        total.push(...r.data);
+        if (r.data.length < N) return { data: total };
+      }
+    }
     const [r1, r2] = await Promise.all([
       sb.from("series").select("*").order("titulo"),
-      sb.from("capitulos").select(campos),
+      todosCaps(),
     ]);
     if (r1.error) throw r1.error;
     if (r2.error) throw r2.error;
