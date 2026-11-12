@@ -40,6 +40,7 @@
         <h2>Obras</h2>
         <input class="busca" id="busca" type="search" placeholder="Buscar por título ou gênero…" />
       </div>
+      <div class="filtros" id="filtros"></div>
       <div class="grade" id="grade"></div>
     </section>
 
@@ -92,37 +93,68 @@
       }).join("");
     }
 
-    // capas no destaque
-    document.getElementById("heroCapas").innerHTML = D.series.slice(0, 3)
-      .map((s) => `<img src="${capa(s)}" alt="${esc(s.titulo)}" />`).join("");
-
-    // últimos lançamentos (todos os capítulos de todas as séries, mais novos primeiro)
-    const todos = D.series.flatMap((s) => s.capitulos.map((c) => ({ s, c })))
-      .sort((a, b) => (b.c.data || "").localeCompare(a.c.data || "") || b.c.numero - a.c.numero)
+    // últimos lançamentos: uma entrada por obra (a mais recente), pra uma obra não tomar a lista toda
+    const recentes = D.series
+      .map((s) => {
+        const caps = s.capitulos.filter((c) => c.data);
+        if (!caps.length) return null;
+        const data = caps.reduce((m, c) => (c.data > m ? c.data : m), "");
+        const doDia = caps.filter((c) => c.data === data).sort((a, b) => a.numero - b.numero);
+        return { s, data, doDia, c: doDia[doDia.length - 1] };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.data.localeCompare(a.data) || b.c.numero - a.c.numero)
       .slice(0, 8);
-    document.getElementById("listaLanc").innerHTML = todos.map(({ s, c }) => {
-      const novo = (Date.now() - new Date(c.data + "T12:00:00")) / 864e5 < 7;
-      return `<a class="lanc" href="ler.html?s=${encodeURIComponent(s.id)}&c=${c.numero}">
+
+    // capas no destaque: as obras com lançamento mais recente
+    const destaque = (recentes.length >= 3 ? recentes.map((r) => r.s) : D.series).slice(0, 3);
+    document.getElementById("heroCapas").innerHTML = destaque
+      .map((s) => `<a href="serie.html?s=${encodeURIComponent(s.id)}"><img src="${capa(s)}" alt="${esc(s.titulo)}" /></a>`).join("");
+
+    document.getElementById("listaLanc").innerHTML = recentes.map(({ s, data, doDia, c }) => {
+      const novo = (Date.now() - new Date(data + "T12:00:00")) / 864e5 < 7;
+      const rotulo = doDia.length > 1
+        ? `Capítulos ${doDia[0].numero}–${c.numero}`
+        : `Capítulo ${c.numero}`;
+      const extra = doDia.length > 1 ? `${doDia.length} capítulos` : (c.titulo || "");
+      return `<a class="lanc" href="ler.html?s=${encodeURIComponent(s.id)}&c=${(doDia.length > 1 ? doDia[0] : c).numero}">
         <img src="${capa(s)}" alt="" loading="lazy" />
         <div class="info">
           <h3>${esc(s.titulo)}</h3>
-          <span class="cap">Capítulo ${c.numero}${novo ? '<span class="novo">NOVO</span>' : ""}</span>
-          <span class="quando">${esc(c.titulo || "")} · ${tempoRelativo(c.data)}</span>
+          <span class="cap">${rotulo}${novo ? '<span class="novo">NOVO</span>' : ""}</span>
+          <span class="quando">${[esc(extra), tempoRelativo(data)].filter(Boolean).join(" · ")}</span>
         </div></a>`;
     }).join("");
 
-    // grade de obras com busca
+    // grade de obras com busca e filtro por status
+    const ORDEM_STATUS = ["Em andamento", "Completo", "Hiato", "Pausado pelo grupo", "Cancelado", "Sem staff"];
+    const statusUsados = ORDEM_STATUS.filter((st) => D.series.some((s) => s.status === st))
+      .concat([...new Set(D.series.map((s) => s.status))].filter((st) => st && !ORDEM_STATUS.includes(st)));
+    let filtroStatus = "";
+    const classeStatus = (st) => ({ "Completo": "completo", "Em andamento": "andamento", "Cancelado": "cancelado",
+      "Pausado pelo grupo": "pausado", "Hiato": "pausado", "Sem staff": "semstaff" })[st] || "";
+    document.getElementById("filtros").innerHTML = ["", ...statusUsados].map((st) =>
+      `<button type="button" class="chip ${st ? "" : "on"}" data-st="${esc(st)}">${st ? esc(st) : "Todas"}
+        <small>${st ? D.series.filter((s) => s.status === st).length : D.series.length}</small></button>`).join("");
+    document.getElementById("filtros").addEventListener("click", (e) => {
+      const b = e.target.closest(".chip");
+      if (!b) return;
+      filtroStatus = b.dataset.st;
+      document.querySelectorAll("#filtros .chip").forEach((x) => x.classList.toggle("on", x === b));
+      renderGrade(document.getElementById("busca").value);
+    });
+
     function renderGrade(filtro = "") {
       const f = filtro.trim().toLowerCase();
-      const lista = D.series.filter((s) => !f ||
-        [s.titulo, s.tituloOriginal, s.autor, ...(s.generos || [])].join(" ").toLowerCase().includes(f));
+      const lista = D.series.filter((s) => (!filtroStatus || s.status === filtroStatus) && (!f ||
+        [s.titulo, s.tituloOriginal, s.autor, ...(s.generos || [])].join(" ").toLowerCase().includes(f)));
       document.getElementById("grade").innerHTML = lista.length ? lista.map((s) => {
         const u = ultimoCap(s);
         return `<a class="obra" href="serie.html?s=${encodeURIComponent(s.id)}">
           <div class="capa"><img src="${capa(s)}" alt="${esc(s.titulo)}" loading="lazy" />
-            <span class="selo ${s.status === "Completo" ? "completo" : ""}">${esc(s.status)}</span></div>
+            <span class="selo ${classeStatus(s.status)}">${esc(s.status)}</span></div>
           <h3>${esc(s.titulo)}</h3>
-          <div class="meta">${u ? "Cap. " + u.numero : "Em breve"} · ${esc((s.generos || [])[0] || "")}</div>
+          <div class="meta">${[u ? "Cap. " + u.numero : "Em breve", esc((s.generos || [])[0] || "")].filter(Boolean).join(" · ")}</div>
         </a>`;
       }).join("") : `<p class="vazio">Nenhuma obra encontrada.</p>`;
     }

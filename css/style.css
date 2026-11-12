@@ -32,14 +32,17 @@ img { display: block; max-width: 100%; }
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--borda);
 }
-.marca { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: .3px; }
+.marca { display: flex; align-items: center; gap: 10px; font-weight: 600; letter-spacing: .3px; min-width: 0; }
+.marca > span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.logo { flex-shrink: 0; }
 .marca b { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; margin-left: 4px; }
 .logo {
   width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
   background: var(--grad); font-weight: 900; font-size: 18px; color: #fff;
   box-shadow: 0 0 20px rgba(139, 92, 246, .45);
 }
-.topo nav { display: flex; align-items: center; gap: 6px; }
+.topo nav { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.topo nav a { white-space: nowrap; }
 .topo nav a { padding: 8px 12px; border-radius: 10px; color: var(--sub); font-size: 14px; transition: .2s; }
 .topo nav a:hover, .topo nav a.on { color: var(--txt); background: var(--card); }
 .topo nav .btn-discord { background: #5865f2; color: #fff; }
@@ -66,6 +69,7 @@ img { display: block; max-width: 100%; }
 .btn:hover { border-color: var(--acc); transform: translateY(-1px); }
 .btn.pri { background: var(--grad); border: 0; color: #fff; box-shadow: 0 8px 24px rgba(139, 92, 246, .35); }
 .hero-capas { display: flex; justify-content: center; }
+.hero-capas a { display: contents; }
 .hero-capas img {
   width: 42%; border-radius: 12px; box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
   transition: transform .3s;
@@ -112,6 +116,18 @@ section { padding: 34px 0; }
   background: rgba(0, 0, 0, .65); backdrop-filter: blur(4px);
 }
 .obra .selo.completo { background: rgba(16, 185, 129, .85); }
+.obra .selo.andamento { background: rgba(139, 92, 246, .85); }
+.obra .selo.pausado { background: rgba(217, 119, 6, .85); }
+.obra .selo.cancelado { background: rgba(185, 28, 28, .8); }
+.obra .selo.semstaff { background: rgba(71, 85, 105, .85); }
+.filtros { display: flex; gap: 8px; flex-wrap: wrap; margin: -6px 0 18px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; cursor: pointer;
+  background: var(--card); border: 1px solid var(--borda); color: var(--sub); font: inherit; font-size: 13px; transition: .2s;
+}
+.chip small { font-size: 11px; opacity: .7; }
+.chip:hover { color: var(--txt); border-color: var(--acc); }
+.chip.on { background: var(--grad); border-color: transparent; color: #fff; }
 .obra h3 { margin-top: 10px; font-size: 15px; line-height: 1.3; }
 .obra .meta { color: var(--sub); font-size: 13px; }
 .vazio { color: var(--sub); padding: 30px 0; }
@@ -168,7 +184,7 @@ body.leitor { background: #08080c; }
 .barra-leitor .voltar strong { display: block; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .barra-leitor .voltar small { color: var(--sub); font-size: 12px; }
 .ctrl { display: flex; align-items: center; gap: 6px; }
-.ctrl select, .ctrl button {
+.ctrl select, .ctrl button { white-space: nowrap;
   background: var(--card); color: var(--txt); border: 1px solid var(--borda); border-radius: 9px;
   padding: 8px 10px; font-size: 13px; cursor: pointer; font-family: inherit;
 }
@@ -359,6 +375,9 @@ body.na-ultima .paginas.paginado ~ .fim-cap { display: block; }
   .topo nav { gap: 4px; }
   .ctrl .so-desk { display: none; }
 }
+@media (max-width: 440px) {
+  .topo nav .btn-discord { display: none; }
+}
 @media (max-width: 560px) {
   .serie-topo .wrap { grid-template-columns: 1fr; }
   .serie-topo .capa-g { max-width: 180px; }
@@ -368,6 +387,13 @@ body.na-ultima .paginas.paginado ~ .fim-cap { display: block; }
   .painel-card { padding: 18px; }
   .busca { min-width: 0; width: 100%; }
   .marca > span:last-child { font-size: 14px; }
+  .topo { padding: 12px 14px; gap: 10px; }
+  .topo nav a { padding: 8px 9px; }
+  .hero { padding: 40px 0 36px; }
+  .hero .wrap { gap: 28px; }
+  .hero-capas { max-width: 300px; }
+  .filtros { flex-wrap: nowrap; overflow-x: auto; margin-inline: -20px; padding: 0 20px 4px; scrollbar-width: none; }
+  .chip { flex-shrink: 0; }
   .barra-leitor { flex-wrap: wrap; }
   .barra-leitor .voltar { flex-basis: 100%; }
   .ctrl { flex: 1; justify-content: space-between; }
