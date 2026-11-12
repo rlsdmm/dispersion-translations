@@ -91,10 +91,10 @@ section { padding: 34px 0; }
 .busca:focus { border-color: var(--acc); }
 
 /* lançamentos */
-.lancamentos { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.lancamentos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 14px; }
 .lanc {
   display: flex; gap: 14px; padding: 12px; background: var(--card); border: 1px solid var(--borda);
-  border-radius: var(--raio); transition: .2s;
+  border-radius: var(--raio); transition: .2s; min-width: 0;
 }
 .lanc:hover { border-color: var(--acc); transform: translateY(-2px); }
 .lanc img { width: 64px; aspect-ratio: 300/430; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
@@ -381,7 +381,7 @@ body.na-ultima .paginas.paginado ~ .fim-cap { display: block; }
   .serie-topo .wrap { grid-template-columns: 1fr; }
   .serie-topo .capa-g { max-width: 180px; }
   .grade { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .lancamentos { grid-template-columns: 1fr; }
+  .lancamentos { grid-template-columns: minmax(0, 1fr); }
   .campos { grid-template-columns: 1fr; }
   .painel-card { padding: 18px; }
   .busca { min-width: 0; width: 100%; }
