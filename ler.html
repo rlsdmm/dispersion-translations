@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Leitor · Dispersion Translations</title>
-  <link rel="stylesheet" href="css/style.css?v=5" />
+  <link rel="stylesheet" href="css/style.css?v=7" />
 </head>
 <body class="leitor">
   <div class="barra-leitor" id="barra">
@@ -21,7 +21,16 @@
       <button id="btnModo" title="Alternar modo de leitura (M)"></button>
       <button id="btnLargura" class="so-desk" title="Largura das páginas"></button>
       <button id="btnDirecao" title="Direção da leitura no modo paginado"></button>
+      <button id="btnBalao" title="Mostrar/esconder os comentários passando na tela (C)" hidden></button>
     </div>
+  </div>
+
+  <div class="danmaku" id="danmaku" aria-hidden="true"></div>
+  <button class="btn-pag-coment" id="btnPagComent" hidden title="Comentários desta página"></button>
+  <div class="painel-pag" id="painelPag" hidden>
+    <div class="painel-pag-cab"><strong id="painelPagTitulo"></strong><button class="link" id="fecharPag" aria-label="Fechar">✕</button></div>
+    <div class="painel-pag-lista" id="painelPagLista"></div>
+    <form class="painel-pag-form" id="formPag"></form>
   </div>
 
   <div class="paginas" id="paginas"></div>
@@ -34,6 +43,6 @@
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
-  <script src="js/leitor.js"></script>
+  <script src="js/leitor.js?v=2"></script>
 </body>
 </html>

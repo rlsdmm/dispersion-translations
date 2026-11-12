@@ -63,6 +63,8 @@ DT.iniciar(function () {
 
   /* estado */
   let atual = 0;
+  let paginaVista = -1;
+  let aoMudarPagina = () => {}; // trocado pelos comentários na página, lá embaixo
   let marcado = lidos.foiLido(s.id, cap.numero);
   let pronto = false; // só salva a posição depois de restaurar
   const posSalva = marcado ? 0 : Math.min(lidos.posicao(s.id, cap.numero), urls.length - 1);
@@ -90,6 +92,7 @@ DT.iniciar(function () {
     }
     $("progresso").style.width = pct + "%";
     $("contador").textContent = `${atual + 1} / ${total}`;
+    if (atual !== paginaVista) { paginaVista = atual; aoMudarPagina(atual); }
     document.body.classList.toggle("na-ultima", pref.modo === "paginado" && atual === total - 1);
     if (pronto) lidos.salvarPosicao(s.id, cap.numero, atual, total);
   }
@@ -208,10 +211,18 @@ DT.iniciar(function () {
     return new Date(iso).toLocaleDateString("pt-BR");
   };
 
+  // conta a leitura pros "Populares do mês" (1x por capítulo por dia neste navegador)
+  try {
+    const marca = `leitura:${s.id}:${cap.numero}`, hoje = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem(marca) !== hoje) {
+      DT.sb.rpc("contar_leitura", { p_serie: s.id }).then(({ error }) => { if (!error) localStorage.setItem(marca, hoje); });
+    }
+  } catch {}
+
   async function carregarComentarios() {
     const [r, e] = await Promise.all([
       DT.sb.from("comentarios").select("id,texto,criado_em,user_id,perfis(apelido)")
-        .eq("serie_id", s.id).eq("numero", cap.numero).order("criado_em", { ascending: true }).limit(500),
+        .eq("serie_id", s.id).eq("numero", cap.numero).is("pagina", null).order("criado_em", { ascending: true }).limit(500),
       equipe ? { data: null } : DT.sb.rpc("equipe_ids"),
     ]);
     if (!equipe) equipe = new Set(e.data || []);
@@ -266,6 +277,130 @@ DT.iniciar(function () {
       carregarComentarios();
     }));
   }
+  /* ---------- comentários na página (passam na tela, estilo Bilibili) ---------- */
+  const camada = $("danmaku"), btnPag = $("btnPagComent"), painel = $("painelPag"), btnBalao = $("btnBalao");
+  let porPagina = new Map();          // página -> [comentários]
+  let balaoOn = store.get("danmaku", true);
+  const mostradoEm = new Map();       // página -> quando passou na tela pela última vez
+  const faixas = [];                  // até quando cada faixa está ocupada
+  const NFAIXAS = innerWidth <= 560 ? 6 : 7;
+
+  function renderBalao() {
+    btnBalao.hidden = false;
+    btnBalao.innerHTML = `💬<span class="txt-balao"> Balões: ${balaoOn ? "on" : "off"}</span>`;
+    btnBalao.classList.toggle("on", balaoOn);
+    camada.hidden = !balaoOn;
+  }
+  btnBalao.onclick = () => {
+    balaoOn = !balaoOn; conta.salvarPref("danmaku", balaoOn); renderBalao();
+    if (balaoOn) { mostradoEm.delete(atual); soltar(atual); } else camada.innerHTML = "";
+  };
+  addEventListener("keydown", (e) => {
+    if (!["SELECT", "TEXTAREA", "INPUT"].includes(e.target.tagName) && e.key.toLowerCase() === "c") btnBalao.click();
+  });
+
+  function voar(c, meu = false) {
+    const agora = performance.now();
+    let f = faixas.findIndex((t) => !t || t < agora);
+    if (f === -1) f = faixas.length < NFAIXAS ? faixas.length : faixas.indexOf(Math.min(...faixas));
+    const el = document.createElement("div");
+    el.className = "bala" + (meu ? " minha" : "") + (equipe?.has(c.user_id) ? " equipe" : "");
+    el.textContent = c.texto;
+    el.style.top = `calc(${f} * var(--faixa))`;
+    camada.appendChild(el);
+    const largura = el.offsetWidth, tela = camada.clientWidth;
+    const dur = Math.min(14000, 7000 + largura * 8);
+    faixas[f] = agora + dur * (largura + 40) / (tela + largura); // libera a faixa quando a bala inteira já entrou
+    el.animate([{ transform: `translateX(${tela}px)` }, { transform: `translateX(${-largura - 20}px)` }],
+      { duration: dur, easing: "linear" }).onfinish = () => el.remove();
+  }
+
+  function soltar(p) {
+    const lista = porPagina.get(p) || [];
+    if (!balaoOn || !lista.length) return;
+    const ult = mostradoEm.get(p);
+    if (ult && Date.now() - ult < 20000) return;
+    mostradoEm.set(p, Date.now());
+    lista.slice(-40).forEach((c, k) => setTimeout(() => paginaVista === p && voar(c), k * 650 + Math.random() * 300));
+  }
+
+  function renderBtnPag() {
+    const n = (porPagina.get(atual) || []).length;
+    btnPag.hidden = false;
+    btnPag.innerHTML = `💬 <span>${n || "+"}</span>`;
+    btnPag.title = n ? `${n} comentário${n > 1 ? "s" : ""} nesta página` : "Comentar nesta página";
+  }
+
+  function renderPainel() {
+    const lista = porPagina.get(atual) || [];
+    const eu = conta.user?.id;
+    $("painelPagTitulo").textContent = `Página ${atual + 1} · ${lista.length} comentário${lista.length === 1 ? "" : "s"}`;
+    $("painelPagLista").innerHTML = lista.length ? lista.map((c) => `
+      <div class="pc"><b>${esc(c.perfis?.apelido || "leitor")}</b>${equipe?.has(c.user_id) ? '<span class="selo-equipe">Equipe</span>' : ""}
+        <span>${esc(c.texto)}</span>
+        ${eu && (eu === c.user_id || conta.membro) ? `<button class="link" data-apagar-pag="${c.id}">apagar</button>` : ""}</div>`).join("")
+      : `<p class="sub">Ninguém comentou nesta página ainda.</p>`;
+    $("formPag").innerHTML = !eu ? `<a class="btn mini-btn" href="${conta.linkEntrar()}">Entre pra comentar</a>`
+      : conta.perfil?.banido ? `<p class="sub">Sua conta foi bloqueada de comentar.</p>`
+      : `<input id="textoPag" maxlength="140" placeholder="Comente esta página (aparece passando na tela)" autocomplete="off" required />
+         <button class="btn pri mini-btn" type="submit">Enviar</button><span class="sub" id="msgPag"></span>`;
+    $("painelPagLista").querySelectorAll("[data-apagar-pag]").forEach((b) => (b.onclick = async () => {
+      if (!confirm("Apagar este comentário?")) return;
+      await DT.sb.from("comentarios").delete().eq("id", b.dataset.apagarPag);
+      for (const l of porPagina.values()) { const i = l.findIndex((c) => String(c.id) === b.dataset.apagarPag); if (i >= 0) l.splice(i, 1); }
+      renderPainel(); renderBtnPag();
+    }));
+  }
+
+  btnPag.onclick = () => {
+    painel.hidden = !painel.hidden;
+    if (!painel.hidden) { renderPainel(); $("textoPag")?.focus(); }
+  };
+  $("fecharPag").onclick = () => (painel.hidden = true);
+  $("formPag").onsubmit = async (ev) => {
+    ev.preventDefault();
+    const inp = $("textoPag"), texto = inp.value.trim();
+    if (!texto) return;
+    const p = atual, b = $("formPag").querySelector("button");
+    b.disabled = true;
+    const { data, error } = await DT.sb.from("comentarios")
+      .insert({ serie_id: s.id, numero: cap.numero, pagina: p, texto }).select("id,texto,criado_em,user_id").single();
+    b.disabled = false;
+    if (error) {
+      $("msgPag").textContent = error.code === "42501" ? "Calma! Espere uns segundos." : "Não deu: " + error.message;
+      return;
+    }
+    const c = { ...data, perfis: { apelido: conta.perfil?.apelido } };
+    if (!porPagina.has(p)) porPagina.set(p, []);
+    porPagina.get(p).push(c);
+    inp.value = "";
+    renderPainel(); renderBtnPag();
+    if (balaoOn) voar(c, true);
+  };
+
+  aoMudarPagina = (p) => {
+    renderBtnPag();
+    if (!painel.hidden) renderPainel();
+    soltar(p);
+  };
+
+  Promise.all([
+    DT.sb.from("comentarios").select("id,texto,criado_em,user_id,pagina,perfis(apelido)")
+      .eq("serie_id", s.id).eq("numero", cap.numero).not("pagina", "is", null).order("criado_em", { ascending: true }).limit(2000),
+    DT.sb.rpc("equipe_ids"),
+  ]).then(([r, e]) => {
+    if (r.error) return; // banco ainda sem a coluna "pagina"
+    equipe = equipe || new Set(e.data || []);
+    porPagina = new Map();
+    for (const c of r.data || []) {
+      if (!porPagina.has(c.pagina)) porPagina.set(c.pagina, []);
+      porPagina.get(c.pagina).push(c);
+    }
+    renderBalao();
+    renderBtnPag();
+    soltar(atual);
+  });
+
   // só busca os comentários quando o leitor chega perto do fim
   new IntersectionObserver((ents, obs) => {
     if (ents.some((x) => x.isIntersecting)) { obs.disconnect(); carregarComentarios(); }

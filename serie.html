@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Obra · Dispersion Translations</title>
-  <link rel="stylesheet" href="css/style.css?v=5" />
+  <link rel="stylesheet" href="css/style.css?v=7" />
 </head>
 <body>
   <div id="topo"></div>
@@ -55,14 +55,27 @@
           </div>
         </div>
         <main class="wrap">
-          <section>
+          <div class="abas abas-serie" id="abas" hidden>
+            <button data-aba="caps" class="on">Capítulos <small>${caps.length}</small></button>
+            <button data-aba="capas">Capas <small id="nCapas"></small></button>
+          </div>
+          <section class="aba" id="aba-caps">
             <div class="titulo-sec">
-              <h2>Capítulos (${caps.length})</h2>
+              <h2 id="tituloCaps">Capítulos (${caps.length})</h2>
               <button class="btn ordem" id="ordem"></button>
             </div>
             <div class="lista-caps" id="lista"></div>
           </section>
-        </main>`;
+          <section class="aba" id="aba-capas" hidden>
+            <div class="grade-vol" id="gradeVol"></div>
+          </section>
+        </main>
+        <div class="visor" id="visor" hidden>
+          <button class="visor-x" aria-label="Fechar">✕</button>
+          <button class="visor-seta ant" aria-label="Capa anterior">‹</button>
+          <figure><img alt="" /><figcaption></figcaption></figure>
+          <button class="visor-seta prox" aria-label="Próxima capa">›</button>
+        </div>`;
 
       let desc = store.get("ordemDesc", true);
       function renderLista() {
@@ -76,6 +89,69 @@
       }
       document.getElementById("ordem").onclick = () => { desc = !desc; store.set("ordemDesc", desc); renderLista(); };
       renderLista();
+
+      // capas dos volumes (dados/volumes.json, gerado por ferramentas/volumes.py)
+      fetch("dados/volumes.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({})).then((todos) => {
+        const vols = todos[s.id] || [];
+        if (!vols.length) return;
+        document.getElementById("abas").hidden = false;
+        document.getElementById("tituloCaps").hidden = true;
+        document.getElementById("nCapas").textContent = vols.length;
+        document.getElementById("gradeVol").innerHTML = vols.map((v, i) => `
+          <button type="button" class="vol" data-i="${i}">
+            <img src="${esc(v.url)}" alt="${esc(s.titulo)} volume ${esc(v.v)}" loading="lazy" />
+            <span>Volume ${esc(v.v)}</span>
+          </button>`).join("");
+
+        const abas = document.querySelectorAll("#abas button");
+        function abrirAba(nome) {
+          abas.forEach((b) => b.classList.toggle("on", b.dataset.aba === nome));
+          document.getElementById("aba-caps").hidden = nome !== "caps";
+          document.getElementById("aba-capas").hidden = nome !== "capas";
+        }
+        abas.forEach((b) => (b.onclick = () => {
+          abrirAba(b.dataset.aba);
+          history.replaceState(null, "", b.dataset.aba === "capas" ? "#capas" : location.pathname + location.search);
+        }));
+        if (location.hash === "#capas") abrirAba("capas");
+
+        // visor em tela cheia, com setas e teclado
+        const visor = document.getElementById("visor"), img = visor.querySelector("img"), leg = visor.querySelector("figcaption");
+        let atual = 0;
+        const mostrar = (i) => {
+          atual = (i + vols.length) % vols.length;
+          img.src = vols[atual].url;
+          img.alt = `${s.titulo} volume ${vols[atual].v}`;
+          leg.textContent = `Volume ${vols[atual].v} · ${atual + 1} de ${vols.length}`;
+        };
+        const fechar = () => { visor.hidden = true; document.body.style.overflow = ""; };
+        document.getElementById("gradeVol").onclick = (e) => {
+          const b = e.target.closest(".vol");
+          if (!b) return;
+          mostrar(+b.dataset.i);
+          visor.hidden = false;
+          document.body.style.overflow = "hidden";
+        };
+        visor.onclick = (e) => {
+          if (e.target.closest(".ant")) mostrar(atual - 1);
+          else if (e.target.closest(".prox")) mostrar(atual + 1);
+          else if (e.target === visor || e.target.closest(".visor-x")) fechar();
+        };
+        document.addEventListener("keydown", (e) => {
+          if (visor.hidden) return;
+          if (e.key === "Escape") fechar();
+          if (e.key === "ArrowLeft") mostrar(atual - 1);
+          if (e.key === "ArrowRight") mostrar(atual + 1);
+        });
+        let x0 = null;
+        visor.addEventListener("touchstart", (e) => (x0 = e.touches[0].clientX), { passive: true });
+        visor.addEventListener("touchend", (e) => {
+          if (x0 == null) return;
+          const dx = e.changedTouches[0].clientX - x0;
+          if (Math.abs(dx) > 50) mostrar(atual + (dx < 0 ? 1 : -1));
+          x0 = null;
+        });
+      });
 
       // favoritar
       const fav = document.getElementById("fav");

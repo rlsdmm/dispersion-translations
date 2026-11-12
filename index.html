@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dispersion Translations</title>
   <meta name="description" content="Dispersion Translations — traduções de mangás feitas por fãs." />
-  <link rel="stylesheet" href="css/style.css?v=5" />
+  <link rel="stylesheet" href="css/style.css?v=7" />
 </head>
 <body>
   <div id="topo"></div>
@@ -33,6 +33,11 @@
     <section id="lancamentos">
       <div class="titulo-sec"><h2>Últimos lançamentos</h2></div>
       <div class="lancamentos" id="listaLanc"></div>
+    </section>
+
+    <section id="popularesSec" hidden>
+      <div class="titulo-sec"><h2>Populares do mês</h2></div>
+      <ol class="populares" id="listaPop"></ol>
     </section>
 
     <section id="obras">
@@ -133,6 +138,25 @@
           <span class="quando">${[esc(extra), tempoRelativo(data)].filter(Boolean).join(" · ")}</span>
         </div></a>`;
     }).join("");
+
+    // populares do mês (leituras dos últimos 30 dias)
+    if (DT.sb) DT.sb.rpc("populares", { p_dias: 30, p_limite: 10 }).then(({ data }) => {
+      const top = (data || []).map((p) => ({ s: DT.serie(p.serie_id), n: Number(p.leituras) })).filter((p) => p.s && p.n > 0);
+      if (top.length < 3) return;
+      document.getElementById("popularesSec").hidden = false;
+      document.getElementById("listaPop").style.setProperty("--linhas", Math.ceil(top.length / 2));
+      document.getElementById("listaPop").innerHTML = top.map(({ s, n }, i) => {
+        const u = ultimoCap(s);
+        return `<li><a class="pop" href="serie.html?s=${encodeURIComponent(s.id)}">
+          <span class="pos">${i + 1}</span>
+          <img src="${capa(s)}" alt="" loading="lazy" />
+          <div class="info">
+            <h3>${esc(s.titulo)}</h3>
+            <span class="sub">${[esc((s.generos || [])[0] || ""), u ? "Cap. " + u.numero : ""].filter(Boolean).join(" · ")}</span>
+            <span class="leituras">${n} ${n === 1 ? "leitura" : "leituras"}</span>
+          </div></a></li>`;
+      }).join("");
+    });
 
     // grade de obras com busca e filtro por status
     const ORDEM_STATUS = ["Em andamento", "Completo", "Hiato", "Pausado pelo grupo", "Cancelado", "Sem staff"];
