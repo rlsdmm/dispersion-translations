@@ -1,5 +1,4 @@
 /* Temas alternativos — ativados por <html data-tema="..."> */
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Space+Grotesk:wght@400;600;700&family=Nunito:wght@400;600;800;900&display=swap");
 
 /* ---------- 1. Azul Profundo ---------- */
 html[data-tema="azul"] {
@@ -75,3 +74,5 @@ html[data-tema="papel"] .btn.fav.on { color: var(--acc); }
 html[data-tema="papel"] input, html[data-tema="papel"] select, html[data-tema="papel"] textarea { color-scheme: light; }
 /* o leitor continua escuro no tema claro (ler à noite) */
 html[data-tema="papel"] body.leitor { --bg: #08080c; --bg2: #15151f; --card: #1b1b28; --borda: #2a2a3b; --txt: #ecebf5; --sub: #9a98b0; color-scheme: dark; }
+html[data-tema="papel"] .serie-topo .fundo { filter: blur(40px) brightness(1.1) saturate(.6); opacity: .45; }
+html[data-tema="papel"] .serie-topo .capa-g { box-shadow: 6px 6px 0 rgba(29, 26, 22, .85); border: 2px solid #1d1a16; }
