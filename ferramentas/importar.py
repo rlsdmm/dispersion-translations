@@ -72,7 +72,11 @@ def extrair(arq):
     destino.mkdir()
     r = subprocess.run([TAR, "-xf", str(arq), "-C", str(destino)], capture_output=True, text=True)
     if r.returncode:
-        raise RuntimeError(f"não deu pra abrir {arq.name}: {r.stderr.strip()[:200]}")
+        erro = r.stderr.strip()[:200]
+        if not any(p.is_file() for p in destino.rglob("*")):
+            raise RuntimeError(f"não deu pra abrir {arq.name}: {erro}")
+        # arquivo com algum pedaço corrompido: usa o que deu pra extrair e avisa
+        print(f"  AVISO: {arq.name} veio com erro ({erro}); usando o que deu pra extrair", flush=True)
     return destino
 
 
