@@ -1,0 +1,68 @@
+/* Temas alternativos — ativados por <html data-tema="..."> */
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Space+Grotesk:wght@400;600;700&family=Nunito:wght@400;600;800;900&display=swap");
+
+/* ---------- 1. Azul Profundo ---------- */
+html[data-tema="azul"] {
+  --bg: #070b16; --bg2: #0c1324; --card: #111a30; --borda: #1f2c4a;
+  --txt: #e8eefc; --sub: #8fa0c4; --acc: #3b82f6; --acc2: #22d3ee; --raio: 16px;
+}
+html[data-tema="azul"] body { font-family: "Outfit", system-ui, sans-serif; }
+html[data-tema="azul"] .topo { background: rgba(7, 11, 22, .82); }
+html[data-tema="azul"] .hero::before {
+  background: radial-gradient(circle at 25% 50%, rgba(59, 130, 246, .38), transparent 55%),
+              radial-gradient(circle at 75% 35%, rgba(34, 211, 238, .22), transparent 50%);
+}
+html[data-tema="azul"] .logo { box-shadow: 0 0 22px rgba(59, 130, 246, .5); }
+html[data-tema="azul"] .btn.pri { box-shadow: 0 8px 24px rgba(59, 130, 246, .35); }
+
+/* ---------- 2. Papel (claro, cara de mangá impresso) ---------- */
+html[data-tema="papel"] {
+  --bg: #f4efe6; --bg2: #ebe4d6; --card: #fffcf6; --borda: #d9cfbd;
+  --txt: #1d1a16; --sub: #6d655a; --acc: #c1272d; --acc2: #c1272d; --raio: 6px;
+  color-scheme: light;
+}
+html[data-tema="papel"] body { font-family: "Zen Kaku Gothic New", system-ui, sans-serif; }
+html[data-tema="papel"] h1, html[data-tema="papel"] h2, html[data-tema="papel"] h3 { font-family: "Shippori Mincho", serif; }
+html[data-tema="papel"] .topo { background: rgba(244, 239, 230, .9); }
+html[data-tema="papel"] .hero::before {
+  background: radial-gradient(circle, rgba(29, 26, 22, .07) 1px, transparent 1.5px) 0 0 / 9px 9px;
+  filter: none; inset: 0; height: auto;
+  -webkit-mask-image: linear-gradient(100deg, transparent 35%, #000 75%); mask-image: linear-gradient(100deg, transparent 35%, #000 75%);
+}
+html[data-tema="papel"] .logo { box-shadow: none; border-radius: 4px; }
+html[data-tema="papel"] .btn.pri { box-shadow: 4px 4px 0 #1d1a16; border: 2px solid #1d1a16; }
+html[data-tema="papel"] .btn { border-width: 2px; }
+html[data-tema="papel"] .hero-capas img { box-shadow: 6px 6px 0 rgba(29, 26, 22, .85); border: 2px solid #1d1a16; }
+
+/* ---------- 3. Neon (preto, verde-limão, cantos retos) ---------- */
+html[data-tema="neon"] {
+  --bg: #050505; --bg2: #0c0c0c; --card: #121212; --borda: #262626;
+  --txt: #f2f2f2; --sub: #8a8a8a; --acc: #a3e635; --acc2: #22d3ee; --raio: 3px;
+}
+html[data-tema="neon"] body { font-family: "Space Grotesk", system-ui, sans-serif; }
+html[data-tema="neon"] .topo { background: rgba(5, 5, 5, .85); }
+html[data-tema="neon"] .hero::before {
+  background: linear-gradient(rgba(163, 230, 53, .06) 1px, transparent 1px) 0 0 / 100% 32px,
+              linear-gradient(90deg, rgba(163, 230, 53, .06) 1px, transparent 1px) 0 0 / 32px 100%;
+  filter: none; inset: 0; height: auto;
+}
+html[data-tema="neon"] .hero h1 { text-transform: uppercase; letter-spacing: -2px; }
+html[data-tema="neon"] .logo { box-shadow: 0 0 18px rgba(163, 230, 53, .55); color: #050505; border-radius: 3px; }
+html[data-tema="neon"] .btn.pri { color: #050505; box-shadow: 0 0 24px rgba(163, 230, 53, .35); }
+html[data-tema="neon"] .hero-capas img { border-radius: 3px; }
+
+/* ---------- 4. Sakura (ameixa escura, rosa e pêssego, bem arredondado) ---------- */
+html[data-tema="sakura"] {
+  --bg: #1a1018; --bg2: #221520; --card: #2a1a27; --borda: #3d2838;
+  --txt: #fbeef5; --sub: #c4a3b6; --acc: #f472b6; --acc2: #fb923c; --raio: 22px;
+}
+html[data-tema="sakura"] body { font-family: "Nunito", system-ui, sans-serif; }
+html[data-tema="sakura"] .topo { background: rgba(26, 16, 24, .85); }
+html[data-tema="sakura"] .hero::before {
+  background: radial-gradient(circle at 30% 50%, rgba(244, 114, 182, .32), transparent 55%),
+              radial-gradient(circle at 75% 40%, rgba(251, 146, 60, .22), transparent 50%);
+}
+html[data-tema="sakura"] .logo { box-shadow: 0 0 22px rgba(244, 114, 182, .5); border-radius: 50%; }
+html[data-tema="sakura"] .btn, html[data-tema="sakura"] .topo nav a { border-radius: 999px; }
+html[data-tema="sakura"] .btn.pri { box-shadow: 0 8px 24px rgba(244, 114, 182, .35); }
+html[data-tema="sakura"] .hero-capas img { border-radius: 20px; }
