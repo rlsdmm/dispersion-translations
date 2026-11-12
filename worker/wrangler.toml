@@ -11,4 +11,4 @@ SUPABASE_URL = "https://mslgqtpvieewxqebajzv.supabase.co"
 # chave pública (anon), a mesma do js/config.js
 SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zbGdxdHB2aWVld3hxZWJhanp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0MTg1MjUsImV4cCI6MjEwOTk5NDUyNX0.ME2TJsuHyFRM8OKzKIprfCmgwCJ8aLdQ06v5ke_HPIs"
 # sites que podem enviar (separados por vírgula)
-ORIGENS = "https://rlsdmm.github.io,http://localhost:5173,http://localhost:5174"
+ORIGENS = "https://dispersiontl.com.br,https://www.dispersiontl.com.br,https://rlsdmm.github.io,http://localhost:5173,http://localhost:5174"
