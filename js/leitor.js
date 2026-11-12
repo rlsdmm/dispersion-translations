@@ -289,7 +289,7 @@ DT.iniciar(function () {
 
   function renderBalao() {
     btnBalao.hidden = false;
-    btnBalao.innerHTML = `💬<span class="txt-balao"> Balões: ${balaoOn ? "on" : "off"}</span>`;
+    btnBalao.innerHTML = `💬<span class="txt-balao"> Comentários: ${balaoOn ? "on" : "off"}</span>`;
     btnBalao.classList.toggle("on", balaoOn);
     camada.hidden = !balaoOn;
   }
