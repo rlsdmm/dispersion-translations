@@ -259,6 +259,7 @@
         for (const n of nums) if (!(t[sid] || []).includes(n)) (t[sid] = t[sid] || []).push(n);
       store.set("lidos", t); store.set("pos", pos);
       for (const [k, v] of Object.entries(this.perfil.prefs || {})) store.set(k, v);
+      aplicarTema(temaAtual());
     },
 
     _fila: {}, _timer: null,
@@ -329,6 +330,41 @@
     }
   }
 
+  /* ---------- tema (visual) escolhido pelo leitor ---------- */
+  const TEMAS = [
+    ["azul", "Azul", "#070b16", "#3b82f6", "#22d3ee"],
+    ["roxo", "Roxo", "#0d0d14", "#8b5cf6", "#ec4899"],
+    ["papel", "Papel", "#f4efe6", "#c1272d", "#1d1a16"],
+    ["neon", "Neon", "#050505", "#a3e635", "#22d3ee"],
+    ["sakura", "Sakura", "#1a1018", "#f472b6", "#fb923c"],
+  ];
+  const temaAtual = () => { const t = store.get("tema", "azul"); return TEMAS.some((x) => x[0] === t) ? t : "azul"; };
+  function aplicarTema(t) {
+    const raiz = document.documentElement;
+    if (!t || t === "azul" || t === "padrao") { delete raiz.dataset.tema; return; }
+    raiz.dataset.tema = t;
+    if (!document.getElementById("fontesTemas")) {
+      const l = document.createElement("link");
+      l.id = "fontesTemas"; l.rel = "stylesheet";
+      l.href = "https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Space+Grotesk:wght@400;600;700&family=Nunito:wght@400;600;800;900&display=swap";
+      document.head.append(l);
+    }
+  }
+  function menuTema() {
+    const at = temaAtual();
+    return TEMAS.map(([id, nome, bg, a, b]) => `<button type="button" class="op-tema ${id === at ? "on" : ""}" data-tema="${id}">
+      <span class="amostra" style="background:${bg}"><i style="background:linear-gradient(135deg,${a},${b})"></i></span>${nome}${id === "azul" ? " <small>padrão</small>" : ""}</button>`).join("");
+  }
+  document.addEventListener("click", (e) => {
+    const menu = document.getElementById("menuTema");
+    if (!menu) return;
+    if (e.target.closest("#btnTema")) { menu.hidden = !menu.hidden; if (!menu.hidden) menu.innerHTML = menuTema(); return; }
+    const op = e.target.closest(".op-tema");
+    if (op) { conta.salvarPref("tema", op.dataset.tema); aplicarTema(op.dataset.tema); menu.innerHTML = menuTema(); return; }
+    if (!e.target.closest("#menuTema")) menu.hidden = true;
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") { const m = document.getElementById("menuTema"); if (m) m.hidden = true; } });
+
   function header(ativo) {
     setTimeout(() => conta.pronto.then(atualizarNav));
     return `<header class="topo">
@@ -338,6 +374,8 @@
         <a href="index.html#obras" class="so-desk-nav">Obras</a>
         <a href="biblioteca.html" id="navBib" class="${ativo === "biblioteca" ? "on" : ""}" title="Minha biblioteca">📚<span class="so-desk-nav"> Biblioteca</span></a>
         <a href="${esc(D.grupo.discord)}" target="_blank" rel="noopener" class="btn-discord">Discord</a>
+        <span class="tema-wrap"><button type="button" id="btnTema" class="btn-tema" title="Mudar o visual do site" aria-label="Mudar o visual do site">🎨</button>
+          <div class="menu-tema" id="menuTema" hidden></div></span>
         <a href="conta.html" id="navConta" class="nav-conta ${ativo === "conta" ? "on" : ""}">Entrar</a>
       </nav>
     </header>`;
