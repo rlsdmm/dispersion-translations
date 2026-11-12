@@ -95,6 +95,16 @@ def capitulos_de(caminhos, data_padrao=None):
             data = dt.date.fromtimestamp(p.stat().st_mtime).isoformat()
             pasta = extrair(p)
             dentro = capitulos_de([pasta], data)
+            # o mesmo capítulo em duas pastas dentro do arquivo (ex: "Cap7" e "MFG-Cap7"):
+            # fica a que tem o nome do arquivo; se nenhuma tiver, a com mais páginas
+            stem = EXT_ARQ.sub("", p.name).lower()
+            por_num = {}
+            for c in dentro:
+                atual = por_num.get(c[0])
+                if atual is None or (c[1].lower() == stem, len(c[3])) > (atual[1].lower() == stem, len(atual[3])):
+                    por_num[c[0]] = c
+            if len(por_num) < len(dentro):
+                dentro = [c for c in dentro if por_num.get(c[0]) is c]
             tem_arquivos = any(EXT_ARQ.search(x.name) for x in pasta.rglob("*") if x.is_file())
             if len(dentro) == 1 and not tem_arquivos:  # capítulo com as imagens numa pasta lá dentro
                 caps.append((numero_do_nome(p.name), p.name, data, dentro[0][3]))
@@ -208,6 +218,10 @@ def main():
     sys.stderr.reconfigure(encoding="utf-8")
 
     caps = capitulos_de(a.caminhos)
+    if not caps:
+        sys.exit("Nenhum capítulo encontrado (nenhuma imagem nos arquivos).")
+    if len(caps) == 1 and caps[0][0] is None:  # one-shot: um capítulo só, sem número no nome
+        caps = [(1,) + tuple(caps[0][1:])]
     sem_num = [c[1] for c in caps if c[0] is None]
     if sem_num:
         sys.exit("Sem número de capítulo no nome: " + ", ".join(sem_num))
