@@ -511,3 +511,19 @@ body.na-ultima .paginas.paginado ~ .fim-cap { display: block; }
   .painel-pag { right: 8px; left: 8px; width: auto; bottom: 96px; }
 }
 .tag-pag { font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 6px; background: var(--card); border: 1px solid var(--borda); color: var(--sub); }
+/* botão de comentários: página + total do capítulo, e abas do painel */
+.btn-pag-coment { padding: 0; gap: 0; overflow: hidden; }
+.btn-pag-coment .n-pag { padding: 8px 12px 8px 14px; }
+.btn-pag-coment .n-cap { padding: 8px 14px 8px 10px; border-left: 1px solid var(--borda); color: var(--sub); font-weight: 600; font-size: 13px; }
+.btn-pag-coment .n-pag:last-child { padding-right: 14px; }
+.painel-pag-cab strong { min-width: 0; }
+.abas-painel { display: flex; gap: 4px; }
+.abas-painel button {
+  background: none; border: 1px solid transparent; color: var(--sub); font: inherit; font-size: 13px; font-weight: 700;
+  padding: 5px 10px; border-radius: 8px; cursor: pointer; white-space: nowrap;
+}
+.abas-painel button.on { color: var(--txt); background: var(--card); border-color: var(--borda); }
+.abas-painel small { color: var(--sub); font-weight: 500; margin-left: 3px; }
+.tag-pag.ir { cursor: pointer; font-family: inherit; margin-right: 6px; }
+.tag-pag.ir:hover { border-color: var(--acc); color: var(--txt); }
+.cab .tag-pag.ir { margin-right: 0; }

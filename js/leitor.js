@@ -227,6 +227,7 @@ DT.iniciar(function () {
     ]);
     if (!equipe) equipe = new Set(e.data || []);
     const lista = r.data || [];
+    if (!r.error) { todos = lista; indexar(); renderBtnPag(); }
     const eu = conta.user?.id;
     caixa.innerHTML = `
       <h3>Comentários <span class="sub">(${lista.length})</span></h3>
@@ -242,7 +243,7 @@ DT.iniciar(function () {
         <div class="coment">
           ${DT.avatar(c.perfis?.apelido, c.user_id)}
           <div>
-            <div class="cab"><b>${esc(c.perfis?.apelido || "leitor")}</b>${equipe.has(c.user_id) ? '<span class="selo-equipe">Equipe</span>' : ""}${c.pagina != null ? `<span class="tag-pag">pág. ${c.pagina + 1}</span>` : ""}<span class="sub">${quando(c.criado_em)}</span></div>
+            <div class="cab"><b>${esc(c.perfis?.apelido || "leitor")}</b>${equipe.has(c.user_id) ? '<span class="selo-equipe">Equipe</span>' : ""}${c.pagina != null ? `<button class="tag-pag ir" data-ir-fim="${c.pagina}" title="Ir até a página ${c.pagina + 1}">pág. ${c.pagina + 1} ↑</button>` : ""}<span class="sub">${quando(c.criado_em)}</span></div>
             <p>${esc(c.texto)}</p>
             ${eu && (eu === c.user_id || conta.membro) ? `<div class="acoes-coment">
               <button class="link" data-apagar="${c.id}">apagar</button>
@@ -265,6 +266,7 @@ DT.iniciar(function () {
       }
       carregarComentarios();
     };
+    caixa.querySelectorAll("[data-ir-fim]").forEach((b) => (b.onclick = () => irParaPagina(+b.dataset.irFim)));
     caixa.querySelectorAll("[data-apagar]").forEach((b) => (b.onclick = async () => {
       if (!confirm("Apagar este comentário?")) return;
       await DT.sb.from("comentarios").delete().eq("id", b.dataset.apagar);
@@ -324,37 +326,81 @@ DT.iniciar(function () {
     lista.slice(-40).forEach((c, k) => setTimeout(() => paginaVista === p && voar(c), k * 650 + Math.random() * 300));
   }
 
+  /* ir até uma página (usado ao clicar num comentário) */
+  function irParaPagina(i) {
+    if (pref.modo === "paginado") return irPara(i);
+    const antes = imgs.slice(0, i + 1);
+    antes.forEach((im) => im.removeAttribute("loading"));
+    const prontas = antes.map((im) => im.complete ? 0 : new Promise((r) => {
+      im.addEventListener("load", r, { once: true }); im.addEventListener("error", r, { once: true });
+    }));
+    const rolar = () => scrollTo({ top: imgs[i].getBoundingClientRect().top + scrollY - 70, behavior: "instant" });
+    rolar();
+    Promise.race([Promise.all(prontas), new Promise((r) => setTimeout(r, 4000))]).then(rolar);
+  }
+
+  let todos = [];                     // todos os comentários do capítulo (páginas + fim)
+  let abaPainel = "pag";
+  function indexar() {
+    porPagina = new Map();
+    for (const c of todos) {
+      if (c.pagina == null) continue;
+      if (!porPagina.has(c.pagina)) porPagina.set(c.pagina, []);
+      porPagina.get(c.pagina).push(c);
+    }
+  }
+
   function renderBtnPag() {
     const n = (porPagina.get(atual) || []).length;
     btnPag.hidden = false;
-    btnPag.innerHTML = `💬 <span>${n || "+"}</span>`;
-    btnPag.title = n ? `${n} comentário${n > 1 ? "s" : ""} nesta página` : "Comentar nesta página";
+    btnPag.innerHTML = `<span class="n-pag">💬 ${n || "+"}</span>${todos.length ? `<span class="n-cap">${todos.length} no cap.</span>` : ""}`;
+    btnPag.title = `${n ? `${n} comentário${n > 1 ? "s" : ""} nesta página` : "Comentar nesta página"} · ${todos.length} no capítulo todo`;
+  }
+
+  function linhaComent(c, eu, comLink) {
+    const onde = c.pagina != null ? `pág. ${c.pagina + 1}` : "fim do cap.";
+    const podeIr = comLink && (c.pagina != null || pref.modo === "vertical");
+    return `<div class="pc">
+      ${comLink ? (podeIr ? `<button class="tag-pag ir" data-ir="${c.pagina ?? "fim"}" title="Ir até ${onde}">${onde} →</button>` : `<span class="tag-pag">${onde}</span>`) : ""}
+      <b>${esc(c.perfis?.apelido || "leitor")}</b>${equipe?.has(c.user_id) ? '<span class="selo-equipe">Equipe</span>' : ""}
+      <span>${esc(c.texto)}</span>
+      ${eu && (eu === c.user_id || conta.membro) ? `<button class="link" data-apagar-pag="${c.id}">apagar</button>` : ""}</div>`;
   }
 
   function renderPainel() {
-    const lista = porPagina.get(atual) || [];
+    const daPagina = porPagina.get(atual) || [];
     const eu = conta.user?.id;
-    $("painelPagTitulo").textContent = `Página ${atual + 1} · ${lista.length} comentário${lista.length === 1 ? "" : "s"}`;
-    $("painelPagLista").innerHTML = lista.length ? lista.map((c) => `
-      <div class="pc"><b>${esc(c.perfis?.apelido || "leitor")}</b>${equipe?.has(c.user_id) ? '<span class="selo-equipe">Equipe</span>' : ""}
-        <span>${esc(c.texto)}</span>
-        ${eu && (eu === c.user_id || conta.membro) ? `<button class="link" data-apagar-pag="${c.id}">apagar</button>` : ""}</div>`).join("")
-      : `<p class="sub">Ninguém comentou nesta página ainda.</p>`;
+    $("painelPagTitulo").innerHTML = `
+      <span class="abas-painel">
+        <button type="button" data-aba-p="pag" class="${abaPainel === "pag" ? "on" : ""}">Página ${atual + 1} <small>${daPagina.length}</small></button>
+        <button type="button" data-aba-p="cap" class="${abaPainel === "cap" ? "on" : ""}">Capítulo todo <small>${todos.length}</small></button>
+      </span>`;
+    const lista = abaPainel === "pag" ? daPagina : todos;
+    $("painelPagLista").innerHTML = lista.length ? lista.map((c) => linhaComent(c, eu, abaPainel === "cap")).join("")
+      : `<p class="sub">${abaPainel === "pag" ? "Ninguém comentou nesta página ainda." : "Ninguém comentou neste capítulo ainda."}</p>`;
     $("formPag").innerHTML = !eu ? `<a class="btn mini-btn" href="${conta.linkEntrar()}">Entre pra comentar</a>`
       : conta.perfil?.banido ? `<p class="sub">Sua conta foi bloqueada de comentar.</p>`
-      : `<input id="textoPag" maxlength="140" placeholder="Comente esta página (aparece passando na tela)" autocomplete="off" required />
+      : `<input id="textoPag" maxlength="140" placeholder="Comente a página ${atual + 1} (aparece passando na tela)" autocomplete="off" required />
          <button class="btn pri mini-btn" type="submit">Enviar</button><span class="sub" id="msgPag"></span>`;
+    $("painelPagTitulo").querySelectorAll("[data-aba-p]").forEach((b) => (b.onclick = () => { abaPainel = b.dataset.abaP; renderPainel(); }));
+    $("painelPagLista").querySelectorAll("[data-ir]").forEach((b) => (b.onclick = () => {
+      if (b.dataset.ir === "fim") { painel.hidden = true; $("fimCap").scrollIntoView({ behavior: "instant" }); return; }
+      abaPainel = "pag";
+      irParaPagina(+b.dataset.ir);
+      mostradoEm.delete(+b.dataset.ir);
+      renderPainel();
+    }));
     $("painelPagLista").querySelectorAll("[data-apagar-pag]").forEach((b) => (b.onclick = async () => {
       if (!confirm("Apagar este comentário?")) return;
       await DT.sb.from("comentarios").delete().eq("id", b.dataset.apagarPag);
-      for (const l of porPagina.values()) { const i = l.findIndex((c) => String(c.id) === b.dataset.apagarPag); if (i >= 0) l.splice(i, 1); }
-      renderPainel(); renderBtnPag();
+      todos = todos.filter((c) => String(c.id) !== b.dataset.apagarPag);
+      indexar(); renderPainel(); renderBtnPag();
     }));
   }
 
   btnPag.onclick = () => {
     painel.hidden = !painel.hidden;
-    if (!painel.hidden) { renderPainel(); $("textoPag")?.focus(); }
+    if (!painel.hidden) { renderPainel(); if (matchMedia("(pointer: fine)").matches) $("textoPag")?.focus(); }
   };
   $("fecharPag").onclick = () => (painel.hidden = true);
   $("formPag").onsubmit = async (ev) => {
@@ -364,16 +410,16 @@ DT.iniciar(function () {
     const p = atual, b = $("formPag").querySelector("button");
     b.disabled = true;
     const { data, error } = await DT.sb.from("comentarios")
-      .insert({ serie_id: s.id, numero: cap.numero, pagina: p, texto }).select("id,texto,criado_em,user_id").single();
+      .insert({ serie_id: s.id, numero: cap.numero, pagina: p, texto }).select("id,texto,criado_em,user_id,pagina").single();
     b.disabled = false;
     if (error) {
       $("msgPag").textContent = error.code === "42501" ? "Calma! Espere uns segundos." : "Não deu: " + error.message;
       return;
     }
     const c = { ...data, perfis: { apelido: conta.perfil?.apelido } };
-    if (!porPagina.has(p)) porPagina.set(p, []);
-    porPagina.get(p).push(c);
+    todos.push(c); indexar();
     inp.value = "";
+    abaPainel = "pag";
     renderPainel(); renderBtnPag();
     if (balaoOn) voar(c, true);
   };
@@ -386,16 +432,13 @@ DT.iniciar(function () {
 
   Promise.all([
     DT.sb.from("comentarios").select("id,texto,criado_em,user_id,pagina,perfis(apelido)")
-      .eq("serie_id", s.id).eq("numero", cap.numero).not("pagina", "is", null).order("criado_em", { ascending: true }).limit(2000),
+      .eq("serie_id", s.id).eq("numero", cap.numero).order("criado_em", { ascending: true }).limit(2000),
     DT.sb.rpc("equipe_ids"),
   ]).then(([r, e]) => {
     if (r.error) return; // banco ainda sem a coluna "pagina"
     equipe = equipe || new Set(e.data || []);
-    porPagina = new Map();
-    for (const c of r.data || []) {
-      if (!porPagina.has(c.pagina)) porPagina.set(c.pagina, []);
-      porPagina.get(c.pagina).push(c);
-    }
+    todos = r.data || [];
+    indexar();
     renderBalao();
     renderBtnPag();
     soltar(atual);
