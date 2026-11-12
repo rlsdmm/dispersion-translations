@@ -69,16 +69,15 @@ img { display: block; max-width: 100%; }
 .btn:hover { border-color: var(--acc); transform: translateY(-1px); }
 .btn.pri { background: var(--grad); border: 0; color: #fff; box-shadow: 0 8px 24px rgba(139, 92, 246, .35); }
 .hero-capas { display: flex; justify-content: center; }
-.hero-capas a { display: contents; }
+.hero-capas > * { width: 42%; flex-shrink: 0; transition: transform .3s; }
 .hero-capas img {
-  width: 42%; border-radius: 12px; box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
-  transition: transform .3s;
+  width: 100%; aspect-ratio: 300/430; object-fit: cover; border-radius: 12px; box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
 }
-.hero-capas img:nth-child(1) { transform: rotate(-8deg) translate(30px, 10px); }
-.hero-capas img:nth-child(2) { transform: translateY(-14px); z-index: 2; }
-.hero-capas img:nth-child(3) { transform: rotate(8deg) translate(-30px, 10px); }
-.hero-capas:hover img:nth-child(1) { transform: rotate(-12deg) translate(10px, 10px); }
-.hero-capas:hover img:nth-child(3) { transform: rotate(12deg) translate(-10px, 10px); }
+.hero-capas > :nth-child(1) { transform: rotate(-8deg) translate(30px, 10px); }
+.hero-capas > :nth-child(2) { transform: translateY(-14px); z-index: 2; }
+.hero-capas > :nth-child(3) { transform: rotate(8deg) translate(-30px, 10px); }
+.hero-capas:hover > :nth-child(1) { transform: rotate(-12deg) translate(10px, 10px); }
+.hero-capas:hover > :nth-child(3) { transform: rotate(12deg) translate(-10px, 10px); }
 
 /* ---------- seções ---------- */
 section { padding: 34px 0; }
