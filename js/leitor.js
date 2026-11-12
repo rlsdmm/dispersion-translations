@@ -221,8 +221,8 @@ DT.iniciar(function () {
 
   async function carregarComentarios() {
     const [r, e] = await Promise.all([
-      DT.sb.from("comentarios").select("id,texto,criado_em,user_id,perfis(apelido)")
-        .eq("serie_id", s.id).eq("numero", cap.numero).is("pagina", null).order("criado_em", { ascending: true }).limit(500),
+      DT.sb.from("comentarios").select("id,texto,criado_em,user_id,pagina,perfis(apelido)")
+        .eq("serie_id", s.id).eq("numero", cap.numero).order("criado_em", { ascending: true }).limit(500),
       equipe ? { data: null } : DT.sb.rpc("equipe_ids"),
     ]);
     if (!equipe) equipe = new Set(e.data || []);
@@ -242,7 +242,7 @@ DT.iniciar(function () {
         <div class="coment">
           ${DT.avatar(c.perfis?.apelido, c.user_id)}
           <div>
-            <div class="cab"><b>${esc(c.perfis?.apelido || "leitor")}</b>${equipe.has(c.user_id) ? '<span class="selo-equipe">Equipe</span>' : ""}<span class="sub">${quando(c.criado_em)}</span></div>
+            <div class="cab"><b>${esc(c.perfis?.apelido || "leitor")}</b>${equipe.has(c.user_id) ? '<span class="selo-equipe">Equipe</span>' : ""}${c.pagina != null ? `<span class="tag-pag">pág. ${c.pagina + 1}</span>` : ""}<span class="sub">${quando(c.criado_em)}</span></div>
             <p>${esc(c.texto)}</p>
             ${eu && (eu === c.user_id || conta.membro) ? `<div class="acoes-coment">
               <button class="link" data-apagar="${c.id}">apagar</button>
