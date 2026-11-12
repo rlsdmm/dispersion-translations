@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dispersion Translations</title>
   <meta name="description" content="Dispersion Translations — traduções de mangás feitas por fãs." />
-  <link rel="stylesheet" href="css/style.css?v=4" />
+  <link rel="stylesheet" href="css/style.css?v=5" />
 </head>
 <body>
   <div id="topo"></div>
@@ -38,7 +38,15 @@
     <section id="obras">
       <div class="titulo-sec">
         <h2>Obras</h2>
-        <input class="busca" id="busca" type="search" placeholder="Buscar por título ou gênero…" />
+        <div class="ferramentas">
+          <select class="seletor" id="genero" aria-label="Filtrar por gênero"><option value="">Todos os gêneros</option></select>
+          <select class="seletor" id="ordem" aria-label="Ordenar">
+            <option value="az">A–Z</option>
+            <option value="recentes">Atualizadas</option>
+            <option value="caps">Mais capítulos</option>
+          </select>
+          <input class="busca" id="busca" type="search" placeholder="Buscar por título ou autor…" />
+        </div>
       </div>
       <div class="filtros" id="filtros"></div>
       <div class="grade" id="grade"></div>
@@ -144,10 +152,33 @@
       renderGrade(document.getElementById("busca").value);
     });
 
+    // gêneros (com quantas obras cada um tem) e ordenação
+    const contGen = {};
+    D.series.forEach((s) => (s.generos || []).forEach((g) => (contGen[g] = (contGen[g] || 0) + 1)));
+    const selGen = document.getElementById("genero"), selOrdem = document.getElementById("ordem");
+    selGen.insertAdjacentHTML("beforeend", Object.keys(contGen).sort((a, b) => a.localeCompare(b, "pt"))
+      .map((g) => `<option value="${esc(g)}">${esc(g)} (${contGen[g]})</option>`).join(""));
+    const ultimaData = (s) => s.capitulos.reduce((m, c) => (c.data > m ? c.data : m), "");
+    const ORDENS = {
+      az: (a, b) => a.titulo.localeCompare(b.titulo, "pt"),
+      recentes: (a, b) => ultimaData(b).localeCompare(ultimaData(a)) || a.titulo.localeCompare(b.titulo, "pt"),
+      caps: (a, b) => b.capitulos.length - a.capitulos.length || a.titulo.localeCompare(b.titulo, "pt"),
+    };
+    try { selOrdem.value = localStorage.getItem("ordemObras") || "az"; } catch {}
+    if (!ORDENS[selOrdem.value]) selOrdem.value = "az";
+    selGen.addEventListener("change", () => renderGrade(document.getElementById("busca").value));
+    selOrdem.addEventListener("change", () => {
+      try { localStorage.setItem("ordemObras", selOrdem.value); } catch {}
+      renderGrade(document.getElementById("busca").value);
+    });
+
     function renderGrade(filtro = "") {
       const f = filtro.trim().toLowerCase();
-      const lista = D.series.filter((s) => (!filtroStatus || s.status === filtroStatus) && (!f ||
-        [s.titulo, s.tituloOriginal, s.autor, ...(s.generos || [])].join(" ").toLowerCase().includes(f)));
+      const gen = selGen.value;
+      const lista = D.series.filter((s) => (!filtroStatus || s.status === filtroStatus) &&
+        (!gen || (s.generos || []).includes(gen)) && (!f ||
+        [s.titulo, s.tituloOriginal, s.autor, ...(s.generos || [])].join(" ").toLowerCase().includes(f)))
+        .sort(ORDENS[selOrdem.value] || ORDENS.az);
       document.getElementById("grade").innerHTML = lista.length ? lista.map((s) => {
         const u = ultimoCap(s);
         return `<a class="obra" href="serie.html?s=${encodeURIComponent(s.id)}">
