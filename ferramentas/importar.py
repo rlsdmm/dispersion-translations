@@ -52,7 +52,8 @@ def numero_do_nome(nome):
     todos = re.findall(r"\d+(?:[.,]\d+)?", base)
     n = cap.group(1) if cap else (todos[-1] if todos else None)
     if n is None:
-        return None
+        # one-shot / piloto sem número no meio dos capítulos = capítulo 0
+        return 0 if re.search(r"one-?shot|piloto|pilot|pr[oó]logo|prologue", base, re.I) else None
     v = float(n.replace(",", "."))
     return int(v) if v.is_integer() else v
 
