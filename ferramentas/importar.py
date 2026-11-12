@@ -47,6 +47,7 @@ def natural(s):
 
 def numero_do_nome(nome):
     base = EXT_ARQ.sub("", pathlib.PurePath(nome).name)
+    base = re.sub(r"(\d)_(\d{1,2})$", r"\1.\2", base)  # "Lumine 18_5" = 18.5
     cap = re.search(r"(?:cap(?:[ií]tulo)?|ch(?:apter)?|ep)[ .#_-]*(\d+(?:[.,]\d+)?)", base, re.I)
     todos = re.findall(r"\d+(?:[.,]\d+)?", base)
     n = cap.group(1) if cap else (todos[-1] if todos else None)
@@ -206,6 +207,14 @@ def main():
     sem_num = [c[1] for c in caps if c[0] is None]
     if sem_num:
         sys.exit("Sem número de capítulo no nome: " + ", ".join(sem_num))
+    # mesmo capítulo duas vezes com as mesmas imagens (cópia repetida na pasta): fica um só
+    vistos, unicos = set(), []
+    for c in caps:
+        assinatura = (float(c[0]), tuple(x.stat().st_size for x in c[3]))
+        if assinatura not in vistos:
+            vistos.add(assinatura)
+            unicos.append(c)
+    caps = unicos
     nums = [c[0] for c in caps]
     dup = {n for n in nums if nums.count(n) > 1}
     if dup:
