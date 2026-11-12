@@ -66,3 +66,12 @@ html[data-tema="sakura"] .logo { box-shadow: 0 0 22px rgba(244, 114, 182, .5); b
 html[data-tema="sakura"] .btn, html[data-tema="sakura"] .topo nav a { border-radius: 999px; }
 html[data-tema="sakura"] .btn.pri { box-shadow: 0 8px 24px rgba(244, 114, 182, .35); }
 html[data-tema="sakura"] .hero-capas img { border-radius: 20px; }
+
+/* ajustes do tema claro pras cores fixas do style.css */
+html[data-tema="papel"] .sinopse, html[data-tema="papel"] .texto-legal p, html[data-tema="papel"] .texto-legal li { color: #3a342c; }
+html[data-tema="papel"] .tag { background: rgba(29, 26, 22, .05); border-color: var(--borda); }
+html[data-tema="papel"] .seletor option { background: #fffcf6; }
+html[data-tema="papel"] .btn.fav.on { color: var(--acc); }
+html[data-tema="papel"] input, html[data-tema="papel"] select, html[data-tema="papel"] textarea { color-scheme: light; }
+/* o leitor continua escuro no tema claro (ler à noite) */
+html[data-tema="papel"] body.leitor { --bg: #08080c; --bg2: #15151f; --card: #1b1b28; --borda: #2a2a3b; --txt: #ecebf5; --sub: #9a98b0; color-scheme: dark; }
