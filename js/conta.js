@@ -122,8 +122,66 @@
   }
 
   /* ---------- perfil público: bio, redes, mensagens ---------- */
+  function renderFoto() {
+    $("fotoAtual").innerHTML = avatar(conta.perfil.apelido, conta.user.id, "grande");
+    $("tirarFoto").hidden = !conta.perfil.avatar_url;
+    $("perfilAvatar").innerHTML = avatar(conta.perfil.apelido, conta.user.id, "grande");
+  }
+  // corta no meio, diminui pra 256x256 e converte (webp; se o navegador não souber, jpeg)
+  async function prepararFoto(arquivo) {
+    const img = await createImageBitmap(arquivo);
+    const lado = Math.min(img.width, img.height), T = 256;
+    const c = document.createElement("canvas"); c.width = c.height = T;
+    const ctx = c.getContext("2d");
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(img, (img.width - lado) / 2, (img.height - lado) / 2, lado, lado, 0, 0, T, T);
+    const blob = (t, q) => new Promise((r) => c.toBlob(r, t, q));
+    let b = await blob("image/webp", 0.86);
+    if (!b || b.type !== "image/webp") b = await blob("image/jpeg", 0.88);
+    return b;
+  }
+  async function apagarFotosAntigas(manter) {
+    const { data } = await DT.sb.storage.from("avatares").list(conta.user.id, { limit: 100 });
+    const velhas = (data || []).map((f) => `${conta.user.id}/${f.name}`).filter((n) => n !== manter);
+    if (velhas.length) await DT.sb.storage.from("avatares").remove(velhas);
+  }
+  $("arquivoFoto").onchange = async () => {
+    const arq = $("arquivoFoto").files[0];
+    $("arquivoFoto").value = "";
+    if (!arq) return;
+    if (!/^image\//.test(arq.type)) return msg("msgFoto", "Isso não parece uma imagem.", "erro");
+    if (arq.size > 15e6) return msg("msgFoto", "Imagem muito grande (máx. 15 MB).", "erro");
+    msg("msgFoto", "Enviando…");
+    try {
+      const b = await prepararFoto(arq);
+      const nome = `${conta.user.id}/${Date.now()}.${b.type === "image/webp" ? "webp" : "jpg"}`;
+      const up = await DT.sb.storage.from("avatares").upload(nome, b, { contentType: b.type, cacheControl: "31536000" });
+      if (up.error) throw up.error;
+      const url = DT.sb.storage.from("avatares").getPublicUrl(nome).data.publicUrl;
+      const { error } = await DT.sb.from("perfis").update({ avatar_url: url }).eq("user_id", conta.user.id);
+      if (error) throw error;
+      conta.perfil.avatar_url = url;
+      DT.trocarFoto(conta.user.id, url);
+      renderFoto();
+      msg("msgFoto", "Foto atualizada! 📸", "ok");
+      apagarFotosAntigas(nome);
+    } catch (e) {
+      msg("msgFoto", "Não deu pra enviar: " + (e.message || e), "erro");
+    }
+  };
+  $("tirarFoto").onclick = async () => {
+    const { error } = await DT.sb.from("perfis").update({ avatar_url: null }).eq("user_id", conta.user.id);
+    if (error) return msg("msgFoto", "Erro: " + error.message, "erro");
+    conta.perfil.avatar_url = null;
+    DT.trocarFoto(conta.user.id, null);
+    renderFoto();
+    msg("msgFoto", "Foto removida.", "ok");
+    apagarFotosAntigas(null);
+  };
+
   function renderPublico() {
     const p = conta.perfil;
+    renderFoto();
     $("linkMeuPerfil").href = DT.linkPerfil(conta.user.id);
     $("bio").value = p.bio || "";
     $("contaBio").textContent = $("bio").value.length;
@@ -241,6 +299,7 @@
     if (conta.membro) return msg("msgDados", "Contas de membros do grupo precisam ser removidas pelo admin no Supabase.", "erro");
     const r = prompt('Isso apaga sua conta, favoritos, histórico e comentários pra sempre.\nDigite EXCLUIR pra confirmar:');
     if (r !== "EXCLUIR") return;
+    try { await apagarFotosAntigas(null); } catch {}
     const { error } = await sb.rpc("excluir_conta");
     if (error) return msg("msgDados", "Erro: " + error.message, "erro");
     await sb.auth.signOut();

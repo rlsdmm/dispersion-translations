@@ -226,12 +226,13 @@
       this.user = user;
       if (!user) return this;
       const [p, f, h, m] = await Promise.all([
-        sb.from("perfis").select("apelido,prefs,banido,vip_ate,bio,redes,selos,aceita_mensagens").eq("user_id", user.id).maybeSingle(),
+        sb.from("perfis").select("apelido,prefs,banido,vip_ate,bio,redes,selos,aceita_mensagens,avatar_url").eq("user_id", user.id).maybeSingle(),
         sb.from("favoritos").select("serie_id,criado_em").order("criado_em", { ascending: false }),
         sb.from("historico").select("serie_id,numero,pagina,total,concluido,lido_em").order("lido_em", { ascending: false }).limit(3000),
         sb.rpc("is_membro"),
       ]);
       this.perfil = p.data || { apelido: (user.email || "leitor").split("@")[0], prefs: {} };
+      fotos.set(user.id, this.perfil.avatar_url || null);
       this.membro = !!m.data;
       this.favoritos = new Set((f.data || []).map((x) => x.serie_id));
       this.historico = (h.data || []).map((x) => ({ ...x, numero: Number(x.numero) }));
@@ -319,9 +320,45 @@
   conta.pronto = conta.carregar().catch((e) => { console.warn(e); return conta; });
   conta.pronto.then(() => aplicarTema(temaAtual())); // tema exclusivo de VIP volta pro padrão se não for VIP
 
+  /* fotos de perfil: guardadas por id; os avatares sem foto conhecida são completados sozinhos */
+  const fotos = new Map();
   function avatar(nome, id, cls = "") {
     const [a, b] = coresDe(id || nome || "?");
-    return `<span class="avatar ${cls}" style="background:linear-gradient(135deg,${a},${b})">${esc((nome || "?").trim().charAt(0).toUpperCase())}</span>`;
+    const f = id && fotos.get(id);
+    return `<span class="avatar ${cls} ${f ? "com-foto" : ""}" ${id ? `data-uid="${esc(id)}"` : ""} style="background:${f ? `url('${esc(f)}') center/cover,` : ""}linear-gradient(135deg,${a},${b})">${esc((nome || "?").trim().charAt(0).toUpperCase())}</span>`;
+  }
+  function aplicarFoto(el, url) {
+    el.dataset.foto = "1";
+    if (!url) return;
+    const [a, b] = coresDe(el.dataset.uid);
+    el.style.background = `url('${url.replace(/'/g, "%27")}') center/cover, linear-gradient(135deg,${a},${b})`;
+    el.classList.add("com-foto");
+  }
+  let filaFotos = null;
+  function completarFotos() {
+    if (!sb || filaFotos) return;
+    filaFotos = setTimeout(async () => {
+      filaFotos = null;
+      const els = [...document.querySelectorAll(".avatar[data-uid]:not([data-foto])")];
+      if (!els.length) return;
+      const faltam = [...new Set(els.map((e) => e.dataset.uid))].filter((id) => !fotos.has(id) && /^[0-9a-f-]{36}$/.test(id));
+      if (faltam.length) {
+        faltam.forEach((id) => fotos.set(id, null));
+        const { data } = await sb.from("perfis").select("user_id,avatar_url").in("user_id", faltam.slice(0, 100));
+        for (const r of data || []) fotos.set(r.user_id, r.avatar_url || null);
+      }
+      for (const e of document.querySelectorAll(".avatar[data-uid]:not([data-foto])"))
+        if (fotos.has(e.dataset.uid)) aplicarFoto(e, fotos.get(e.dataset.uid));
+    }, 60);
+  }
+  if (sb) new MutationObserver(completarFotos).observe(document.documentElement, { childList: true, subtree: true });
+  function trocarFoto(id, url) {
+    fotos.set(id, url || null);
+    document.querySelectorAll(`.avatar[data-uid="${id}"]`).forEach((e) => {
+      delete e.dataset.foto; e.classList.remove("com-foto");
+      const [a, b] = coresDe(id); e.style.background = `linear-gradient(135deg,${a},${b})`;
+      aplicarFoto(e, url);
+    });
   }
 
   /* atualiza o topo quando a conta termina de carregar */
@@ -513,6 +550,6 @@
 
   window.DT = {
     D, sb, carregar, iniciar, coresDe, esc, store, serie, capsOrdenados, ultimoCap, dataBR, tempoRelativo, capa, paginas,
-    lidos, continuar, novosDesde, conta, avatar, atualizarNav, header, footer, metaDoMes, nivel, seloNivel, NIVEIS, CONQUISTAS, SELOS, selosEspeciais, REDES, limparUsuario, usuarioValido, linkPerfil,
+    lidos, continuar, novosDesde, conta, avatar, atualizarNav, header, footer, metaDoMes, nivel, seloNivel, NIVEIS, CONQUISTAS, SELOS, selosEspeciais, REDES, limparUsuario, usuarioValido, linkPerfil, trocarFoto,
   };
 })();

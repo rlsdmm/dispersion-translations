@@ -1082,3 +1082,11 @@ html[data-tema="papel"] .xp-fogo, html[data-tema="fofinho"] .xp-fogo { color: #c
 .gr-item.on small { color: var(--txt); }
 .gr-item.travado span { filter: grayscale(1); opacity: .45; }
 .gr-item.travado { border-style: dashed; }
+
+/* ---------- foto de perfil ---------- */
+.avatar.com-foto { color: transparent; }
+.foto-perfil { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 16px; }
+.foto-perfil .avatar { width: 88px; height: 88px; font-size: 36px; }
+.foto-perfil .acoes { margin: 0; }
+.foto-perfil .sub { font-size: 12px; flex-basis: 100%; margin-top: -6px; }
+.perfil-topo .avatar.grande.com-foto, .pp-topo .avatar.com-foto { box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--acc); }
