@@ -970,12 +970,12 @@ html[data-tema="papel"] .xp-fogo, html[data-tema="fofinho"] .xp-fogo { color: #c
 
 /* ---------- pets ---------- */
 .pet-svg, .ovo-svg { display: block; width: 100%; height: auto; overflow: visible; }
-.pet-svg .corpo { transform-box: fill-box; transform-origin: 50% 100%; animation: pet-respira 2.6s ease-in-out infinite; }
-.pet-svg .corpo.flutua { animation: pet-flutua 3.2s ease-in-out infinite; }
+.pet-svg .corpo-todo { transform-box: fill-box; transform-origin: 50% 100%; animation: pet-respira 2.6s ease-in-out infinite; }
+.pet-svg.nuvem .corpo-todo { animation: pet-flutua 3.2s ease-in-out infinite; }
 .pet-svg .olhos { transform-box: fill-box; transform-origin: 50% 50%; animation: pet-pisca 4.5s infinite; }
 .pet-svg .brilhante path, .pet-svg .brilhinhos path { transform-box: fill-box; transform-origin: center; animation: pet-cintila 1.8s ease-in-out infinite; }
 .pet-svg .brilhante path:nth-child(2n), .pet-svg .brilhinhos path:nth-child(2n) { animation-delay: .9s; }
-.pet-svg.feliz .corpo { animation: pet-pula .5s ease-in-out 3; }
+.pet-svg.feliz .corpo-todo { animation: pet-pula .5s ease-in-out 3; }
 @keyframes pet-respira { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.035, .965); } }
 @keyframes pet-flutua { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 @keyframes pet-pisca { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
@@ -1057,9 +1057,9 @@ html[data-tema="papel"] .xp-fogo, html[data-tema="fofinho"] .xp-fogo { color: #c
 .pet-sobre { margin-top: 14px; }
 .pet-sobre summary { cursor: pointer; font-weight: 700; color: var(--acc); font-size: 14px; }
 .pet-sobre > p { margin: 8px 0; }
-.pet-svg.humor-dormindo .corpo { animation-duration: 4.5s; }
+.pet-svg.humor-dormindo .corpo-todo { animation-duration: 4.5s; }
 .pet-svg.humor-dormindo .olhos { animation: none; }
-.pet-svg.humor-triste .corpo { animation-duration: 3.6s; }
+.pet-svg.humor-triste .corpo-todo { animation-duration: 3.6s; }
 .pet-svg .zz text { animation: pet-zz 2.4s ease-in-out infinite; }
 .pet-svg .zz text:nth-child(2) { animation-delay: .4s; }
 .pet-svg .zz text:nth-child(3) { animation-delay: .8s; }
@@ -1070,3 +1070,15 @@ html[data-tema="papel"] .xp-fogo, html[data-tema="fofinho"] .xp-fogo { color: #c
   .pet-comida, .barra-pet { margin-left: auto; margin-right: auto; text-align: left; }
   .pet-humor { justify-content: center; text-align: left; }
 }
+.guarda-roupa { margin-top: 12px; }
+.gr-linha { display: grid; gap: 6px; margin-bottom: 10px; }
+.gr-linha > small { font-size: 11px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: var(--sub); }
+.gr-itens { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 6px; }
+.gr-item { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 8px 4px; border-radius: 12px; border: 1px solid var(--borda); background: var(--card); color: var(--txt); font: inherit; cursor: pointer; transition: transform .15s, border-color .15s; }
+.gr-item span { font-size: 22px; line-height: 1.15; }
+.gr-item small { font-size: 10px; font-weight: 700; color: var(--sub); text-align: center; line-height: 1.2; }
+.gr-item:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--acc); }
+.gr-item.on { border-color: var(--acc); background: color-mix(in srgb, var(--acc) 16%, var(--card)); box-shadow: 0 0 0 1px var(--acc) inset; }
+.gr-item.on small { color: var(--txt); }
+.gr-item.travado span { filter: grayscale(1); opacity: .45; }
+.gr-item.travado { border-style: dashed; }

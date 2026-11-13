@@ -162,6 +162,79 @@
       <path d="M62 76 l1.5 3.5 l1.5 -3.5" fill="#fff" stroke="${p.linha}" stroke-width="1"/>` : rosto(60, 68, p.linha)}</g>`,
   };
 
+  /* ---------- acessórios ---------- */
+  // id: [emoji, nome, lugar, como liberar]
+  const ACESSORIOS = {
+    laco: ["🎀", "Laço", "cabeca", "Termine de ler uma obra inteira"],
+    coroa: ["👑", "Coroa", "cabeca", "Termine 10 obras"],
+    bruxa: ["🧙", "Chapéu de bruxa", "cabeca", "Exclusivo VIP"],
+    fone: ["🎧", "Fone", "cabeca", "Conquista Coruja (ler entre meia-noite e 5h)"],
+    flor: ["🌸", "Florzinha", "cabeca", "Descubra a comida favorita do seu pet"],
+    gato: ["🐱", "Orelhinhas de gato", "cabeca", "Chegue no nível 2 (100 XP)"],
+    oculos: ["👓", "Óculos", "rosto", "Chegue no nível 3 (300 XP)"],
+    escuros: ["🕶️", "Óculos escuros", "rosto", "Exclusivo VIP"],
+    cachecol: ["🧣", "Cachecol", "rosto", "Chegue no nível 4 (700 XP)"],
+    sininho: ["🔔", "Sininho", "rosto", "Cuide do pet por 7 dias"],
+  };
+  // onde cada coisa fica em cada bicho: topo da cabeça [x, y, escala, giro], olhos [x, y, escala], pescoço [y, largura]
+  const PONTOS = {
+    bolinho: { topo: [60, 37, 1, 0], olhos: [60, 76, 1], pescoco: [95, 66] },
+    pipoca: { topo: [60, 39, 1, 0], olhos: [60, 64, 1], pescoco: [88, 50] },
+    mochi: { topo: [60, 52, .95, 0], olhos: [60, 79, 1], pescoco: [99, 58] },
+    nuvem: { topo: [70, 46, .95, 8], olhos: [60, 80, 1], pescoco: [98, 56] },
+    brotinho: { topo: [42, 60, .85, -22], olhos: [60, 83, 1], pescoco: [101, 52] },
+    estrelinha: { topo: [60, 30, .75, 0], olhos: [60, 72, .85], pescoco: [88, 30] },
+    nanquim: { topo: [60, 33, 1, 0], olhos: [60, 70, 1.12], pescoco: [93, 62] },
+    draguinho: { topo: [60, 47, .9, 0], olhos: [60, 68, 1], pescoco: [90, 46] },
+  };
+  const DES_ACESSORIO = {
+    laco: () => `<g transform="translate(0 -6)">
+      <path d="M0 0 C-8 -12 -22 -10 -20 0 C-22 10 -8 12 0 0Z" fill="#f472b6" stroke="#9d174d" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M0 0 C8 -12 22 -10 20 0 C22 10 8 12 0 0Z" fill="#f472b6" stroke="#9d174d" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M-14 -3 q4 3 0 6 M14 -3 q-4 3 0 6" stroke="#be185d" stroke-width="1.5" fill="none"/>
+      <circle r="5" fill="#ec4899" stroke="#9d174d" stroke-width="2.2"/></g>`,
+    coroa: () => `<path d="M-17 1 L-19 -18 L-9 -9 L0 -23 L9 -9 L19 -18 L17 1Z" fill="#fcd34d" stroke="#b45309" stroke-width="2.4" stroke-linejoin="round"/>
+      <path d="M-16 -4 H16" stroke="#f59e0b" stroke-width="2"/><circle cx="0" cy="-23" r="2.6" fill="#f472b6" stroke="#b45309" stroke-width="1.4"/>
+      <circle cx="-19" cy="-18" r="2" fill="#60a5fa" stroke="#b45309" stroke-width="1.2"/><circle cx="19" cy="-18" r="2" fill="#60a5fa" stroke="#b45309" stroke-width="1.2"/>
+      <circle cx="0" cy="-5" r="2.6" fill="#ef4444" stroke="#b45309" stroke-width="1.2"/>`,
+    bruxa: () => `<path d="M-14 -3 L2 -36 Q5 -40 9 -36 L14 -3Z" fill="#6d28d9" stroke="#2e1065" stroke-width="2.4" stroke-linejoin="round"/>
+      <path d="M-13 -9 L13 -9 L14 -3 L-14 -3Z" fill="#fbbf24" stroke="#2e1065" stroke-width="2"/>
+      <ellipse cx="0" cy="-2" rx="25" ry="5.5" fill="#7c3aed" stroke="#2e1065" stroke-width="2.4"/>
+      ${brilho(6, -24, 3, "#fde68a")}`,
+    fone: () => `<path d="M-25 8 Q-26 -24 0 -24 Q26 -24 25 8" stroke="#334155" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <rect x="-31" y="0" width="11" height="17" rx="5" fill="#f472b6" stroke="#334155" stroke-width="2.4"/>
+      <rect x="20" y="0" width="11" height="17" rx="5" fill="#f472b6" stroke="#334155" stroke-width="2.4"/>`,
+    flor: () => `<g transform="translate(15 -4)">${[0, 72, 144, 216, 288].map((a) =>
+      `<circle cx="${(7 * Math.cos((a * Math.PI) / 180)).toFixed(1)}" cy="${(7 * Math.sin((a * Math.PI) / 180)).toFixed(1)}" r="5.5" fill="#fbcfe8" stroke="#db2777" stroke-width="1.6"/>`).join("")}
+      <circle r="4.5" fill="#fde047" stroke="#ca8a04" stroke-width="1.6"/></g>`,
+    gato: (p) => `<path d="M-24 4 L-18 -17 L-6 -3Z" fill="${p.c2}" stroke="${p.linha}" stroke-width="2.4" stroke-linejoin="round"/>
+      <path d="M-19 0 L-17 -10 L-11 -3Z" fill="#ffc2d4"/>
+      <path d="M24 4 L18 -17 L6 -3Z" fill="${p.c2}" stroke="${p.linha}" stroke-width="2.4" stroke-linejoin="round"/>
+      <path d="M19 0 L17 -10 L11 -3Z" fill="#ffc2d4"/>`,
+    oculos: () => `<circle cx="-13" cy="0" r="9.5" fill="rgba(255,255,255,.18)" stroke="#1f2937" stroke-width="2.6"/>
+      <circle cx="13" cy="0" r="9.5" fill="rgba(255,255,255,.18)" stroke="#1f2937" stroke-width="2.6"/>
+      <path d="M-4 -1 q4 -3 8 0" stroke="#1f2937" stroke-width="2.4" fill="none"/>
+      <path d="M-18 -4 l4 -2 M8 -4 l4 -2" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>`,
+    escuros: () => `<path d="M-24 -6 H-3 Q-3 8 -13 8 Q-23 8 -24 -6Z M24 -6 H3 Q3 8 13 8 Q23 8 24 -6Z" fill="#111827" stroke="#000" stroke-width="2"/>
+      <path d="M-3 -5 H3" stroke="#000" stroke-width="2.6"/>
+      <path d="M-20 -3 l5 0 M7 -3 l5 0" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".55"/>`,
+    cachecol: (p, larg) => `<path d="M${-larg / 2} -5 Q0 4 ${larg / 2} -5 L${larg / 2} 3 Q0 12 ${-larg / 2} 3Z" fill="#ef4444" stroke="#7f1d1d" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M${larg / 2 - 14} 2 l-2 16 l9 0 l1 -16" fill="#ef4444" stroke="#7f1d1d" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M${-larg / 4} -1 v5 M0 2 v6 M${larg / 4} -1 v5" stroke="#fca5a5" stroke-width="2.4" stroke-linecap="round"/>`,
+    sininho: (p, larg) => `<path d="M${-larg / 2} -3 Q0 6 ${larg / 2} -3" stroke="#dc2626" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <circle cx="0" cy="7" r="6.5" fill="#fcd34d" stroke="#b45309" stroke-width="2"/>
+      <path d="M-4 7 h8" stroke="#b45309" stroke-width="1.6"/><circle cx="0" cy="10" r="1.4" fill="#b45309"/>`,
+  };
+  function desenharAcessorios(esp, pet, p) {
+    const pt = PONTOS[esp]; let s = "";
+    const cab = DES_ACESSORIO[pet.acessorio_cabeca] && ACESSORIOS[pet.acessorio_cabeca][2] === "cabeca" ? pet.acessorio_cabeca : null;
+    const ros = DES_ACESSORIO[pet.acessorio_rosto] && ACESSORIOS[pet.acessorio_rosto][2] === "rosto" ? pet.acessorio_rosto : null;
+    if (ros === "cachecol" || ros === "sininho") s += `<g class="ac-${ros}" transform="translate(60 ${pt.pescoco[0]})">${DES_ACESSORIO[ros](p, pt.pescoco[1])}</g>`;
+    if (ros === "oculos" || ros === "escuros") s += `<g class="ac-${ros}" transform="translate(${pt.olhos[0]} ${pt.olhos[1]}) scale(${pt.olhos[2]})">${DES_ACESSORIO[ros](p)}</g>`;
+    if (cab) s += `<g class="ac-${cab}" transform="translate(${pt.topo[0]} ${pt.topo[1]}) rotate(${pt.topo[3]}) scale(${pt.topo[2]})">${DES_ACESSORIO[cab](p)}</g>`;
+    return s;
+  }
+
   function desenharPet(pet, classe = "", humor = "feliz") {
     const esp = DESENHOS[pet.especie] ? pet.especie : "bolinho";
     const p = { ...paleta(pet.cor ?? 200), h: pet.cor ?? 200 };
@@ -169,7 +242,9 @@
     const brilhos = pet.brilhante
       ? `<g class="brilhante">${brilho(14, 20, 7, "#fde68a")}${brilho(108, 26, 5, "#fde68a")}${brilho(18, 92, 4, "#fde68a")}${brilho(104, 96, 6, "#fde68a")}</g>` : "";
     const zz = HUMOR === "dormindo" ? `<g class="zz" fill="${p.linha}" font-weight="900" font-family="system-ui,sans-serif"><text x="90" y="34" font-size="15">z</text><text x="100" y="22" font-size="11">z</text><text x="107" y="13" font-size="8">z</text></g>` : "";
-    const svg = `<svg class="pet-svg ${esp} humor-${HUMOR} ${classe}" viewBox="0 0 120 120" role="img" aria-label="${ESPECIES[esp][0]}">${DESENHOS[esp](p)}${brilhos}${zz}</svg>`;
+    // tudo (corpo + acessórios) mexe junto; a sombra fica parada
+    const corpo = DESENHOS[esp](p).replace(sombra, "");
+    const svg = `<svg class="pet-svg ${esp} humor-${HUMOR} ${classe}" viewBox="0 0 120 120" role="img" aria-label="${ESPECIES[esp][0]}">${sombra}<g class="corpo-todo">${corpo}${desenharAcessorios(esp, pet, p)}</g>${brilhos}${zz}</svg>`;
     HUMOR = "feliz";
     return svg;
   }
@@ -223,5 +298,5 @@
       </g></svg>`;
   }
 
-  window.PETS = { ESPECIES, RARIDADES, HUMORES, COMIDAS, desenharPet, desenharOvo, corOvo, valoresAgora, humorDe };
+  window.PETS = { ESPECIES, RARIDADES, HUMORES, COMIDAS, ACESSORIOS, desenharPet, desenharOvo, corOvo, valoresAgora, humorDe };
 })();

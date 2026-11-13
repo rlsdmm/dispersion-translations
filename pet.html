@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=22" />
+  <link rel="stylesheet" href="css/style.css?v=23" />
   <link rel="stylesheet" href="css/temas.css?v=6" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -45,7 +45,7 @@
   <script src="js/config.js"></script>
   <script src="js/data.js?v=5"></script>
   <script src="js/app.js?v=10"></script>
-  <script src="js/pets.js?v=2"></script>
+  <script src="js/pets.js?v=3"></script>
   <script>
     const { esc, conta, sb } = DT;
     const $ = (id) => document.getElementById(id);
@@ -153,6 +153,12 @@
               <p class="sub">Cada capítulo que você termina vale <b>1 petisco</b>, e tem 1 de presente por dia. Cada pet tem uma comida favorita… descubra qual! 👀</p>
               <p class="msg" id="msgComida"></p>
             </div>
+            <div class="pet-comida guarda-roupa">
+              <div class="pc-topo"><b>👗 Guarda-roupa</b><small class="sub" id="nLiberados"></small></div>
+              <div class="gr-linha"><small>Cabeça</small><div class="gr-itens" id="grCabeca"></div></div>
+              <div class="gr-linha"><small>Rosto e pescoço</small><div class="gr-itens" id="grRosto"></div></div>
+              <p class="msg" id="msgRoupa"></p>
+            </div>
             <details class="pet-sobre">
               <summary>Sobre ${esc(pet.nome || nome)} e nome</summary>
               <p>${desc}</p>
@@ -167,6 +173,7 @@
           </div>`;
         if (!pet.nome || nasceuAgora) $("petCard").querySelector(".pet-sobre").open = true;
         renderStatus();
+        renderRoupas();
 
         $("palco").onclick = async (e) => {
           coracao(e);
@@ -220,6 +227,34 @@
         $("btnPresente").disabled = pet.presente_hoje;
         $("btnPresente").textContent = pet.presente_hoje ? "🎁 Presente de hoje já pego" : "🎁 Pegar presente do dia";
         $("petCard").querySelectorAll(".comida").forEach((b) => (b.disabled = pet.petiscos < 1));
+      }
+
+      // guarda-roupa: liberados dá pra vestir/tirar; bloqueados mostram como liberar
+      function renderRoupas() {
+        const lib = new Set(pet.liberados || []);
+        const total = Object.keys(PETS.ACESSORIOS).length;
+        $("nLiberados").textContent = `${lib.size} de ${total} liberados`;
+        const item = ([id, [emoji, nome, slot, como]]) => {
+          const vestido = pet[slot === "cabeca" ? "acessorio_cabeca" : "acessorio_rosto"] === id;
+          return lib.has(id)
+            ? `<button type="button" class="gr-item ${vestido ? "on" : ""}" data-slot="${slot}" data-item="${id}" title="${vestido ? "Tirar" : "Vestir"} ${nome}"><span>${emoji}</span><small>${nome}</small></button>`
+            : `<button type="button" class="gr-item travado" data-como="${esc(como)}" data-nome="${esc(nome)}" title="${esc(como)}"><span>${emoji}</span><small>🔒 ${nome}</small></button>`;
+        };
+        const lista = Object.entries(PETS.ACESSORIOS);
+        $("grCabeca").innerHTML = lista.filter(([, a]) => a[2] === "cabeca").map(item).join("");
+        $("grRosto").innerHTML = lista.filter(([, a]) => a[2] === "rosto").map(item).join("");
+        $("petCard").querySelectorAll(".gr-item").forEach((b) => (b.onclick = () => vestir(b)));
+      }
+      async function vestir(b) {
+        if (b.classList.contains("travado")) return msg("msgRoupa", `🔒 <b>${b.dataset.nome}</b>: ${b.dataset.como}.`, "");
+        const slot = b.dataset.slot, item = b.classList.contains("on") ? null : b.dataset.item;
+        $("petCard").querySelectorAll(".gr-item").forEach((x) => (x.disabled = true));
+        const { data, error } = await sb.rpc("vestir_pet", { p_slot: slot, p_item: item });
+        if (error) { renderRoupas(); return msg("msgRoupa", "Não deu: " + esc(error.message), "erro"); }
+        pet = data;
+        $("palco").querySelector(".pet-svg")?.remove();
+        renderStatus(); renderRoupas(); pular();
+        msg("msgRoupa", item ? `${PETS.ACESSORIOS[item][0]} Ficou lindo!` : "Tirou o acessório.", "ok");
       }
 
       function pular() {
