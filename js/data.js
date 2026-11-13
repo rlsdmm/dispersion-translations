@@ -48,7 +48,7 @@ window.DISPERSION = {
     },
     links: [
       { nome: "Discord", url: "https://discord.gg/FxBMF3k" },
-      { nome: "Twitter / X", url: "https://x.com/" },
+      { nome: "Twitter / X", url: "https://x.com/DispersionTL" },
     ],
   },
 

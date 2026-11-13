@@ -14,9 +14,10 @@
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@DispersionTL" />
   <meta property="og:url" content="https://dispersiontl.com.br/" />
   <link rel="canonical" href="https://dispersiontl.com.br/" />
-  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "name": "Dispersion Translations", "alternateName": "Dispersion TL", "url": "https://dispersiontl.com.br/", "inLanguage": "pt-BR"}, {"@type": "Organization", "name": "Dispersion Translations", "url": "https://dispersiontl.com.br/", "logo": "https://dispersiontl.com.br/icone-512.png", "sameAs": ["https://discord.gg/FxBMF3k", "https://mangadex.org/group/a706dc7b-a936-41aa-a624-399034056059"]}]}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "name": "Dispersion Translations", "alternateName": "Dispersion TL", "url": "https://dispersiontl.com.br/", "inLanguage": "pt-BR"}, {"@type": "Organization", "name": "Dispersion Translations", "url": "https://dispersiontl.com.br/", "logo": "https://dispersiontl.com.br/icone-512.png", "sameAs": ["https://x.com/DispersionTL", "https://discord.gg/FxBMF3k", "https://mangadex.org/group/a706dc7b-a936-41aa-a624-399034056059"]}]}</script>
   <link rel="icon" href="favicon.ico" sizes="48x48" />
   <link rel="icon" href="icone-192.png" type="image/png" sizes="192x192" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -26,7 +27,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=18" />
+  <link rel="stylesheet" href="css/style.css?v=19" />
   <link rel="stylesheet" href="css/temas.css?v=6" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -101,8 +102,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
-  <script src="js/data.js?v=4"></script>
-  <script src="js/app.js?v=7"></script>
+  <script src="js/data.js?v=5"></script>
+  <script src="js/app.js?v=8"></script>
   <script>
     const { D, esc, capa, capsOrdenados, ultimoCap, tempoRelativo, header, footer } = DT;
     document.getElementById("topo").innerHTML = header("inicio");
@@ -354,7 +355,7 @@
       const gen = selGen.value;
       const lista = D.series.filter((s) => (!filtroStatus || s.status === filtroStatus) &&
         (!gen || (s.generos || []).includes(gen)) && (!f ||
-        [s.titulo, s.tituloOriginal, s.autor, ...(s.generos || [])].join(" ").toLowerCase().includes(f)))
+        [s.titulo, s.tituloOriginal, ...(s.nomesAlt || []), s.autor, ...(s.generos || [])].join(" ").toLowerCase().includes(f)))
         .sort(ORDENS[selOrdem.value] || ORDENS.az);
       document.getElementById("grade").innerHTML = lista.length ? lista.map((s) => {
         const u = ultimoCap(s);

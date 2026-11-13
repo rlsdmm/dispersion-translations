@@ -49,7 +49,17 @@ DT.iniciar(function () {
   };
 
   /* cabeçalho */
-  document.title = `${s.titulo} · Cap. ${cap.numero} · Dispersion Translations`;
+  document.title = `${s.titulo} Capítulo ${cap.numero} em Português · Dispersion Translations`;
+  {
+    const url = `https://dispersiontl.com.br/ler.html?s=${encodeURIComponent(s.id)}&c=${cap.numero}`;
+    const desc = `Ler ${s.titulo} capítulo ${cap.numero} em português (PT-BR), online e grátis. Tradução da Dispersion Translations.`;
+    const pôr = (sel, attr, v, tag) => { let m = document.head.querySelector(sel); if (!m) { m = document.createElement(tag); const [, k, n] = sel.match(/\[(\w+)="([^"]+)"/); m.setAttribute(k, n); document.head.appendChild(m); } m.setAttribute(attr, v); };
+    pôr('meta[name="description"]', "content", desc, "meta");
+    pôr('meta[property="og:title"]', "content", `${s.titulo} · Capítulo ${cap.numero}`, "meta");
+    pôr('meta[property="og:description"]', "content", desc, "meta");
+    pôr('meta[property="og:image"]', "content", DT.capa(s), "meta");
+    pôr('link[rel="canonical"]', "href", url, "link");
+  }
   $("voltar").href = `serie.html?s=${encodeURIComponent(s.id)}`;
   $("tituloSerie").textContent = s.titulo;
   $("tituloCap").textContent = `Capítulo ${cap.numero}${cap.titulo ? " — " + cap.titulo : ""}`;

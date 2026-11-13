@@ -55,6 +55,7 @@
       id: s.id,
       titulo: s.titulo,
       tituloOriginal: s.titulo_original,
+      nomesAlt: s.nomes_alt || [],
       autor: s.autor,
       generos: s.generos || [],
       status: s.status,

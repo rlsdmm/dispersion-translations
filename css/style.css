@@ -884,3 +884,6 @@ html[data-tema="papel"] .selo-vip { color: #fff; }
 html[data-tema="papel"] .selo-nivel.nv3, html[data-tema="papel"] .selo-nivel.nv4, html[data-tema="fofinho"] .selo-nivel.nv3, html[data-tema="fofinho"] .selo-nivel.nv4 { color: #1d4ed8; }
 html[data-tema="papel"] .selo-nivel.nv5, html[data-tema="papel"] .selo-nivel.nv6, html[data-tema="fofinho"] .selo-nivel.nv5, html[data-tema="fofinho"] .selo-nivel.nv6 { color: #7e22ce; }
 html[data-tema="papel"] .xp-fogo, html[data-tema="fofinho"] .xp-fogo { color: #c2410c; }
+.serie-topo .nomes-alt { font-size: 13px; color: var(--sub); margin: -4px 0 12px; line-height: 1.5; }
+.serie-topo .nomes-alt span { font-weight: 700; color: var(--txt); opacity: .8; margin-right: 4px; }
+.serie-topo .nomes-alt span::after { content: ":"; }

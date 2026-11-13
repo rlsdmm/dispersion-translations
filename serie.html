@@ -14,6 +14,7 @@
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@DispersionTL" />
   <link rel="icon" href="favicon.ico" sizes="48x48" />
   <link rel="icon" href="icone-192.png" type="image/png" sizes="192x192" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -22,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=18" />
+  <link rel="stylesheet" href="css/style.css?v=19" />
   <link rel="stylesheet" href="css/temas.css?v=6" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -33,8 +34,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
-  <script src="js/data.js?v=4"></script>
-  <script src="js/app.js?v=7"></script>
+  <script src="js/data.js?v=5"></script>
+  <script src="js/app.js?v=8"></script>
   <script>
     const { esc, serie, capa, capsOrdenados, dataBR, lidos, header, footer, store, conta, continuar } = DT;
     document.getElementById("topo").innerHTML = header();
@@ -48,16 +49,29 @@
     if (!s) {
       el.innerHTML = `<div class="wrap"><p class="erro-pag">Obra não encontrada. <a href="index.html" style="color:var(--acc)">Voltar ao início</a></p></div>`;
     } else {
-      document.title = `${s.titulo} · Dispersion Translations`;
+      document.title = `${s.titulo} em Português | Ler Mangá Online · Dispersion Translations`;
       // descrição e prévia de link da obra (Google, Discord, WhatsApp...)
       const meta = (sel, attr, v) => { let m = document.head.querySelector(sel); if (!m) { m = document.createElement(sel.startsWith("link") ? "link" : "meta"); const [, k, n] = sel.match(/\[(\w+)="([^"]+)"/); m.setAttribute(k, n); document.head.appendChild(m); } m.setAttribute(attr, v); };
       const url = `https://dispersiontl.com.br/serie.html?s=${encodeURIComponent(s.id)}`;
-      const descMeta = `Leia ${s.titulo} em português${s.autor ? ", de " + s.autor : ""}. ${(s.sinopse || "").replace(/\s+/g, " ")}`.slice(0, 300);
+      const alt = (s.nomesAlt || []).find((n) => /^[\x20-\x7EÀ-ÿ’]+$/.test(n) && n.length <= 60);
+      const descMeta = `Ler ${s.titulo}${alt ? ` (${alt})` : ""} em português (PT-BR), online e grátis. Mangá${s.autor ? " de " + s.autor : ""} traduzido por fãs, ${capsOrdenados(s).length} ${capsOrdenados(s).length === 1 ? "capítulo" : "capítulos"}. ${(s.sinopse || "").replace(/\s+/g, " ")}`.slice(0, 320);
       meta('meta[name="description"]', "content", descMeta);
       meta('meta[property="og:title"]', "content", `${s.titulo} · Dispersion Translations`);
       meta('meta[property="og:description"]', "content", descMeta);
       meta('meta[property="og:url"]', "content", url);
       meta('link[rel="canonical"]', "href", url);
+      meta('meta[property="og:image"]', "content", capa(s));
+      // dados estruturados (Google entende que é uma série de mangá, com nomes alternativos)
+      const ld = document.createElement("script");
+      ld.type = "application/ld+json";
+      ld.textContent = JSON.stringify({
+        "@context": "https://schema.org", "@type": "ComicSeries", name: s.titulo, url,
+        alternateName: [s.tituloOriginal, ...(s.nomesAlt || [])].filter(Boolean),
+        author: s.autor ? s.autor.split(/,\s*/).map((n) => ({ "@type": "Person", name: n })) : undefined,
+        genre: s.generos, image: capa(s), description: s.sinopse, inLanguage: "pt-BR",
+        publisher: { "@type": "Organization", name: "Dispersion Translations", url: "https://dispersiontl.com.br/" },
+      });
+      document.head.appendChild(ld);
       const caps = capsOrdenados(s);
       const cont = continuar(s);
 
@@ -69,6 +83,7 @@
             <div>
               <h1>${esc(s.titulo)}</h1>
               ${s.tituloOriginal ? `<div class="original">${esc(s.tituloOriginal)} · ${esc(s.autor || "")}</div>` : ""}
+              ${(s.nomesAlt || []).length ? `<div class="nomes-alt"><span>Também conhecido como</span> ${s.nomesAlt.map(esc).join(" · ")}</div>` : ""}
               <div class="tags">
                 <span class="tag status">${esc(s.status)}</span>
                 ${(s.generos || []).map((g) => `<span class="tag">${esc(g)}</span>`).join("")}
