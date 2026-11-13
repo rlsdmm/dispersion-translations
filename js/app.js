@@ -412,8 +412,34 @@
     </footer>`;
   }
 
+  /* barrinha da meta do mês ("já recebemos X de Y") — usada na página Apoie e na inicial */
+  const MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  async function metaDoMes(el, { compacta = false } = {}) {
+    const A = D.grupo.apoie || {};
+    if (!el || !sb || !A.metaMensal) return;
+    const { data, error } = await sb.rpc("arrecadado_mes");
+    if (error || !data) return;
+    const total = Number(data.total) || 0, meta = Number(A.metaMensal);
+    const pct = Math.min(100, Math.round((total / meta) * 100));
+    const real = (v) => Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: v % 1 ? 2 : 0 });
+    const mes = MESES[Number(String(data.mes).slice(5, 7)) - 1] || "";
+    const batida = total >= meta;
+    el.innerHTML = `<div class="meta ${compacta ? "compacta" : ""} ${batida ? "batida" : ""}">
+      <div class="meta-topo">
+        <span>${batida ? "🎉 Meta de " + mes + " batida!" : "💙 Meta de " + mes}</span>
+        <span><b>${real(total)}</b> de ${real(meta)}</span>
+      </div>
+      <div class="meta-barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Meta do mês"><div style="width:${Math.max(pct, total > 0 ? 3 : 0)}%"></div></div>
+      <div class="meta-pe">
+        <span>${data.apoios ? `${data.apoios} ${data.apoios === 1 ? "apoio" : "apoios"} este mês · ${pct}%` : "Ninguém apoiou ainda este mês. Seja a primeira pessoa!"}${!compacta && A.metaPra ? ` · pra ${esc(A.metaPra)}` : ""}</span>
+        ${compacta ? `<a href="apoie.html">Apoiar →</a>` : ""}
+      </div>
+    </div>`;
+    el.hidden = false;
+  }
+
   window.DT = {
     D, sb, carregar, iniciar, coresDe, esc, store, serie, capsOrdenados, ultimoCap, dataBR, tempoRelativo, capa, paginas,
-    lidos, continuar, novosDesde, conta, avatar, atualizarNav, header, footer,
+    lidos, continuar, novosDesde, conta, avatar, atualizarNav, header, footer, metaDoMes,
   };
 })();

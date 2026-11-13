@@ -41,6 +41,8 @@ window.DISPERSION = {
       pixChave: "rlsdmm@gmail.com",
       pixNome: "Luis Marlon Amorim Ricci",
       pixCidade: "",         // vazio = "BRASIL" no QR Code (o banco mostra o nome da chave de qualquer jeito)
+      metaMensal: 100,       // meta de cada mês em R$ (barrinha "já recebemos X de Y")
+      metaPra: "domínio, armazenamento das páginas e um agrado pra equipe",
       vipMensal: 5,          // R$ por 30 dias de VIP (sugestão que o painel usa pra calcular os dias)
       diasAntecipado: 3,     // quantos dias antes os VIP costumam ler (só aparece no texto da página)
     },

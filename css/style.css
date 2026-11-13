@@ -801,3 +801,33 @@ html[data-tema="papel"] .selo-vip { color: #fff; }
   .pop-resto { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; }
   .pop-resto li { flex: 0 0 110px; width: 110px; min-width: 0; overflow: hidden; scroll-snap-align: start; }
 }
+
+/* ---------- meta do mês ---------- */
+.meta { padding: 18px 20px; border-radius: var(--raio); background: var(--card); border: 1px solid var(--borda); margin-bottom: 22px; }
+.meta-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; font-weight: 600; }
+.meta-topo b { font-size: 22px; font-weight: 900; }
+.meta-barra { height: 14px; border-radius: 999px; background: var(--bg2); border: 1px solid var(--borda); overflow: hidden; }
+.meta-barra div { height: 100%; border-radius: inherit; background: var(--grad); position: relative; overflow: hidden; transition: width 1s ease; }
+.meta-barra div::after {
+  content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .35), transparent);
+  transform: translateX(-100%); animation: meta-brilho 2.6s ease-in-out infinite;
+}
+@keyframes meta-brilho { to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .meta-barra div::after { animation: none; } }
+.meta.batida .meta-barra div { background: linear-gradient(90deg, var(--vip1), var(--vip2)); }
+.meta-pe { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 8px; font-size: 13px; color: var(--sub); }
+.meta-pe a { color: var(--acc); font-weight: 700; white-space: nowrap; }
+.meta.compacta { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px 18px; padding: 14px 18px; }
+.meta.compacta .meta-topo { display: contents; }
+.meta.compacta .meta-topo > span:first-child { grid-column: 1; grid-row: 1; }
+.meta.compacta .meta-barra { grid-column: 2; grid-row: 1; }
+.meta.compacta .meta-topo > span:last-child { grid-column: 3; grid-row: 1; white-space: nowrap; }
+.meta.compacta .meta-topo b { font-size: 16px; }
+.meta.compacta .meta-pe { grid-column: 1 / -1; grid-row: 2; margin-top: 0; }
+.meta-home { margin: 6px 0 4px; }
+@media (max-width: 640px) {
+  .meta.compacta { grid-template-columns: 1fr auto; }
+  .meta.compacta .meta-barra { grid-column: 1 / -1; grid-row: 2; }
+  .meta.compacta .meta-topo > span:last-child { grid-column: 2; }
+  .meta.compacta .meta-pe { grid-row: 3; }
+}
