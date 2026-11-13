@@ -347,6 +347,8 @@
     ["papel", "Papel", "#f4efe6", "#c1272d", "#1d1a16"],
     ["neon", "Neon", "#050505", "#a3e635", "#22d3ee", true],
     ["sakura", "Sakura", "#1a1018", "#f472b6", "#fb923c", true],
+    ["edgy", "Edgy", "#080606", "#dc2626", "#fb3b55", true],
+    ["fofinho", "Fofinho", "#fff6fa", "#ff7eb6", "#b69cff", true],
   ];
   const temaVip = (t) => TEMAS.some((x) => x[0] === t && x[5]);
   const temaAtual = () => {
@@ -361,7 +363,7 @@
     if (!document.getElementById("fontesTemas")) {
       const l = document.createElement("link");
       l.id = "fontesTemas"; l.rel = "stylesheet";
-      l.href = "https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Space+Grotesk:wght@400;600;700&family=Nunito:wght@400;600;800;900&display=swap";
+      l.href = "https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Space+Grotesk:wght@400;600;700&family=Nunito:wght@400;600;800;900&family=Oswald:wght@500;700&family=Rubik:wght@400;500;700&family=Fredoka:wght@400;500;600;700&display=swap";
       document.head.append(l);
     }
   }
