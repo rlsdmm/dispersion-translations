@@ -534,7 +534,7 @@
     const real = (v) => Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: v % 1 ? 2 : 0 });
     const mes = MESES[Number(String(data.mes).slice(5, 7)) - 1] || "";
     const batida = total >= meta;
-    el.innerHTML = `<div class="meta ${compacta ? "compacta" : ""} ${batida ? "batida" : ""}">
+    el.innerHTML = `<div class="meta-mes ${compacta ? "compacta" : ""} ${batida ? "batida" : ""}">
       <div class="meta-topo">
         <span>${batida ? "🎉 Meta de " + mes + " batida!" : "💙 Meta de " + mes}</span>
         <span><b>${real(total)}</b> de ${real(meta)}</span>

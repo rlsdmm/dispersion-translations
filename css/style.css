@@ -803,7 +803,7 @@ html[data-tema="papel"] .selo-vip { color: #fff; }
 }
 
 /* ---------- meta do mês ---------- */
-.meta { padding: 18px 20px; border-radius: var(--raio); background: var(--card); border: 1px solid var(--borda); margin-bottom: 22px; }
+.meta-mes { padding: 18px 20px; border-radius: var(--raio); background: var(--card); border: 1px solid var(--borda); margin-bottom: 22px; }
 .meta-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; font-weight: 600; }
 .meta-topo b { font-size: 22px; font-weight: 900; }
 .meta-barra { height: 14px; border-radius: 999px; background: var(--bg2); border: 1px solid var(--borda); overflow: hidden; }
@@ -814,22 +814,22 @@ html[data-tema="papel"] .selo-vip { color: #fff; }
 }
 @keyframes meta-brilho { to { transform: translateX(100%); } }
 @media (prefers-reduced-motion: reduce) { .meta-barra div::after { animation: none; } }
-.meta.batida .meta-barra div { background: linear-gradient(90deg, var(--vip1), var(--vip2)); }
+.meta-mes.batida .meta-barra div { background: linear-gradient(90deg, var(--vip1), var(--vip2)); }
 .meta-pe { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 8px; font-size: 13px; color: var(--sub); }
 .meta-pe a { color: var(--acc); font-weight: 700; white-space: nowrap; }
-.meta.compacta { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px 18px; padding: 14px 18px; }
-.meta.compacta .meta-topo { display: contents; }
-.meta.compacta .meta-topo > span:first-child { grid-column: 1; grid-row: 1; }
-.meta.compacta .meta-barra { grid-column: 2; grid-row: 1; }
-.meta.compacta .meta-topo > span:last-child { grid-column: 3; grid-row: 1; white-space: nowrap; }
-.meta.compacta .meta-topo b { font-size: 16px; }
-.meta.compacta .meta-pe { grid-column: 1 / -1; grid-row: 2; margin-top: 0; }
+.meta-mes.compacta { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px 18px; padding: 14px 18px; }
+.meta-mes.compacta .meta-topo { display: contents; }
+.meta-mes.compacta .meta-topo > span:first-child { grid-column: 1; grid-row: 1; }
+.meta-mes.compacta .meta-barra { grid-column: 2; grid-row: 1; }
+.meta-mes.compacta .meta-topo > span:last-child { grid-column: 3; grid-row: 1; white-space: nowrap; }
+.meta-mes.compacta .meta-topo b { font-size: 16px; }
+.meta-mes.compacta .meta-pe { grid-column: 1 / -1; grid-row: 2; margin-top: 0; }
 .meta-home { margin: 6px 0 4px; }
 @media (max-width: 640px) {
-  .meta.compacta { grid-template-columns: 1fr auto; }
-  .meta.compacta .meta-barra { grid-column: 1 / -1; grid-row: 2; }
-  .meta.compacta .meta-topo > span:last-child { grid-column: 2; }
-  .meta.compacta .meta-pe { grid-row: 3; }
+  .meta-mes.compacta { grid-template-columns: 1fr auto; }
+  .meta-mes.compacta .meta-barra { grid-column: 1 / -1; grid-row: 2; }
+  .meta-mes.compacta .meta-topo > span:last-child { grid-column: 2; }
+  .meta-mes.compacta .meta-pe { grid-row: 3; }
 }
 
 /* ---------- XP, níveis e conquistas ---------- */
@@ -1090,3 +1090,6 @@ html[data-tema="papel"] .xp-fogo, html[data-tema="fofinho"] .xp-fogo { color: #c
 .foto-perfil .acoes { margin: 0; }
 .foto-perfil .sub { font-size: 12px; flex-basis: 100%; margin-top: -6px; }
 .perfil-topo .avatar.grande.com-foto, .pp-topo .avatar.com-foto { box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--acc); }
+.serie-topo .nomes-alt .mais-nomes { font-weight: 400; color: inherit; opacity: 1; margin: 0; }
+.serie-topo .nomes-alt .mais-nomes::after { content: none; }
+.serie-topo .nomes-alt .ver-nomes { font-size: 12px; font-weight: 700; text-decoration: none; }
