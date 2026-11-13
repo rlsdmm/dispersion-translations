@@ -1108,3 +1108,15 @@ html[data-tema="papel"] .xp-fogo, html[data-tema="fofinho"] .xp-fogo { color: #c
 a.tag { color: inherit; transition: border-color .15s, background .15s, transform .15s; }
 a.tag:hover { border-color: var(--acc); background: color-mix(in srgb, var(--acc) 18%, transparent); transform: translateY(-1px); }
 a.tag.status:hover { filter: brightness(1.12); background: var(--grad); }
+
+/* abas de capítulos (obras com muitos capítulos) */
+.caps-ferr { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+.ir-cap { width: 120px; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--borda); background: var(--card); color: var(--txt); font: inherit; font-size: 14px; }
+.ir-cap::-webkit-inner-spin-button { display: none; }
+.faixas-caps { display: flex; gap: 6px; overflow-x: auto; padding: 2px 0 12px; margin-bottom: 4px; scrollbar-width: thin; }
+.faixa { flex-shrink: 0; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--borda); background: var(--card); color: var(--sub); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: border-color .15s, color .15s; }
+.faixa:hover { border-color: var(--acc); color: var(--txt); }
+.faixa.on { background: var(--grad); color: var(--on-acc); border-color: transparent; }
+.faixa.completa:not(.on) { color: #34d399; }
+.lista-caps a.destacado { border-color: var(--acc); box-shadow: 0 0 0 2px var(--acc); }
+@media (max-width: 560px) { .ir-cap { width: 96px; } }

@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=29" />
+  <link rel="stylesheet" href="css/style.css?v=30" />
   <link rel="stylesheet" href="css/temas.css?v=7" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -106,8 +106,12 @@
           <section class="aba" id="aba-caps">
             <div class="titulo-sec">
               <h2 id="tituloCaps">Capítulos (${caps.length})</h2>
-              <button class="btn ordem" id="ordem"></button>
+              <div class="caps-ferr">
+                <input type="number" id="irCap" class="ir-cap" placeholder="Ir pro cap." inputmode="decimal" aria-label="Ir para o capítulo" hidden />
+                <button class="btn ordem" id="ordem"></button>
+              </div>
             </div>
+            <div class="faixas-caps" id="faixas" hidden></div>
             <div class="lista-caps" id="lista"></div>
           </section>
           <section class="aba" id="aba-capas" hidden>
@@ -122,18 +126,55 @@
         </div>`;
 
       let desc = store.get("ordemDesc", true);
+      // capítulos antecipados que a pessoa ainda não pode ler aparecem com cadeado
+      const todosCaps = [...caps, ...(s.antecipados || []).map((a) => ({ ...a, travado: true }))].sort((a, b) => a.numero - b.numero);
+      // obras longas: a lista é dividida em abas de 50 capítulos
+      const TAM = 50, comFaixas = todosCaps.length > 60;
+      const blocos = [];
+      for (let i = 0; i < todosCaps.length; i += TAM) blocos.push(todosCaps.slice(i, i + TAM));
+      const blocoDe = (num) => blocos.findIndex((b) => b.some((c) => c.numero === num));
+      let bloco = comFaixas ? (cont && blocoDe(cont.cap.numero) >= 0 ? blocoDe(cont.cap.numero) : blocos.length - 1) : 0;
+      function renderFaixas() {
+        const el = document.getElementById("faixas");
+        el.hidden = !comFaixas;
+        document.getElementById("irCap").hidden = !comFaixas;
+        if (!comFaixas) return;
+        const ordem = blocos.map((b, i) => i);
+        if (desc) ordem.reverse();
+        el.innerHTML = ordem.map((i) => {
+          const b = blocos[i], lidosB = b.filter((c) => !c.travado && lidos.foiLido(s.id, c.numero)).length;
+          return `<button type="button" class="faixa ${i === bloco ? "on" : ""} ${lidosB === b.length ? "completa" : ""}" data-b="${i}"
+            title="${lidosB} de ${b.length} lidos">${b[0].numero}–${b[b.length - 1].numero}${lidosB === b.length ? " ✓" : ""}</button>`;
+        }).join("");
+        // deixa a aba escolhida visível (no celular a fileira rola pro lado)
+        const on = el.querySelector(".faixa.on");
+        if (on) el.scrollLeft = on.offsetLeft - el.offsetLeft - (el.clientWidth - on.offsetWidth) / 2;
+      }
+      document.getElementById("faixas").onclick = (e) => {
+        const b = e.target.closest(".faixa"); if (!b) return;
+        bloco = +b.dataset.b; renderLista();
+      };
+      document.getElementById("irCap").onkeydown = (e) => {
+        if (e.key !== "Enter") return;
+        const n = Number(String(e.target.value).replace(",", "."));
+        const alvo = todosCaps.reduce((m, c) => (Math.abs(c.numero - n) < Math.abs(m.numero - n) ? c : m), todosCaps[0]);
+        if (!alvo) return;
+        bloco = blocoDe(alvo.numero); renderLista();
+        const a = document.querySelector(`#lista [data-n="${alvo.numero}"]`);
+        if (a) { a.scrollIntoView({ block: "center", behavior: "instant" }); a.classList.add("destacado"); setTimeout(() => a.classList.remove("destacado"), 1800); }
+      };
       function renderLista() {
-        // capítulos antecipados que a pessoa ainda não pode ler aparecem com cadeado
-        const todosCaps = [...caps, ...(s.antecipados || []).map((a) => ({ ...a, travado: true }))].sort((a, b) => a.numero - b.numero);
-        const l = desc ? [...todosCaps].reverse() : todosCaps;
+        renderFaixas();
+        const base = comFaixas ? blocos[bloco] : todosCaps;
+        const l = desc ? [...base].reverse() : base;
         const libera = (c) => { const d = Math.max(0, Math.ceil((new Date(c.publicoEm) - Date.now()) / 864e5)); return d <= 1 ? "libera amanhã" : `libera em ${d} dias`; };
         document.getElementById("ordem").textContent = desc ? "↓ Mais novos" : "↑ Mais antigos";
         document.getElementById("lista").innerHTML = l.length ? l.map((c) => c.travado ? `
-          <a href="apoie.html#vip" class="cap-travado" title="Capítulo antecipado para apoiadores VIP">
+          <a href="apoie.html#vip" class="cap-travado" data-n="${c.numero}" title="Capítulo antecipado para apoiadores VIP">
             <span><span class="n">🔒 Capítulo ${c.numero}</span><span class="cap-vip">VIP</span><span class="t">${libera(c)} pra todo mundo</span></span>
             <span class="d">${dataBR(c.data)}</span>
           </a>` : `
-          <a href="ler.html?s=${encodeURIComponent(s.id)}&c=${c.numero}" class="${lidos.foiLido(s.id, c.numero) ? "lido" : ""}">
+          <a href="ler.html?s=${encodeURIComponent(s.id)}&c=${c.numero}" data-n="${c.numero}" class="${lidos.foiLido(s.id, c.numero) ? "lido" : ""}">
             <span><span class="n">Capítulo ${c.numero}</span>${c.vip ? '<span class="cap-vip">VIP</span>' : ""}${c.titulo ? `<span class="t">${esc(c.titulo)}</span>` : ""}</span>
             <span class="d">${dataBR(c.data)}</span>
           </a>`).join("") : `<p class="vazio">Nenhum capítulo ainda. Em breve!</p>`;
