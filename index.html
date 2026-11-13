@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=15" />
+  <link rel="stylesheet" href="css/style.css?v=16" />
   <link rel="stylesheet" href="css/temas.css?v=5" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -35,7 +35,8 @@
 
     <section id="popularesSec" hidden>
       <div class="titulo-sec"><h2>Populares do mês</h2></div>
-      <ol class="populares" id="listaPop"></ol>
+      <div class="pop-top" id="listaPop"></div>
+      <ol class="pop-resto" id="listaPopResto"></ol>
     </section>
 
     <section id="generosSec" hidden>
@@ -230,18 +231,27 @@
       if (top.length < 3) return;
       top.splice(10);
       document.getElementById("popularesSec").hidden = false;
-      document.getElementById("listaPop").style.setProperty("--linhas", Math.ceil(top.length / 2));
-      document.getElementById("listaPop").innerHTML = top.map(({ s, n }, i) => {
+      const leit = (n) => `👁 ${n} ${n === 1 ? "leitura" : "leituras"}`;
+      document.getElementById("listaPop").innerHTML = top.slice(0, 3).map(({ s, n }, i) => {
         const u = ultimoCap(s);
-        return `<li><a class="pop" href="serie.html?s=${encodeURIComponent(s.id)}">
-          <span class="pos">${i + 1}</span>
+        return `<a class="pop-card r${i + 1}" href="serie.html?s=${encodeURIComponent(s.id)}">
+          <span class="pc-fundo" style="background-image:url('${capa(s)}')"></span>
+          <span class="pc-num">${i + 1}</span>
           <img src="${capa(s)}" alt="" loading="lazy" />
-          <div class="info">
-            <h3>${esc(s.titulo)}</h3>
-            <span class="sub">${[esc((s.generos || [])[0] || ""), u ? "Cap. " + u.numero : ""].filter(Boolean).join(" · ")}</span>
-            <span class="leituras">${n} ${n === 1 ? "leitura" : "leituras"}</span>
-          </div></a></li>`;
+          <span class="pc-info">
+            <span class="pc-gen">${esc((s.generos || [])[0] || s.status || "")}</span>
+            <b class="pc-titulo">${esc(s.titulo)}</b>
+            <span class="pc-meta">${u ? "Cap. " + u.numero : ""}${s.autor ? " · " + esc(s.autor) : ""}</span>
+            <span class="pc-leit">${leit(n)}</span>
+          </span>
+        </a>`;
       }).join("");
+      document.getElementById("listaPopResto").innerHTML = top.slice(3).map(({ s, n }, i) => `
+        <li><a class="pop-mini" href="serie.html?s=${encodeURIComponent(s.id)}">
+          <span class="pm-capa"><img src="${capa(s)}" alt="" loading="lazy" /><span class="pm-num">${i + 4}</span></span>
+          <b>${esc(s.titulo)}</b>
+          <small>${leit(n)}</small>
+        </a></li>`).join("");
     });
 
     // grade de obras com busca e filtro por status
