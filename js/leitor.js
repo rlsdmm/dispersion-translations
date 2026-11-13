@@ -381,13 +381,25 @@ DT.iniciar(function () {
       { duration: dur, easing: "linear" }).onfinish = () => el.remove();
   }
 
+  // enquanto a pessoa fica na mesma página, os comentários voltam a passar em loop
+  let loopT = null, loopPag = null;
   function soltar(p) {
+    if (p !== loopPag) { clearTimeout(loopT); loopT = null; loopPag = p; }
     const lista = porPagina.get(p) || [];
     if (!balaoOn || !lista.length) return;
     const ult = mostradoEm.get(p);
     if (ult && Date.now() - ult < 20000) return;
     mostradoEm.set(p, Date.now());
-    lista.slice(-40).forEach((c, k) => setTimeout(() => paginaVista === p && voar(c), k * 650 + Math.random() * 300));
+    const leva = lista.slice(-40);
+    leva.forEach((c, k) => setTimeout(() => paginaVista === p && voar(c), k * 650 + Math.random() * 300));
+    clearTimeout(loopT);
+    const rodada = () => {
+      if (paginaVista !== p || !balaoOn) { loopPag = null; return; }
+      if (document.hidden) { loopT = setTimeout(rodada, 5000); return; } // aba em segundo plano: espera voltar
+      mostradoEm.delete(p);
+      soltar(p);
+    };
+    loopT = setTimeout(rodada, leva.length * 650 + 8000);
   }
 
   /* ir até uma página (usado ao clicar num comentário) */
