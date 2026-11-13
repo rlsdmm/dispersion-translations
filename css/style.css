@@ -704,3 +704,54 @@ html[data-tema="papel"] .selo-vip { color: #fff; }
 .conta-op { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; text-align: left; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--borda); background: var(--bg2); color: var(--txt); font: inherit; font-size: 14px; cursor: pointer; }
 .conta-op:hover { border-color: var(--acc); }
 .conta-op.on { border-color: var(--acc); box-shadow: inset 0 0 0 1px var(--acc); }
+
+/* ---------- lançamentos: card com os 2 últimos capítulos ---------- */
+.lanc2 { display: flex; gap: 14px; padding: 12px; border-radius: var(--raio); background: var(--card); border: 1px solid var(--borda); transition: border-color .2s; min-width: 0; }
+.lanc2:hover { border-color: var(--acc); }
+.l2-capa img { width: 84px; aspect-ratio: 300/430; object-fit: cover; border-radius: 10px; }
+.l2-info { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1; }
+.l2-topo { display: flex; gap: 8px; align-items: center; font-size: 11px; }
+.l2-gen { text-transform: uppercase; letter-spacing: .6px; font-weight: 700; color: var(--acc); border: 1px solid var(--borda); border-radius: 6px; padding: 1px 6px; }
+.l2-titulo { font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.l2-titulo:hover { color: var(--acc); }
+.l2-cap { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 8px; background: var(--bg2); border: 1px solid var(--borda); font-size: 13px; transition: border-color .2s; }
+.l2-cap:hover { border-color: var(--acc); }
+.l2-cap .novo, .l2-cap .cap-vip { margin-left: 0; }
+.l2-cap .quando { margin-left: auto; color: var(--sub); font-size: 12px; white-space: nowrap; }
+
+/* ---------- explorar por gênero ---------- */
+.generos-grade { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.genero-bloco { aspect-ratio: 16 / 10;
+  position: relative; overflow: hidden; border-radius: var(--raio); border: 1px solid var(--borda);
+  background: var(--card); color: #fff; cursor: pointer; font: inherit; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; padding: 14px; text-align: left;
+}
+.genero-bloco img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .4s, filter .4s; filter: brightness(.55) saturate(1.1); }
+.genero-bloco::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0, 0, 0, .85), transparent 65%); }
+.genero-bloco:hover img { transform: scale(1.07); filter: brightness(.7) saturate(1.2); }
+.genero-bloco:hover { border-color: var(--acc); }
+.g-nome, .g-n { position: relative; z-index: 1; }
+.g-nome { font-weight: 900; font-size: 16px; letter-spacing: .3px; text-transform: uppercase; overflow-wrap: anywhere; line-height: 1.15; }
+.g-n { font-size: 12px; opacity: .8; }
+
+/* ---------- pódio de leitores ---------- */
+.podio { list-style: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; align-items: end; }
+.podio li {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 18px 10px; border-radius: var(--raio);
+  background: var(--card); border: 1px solid var(--borda); min-width: 0;
+}
+.podio li b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.podio .pos { font-size: 26px; line-height: 1; font-weight: 900; color: var(--sub); }
+.podio .avatar.grande { width: 64px; height: 64px; font-size: 26px; }
+.podio .podio-1 { order: 2; padding-top: 30px; border-color: #fbbf24; background: linear-gradient(180deg, rgba(251, 191, 36, .12), transparent 60%), var(--card); }
+.podio .podio-2 { order: 1; padding-top: 22px; border-color: #cbd5e1; }
+.podio .podio-3 { order: 3; padding-top: 22px; border-color: #d97706; }
+.podio .podio-4 { order: 4; }
+.podio .podio-5 { order: 5; }
+.podio .podio-1 .avatar.grande { width: 80px; height: 80px; box-shadow: 0 0 0 3px #fbbf24; }
+.podio .selo-equipe, .podio .selo-vip { margin-left: 0; }
+@media (max-width: 860px) {
+  .podio { grid-template-columns: repeat(3, 1fr); }
+  .podio .podio-4, .podio .podio-5 { display: none; }
+  .generos-grade { grid-template-columns: repeat(2, 1fr); }
+  .g-nome { font-size: 13px; letter-spacing: 0; overflow-wrap: normal; }
+}
