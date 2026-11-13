@@ -41,6 +41,7 @@
 
     <h2>O que guardamos</h2>
     <p><b>Sem conta:</b> nada sai do seu aparelho. Capítulos lidos e preferências do leitor ficam só no armazenamento do seu navegador.</p>
+    <p><b>Estatísticas de visita:</b> usamos o <a class="link" href="https://www.cloudflare.com/web-analytics/" target="_blank" rel="noopener">Cloudflare Web Analytics</a> pra saber quantas pessoas visitam o site, quais páginas são mais vistas e de onde vêm as visitas (ex: Google, Discord). Ele <b>não usa cookies</b>, não guarda seu IP e não identifica nem acompanha ninguém entre sites; só vemos totais.</p>
     <p><b>Com conta:</b></p>
     <ul>
       <li>seu <b>e-mail</b> (ou os dados básicos do Discord/Google, se entrar por eles) e uma senha criptografada, pra você poder entrar;</li>
@@ -54,7 +55,7 @@
     <p>Só pra fazer a sua conta funcionar: sincronizar biblioteca e histórico entre aparelhos, avisar de capítulos novos e mostrar seus comentários. Também vemos números gerais (ex: quantas pessoas leram ou favoritaram uma obra), sem identificar ninguém.</p>
 
     <h2>Com quem compartilhamos</h2>
-    <p>Com ninguém. Os dados ficam guardados no <a class="link" href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase</a>, o serviço que usamos como banco de dados e login, e o site é hospedado no GitHub Pages.</p>
+    <p>Com ninguém. Os dados ficam guardados no <a class="link" href="https://supabase.com/privacy" target="_blank" rel="noopener">Supabase</a>, o serviço que usamos como banco de dados e login, e o site é hospedado no GitHub Pages. As estatísticas anônimas de visita passam pela Cloudflare.</p>
 
     <h2>Seus direitos (LGPD)</h2>
     <p>Na página <a class="link" href="conta.html">Minha conta</a> você pode, a qualquer momento:</p>
@@ -81,5 +82,6 @@
     document.getElementById("rodape").innerHTML = DT.footer();
     document.getElementById("discord").href = DT.D.grupo.discord;
   </script>
+  <!-- Cloudflare Web Analytics (contagem anônima de visitas, sem cookies) --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "0950cd16f7fa48d592b6e8d109a58805"}'></script>
 </body>
 </html>
