@@ -38,9 +38,9 @@ window.DISPERSION = {
     // Página "Apoie": chave Pix (CPF, e-mail, celular ou aleatória), nome e cidade de quem recebe
     // (o QR Code do Pix precisa do nome e da cidade). Sem chave, a página mostra "em breve".
     apoie: {
-      pixChave: "",
-      pixNome: "",
-      pixCidade: "",
+      pixChave: "rlsdmm@gmail.com",
+      pixNome: "Luis Marlon Amorim Ricci",
+      pixCidade: "",         // vazio = "BRASIL" no QR Code (o banco mostra o nome da chave de qualquer jeito)
       vipMensal: 5,          // R$ por 30 dias de VIP (sugestão que o painel usa pra calcular os dias)
       diasAntecipado: 3,     // quantos dias antes os VIP costumam ler (só aparece no texto da página)
     },
