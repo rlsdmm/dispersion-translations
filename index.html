@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=28" />
+  <link rel="stylesheet" href="css/style.css?v=29" />
   <link rel="stylesheet" href="css/temas.css?v=6" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -369,7 +369,22 @@
         </a>`;
       }).join("") : `<p class="vazio">Nenhuma obra encontrada.</p>`;
     }
+    // filtro vindo de um link (ex: clicar num gênero na página da obra): index.html?genero=Ação#obras
+    const qs = new URLSearchParams(location.search);
+    const genLink = qs.get("genero"), stLink = qs.get("status");
+    if (genLink && contGen[genLink]) selGen.value = genLink;
+    if (stLink && statusUsados.includes(stLink)) {
+      filtroStatus = stLink;
+      document.querySelectorAll("#filtros .chip").forEach((x) => x.classList.toggle("on", x.dataset.st === stLink));
+    }
     renderGrade();
+    if ((genLink && contGen[genLink]) || (stLink && statusUsados.includes(stLink)))
+    {
+      // as seções de cima carregam depois e empurram a lista; reajusta algumas vezes (para se a pessoa rolar)
+      let mexeu = false;
+      ["wheel", "touchstart", "keydown"].forEach((ev) => addEventListener(ev, () => (mexeu = true), { once: true, passive: true }));
+      [50, 600, 1500, 3000].forEach((ms) => setTimeout(() => !mexeu && document.getElementById("obras").scrollIntoView({ block: "start", behavior: "instant" }), ms));
+    }
     document.getElementById("busca").addEventListener("input", (e) => renderGrade(e.target.value));
     if (!D.series.length) document.getElementById("listaLanc").innerHTML = `<p class="vazio">Nenhum capítulo publicado ainda.</p>`;
     });

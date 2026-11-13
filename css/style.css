@@ -1103,3 +1103,8 @@ html[data-tema="papel"] .xp-fogo, html[data-tema="fofinho"] .xp-fogo { color: #c
 .paginas.paginado.com-zoom img.atual { height: calc((100vh - var(--base-alt)) * var(--zoom, 1)); max-height: none; max-width: none; width: auto; margin: 0 auto; }
 .pl-dica { margin-top: 8px; font-size: 11px; color: var(--sub); line-height: 1.4; }
 @media (max-width: 560px) { .paginas.paginado { --base-alt: 120px; } }
+
+/* tags de gênero/status na página da obra viram links pra lista filtrada */
+a.tag { color: inherit; transition: border-color .15s, background .15s, transform .15s; }
+a.tag:hover { border-color: var(--acc); background: color-mix(in srgb, var(--acc) 18%, transparent); transform: translateY(-1px); }
+a.tag.status:hover { filter: brightness(1.12); background: var(--grad); }

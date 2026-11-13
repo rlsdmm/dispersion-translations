@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=28" />
+  <link rel="stylesheet" href="css/style.css?v=29" />
   <link rel="stylesheet" href="css/temas.css?v=6" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -85,8 +85,8 @@
               ${s.tituloOriginal ? `<div class="original">${esc(s.tituloOriginal)} · ${esc(s.autor || "")}</div>` : ""}
               ${(s.nomesAlt || []).length ? `<div class="nomes-alt"><span>Também conhecido como</span> ${s.nomesAlt.slice(0, 3).map(esc).join(" · ")}${s.nomesAlt.length > 3 ? `<span class="mais-nomes" hidden> · ${s.nomesAlt.slice(3).map(esc).join(" · ")}</span> <button type="button" class="link ver-nomes" onclick="this.previousElementSibling.hidden=false;this.remove()">+${s.nomesAlt.length - 3}</button>` : ""}</div>` : ""}
               <div class="tags">
-                <span class="tag status">${esc(s.status)}</span>
-                ${(s.generos || []).map((g) => `<span class="tag">${esc(g)}</span>`).join("")}
+                <a class="tag status" href="index.html?status=${encodeURIComponent(s.status)}#obras" title="Ver outras obras: ${esc(s.status)}">${esc(s.status)}</a>
+                ${(s.generos || []).map((g) => `<a class="tag" href="index.html?genero=${encodeURIComponent(g)}#obras" title="Ver mais obras de ${esc(g)}">${esc(g)}</a>`).join("")}
               </div>
               <p class="sinopse">${esc(s.sinopse || "")}</p>
               <div class="botoes">
