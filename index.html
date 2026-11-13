@@ -8,26 +8,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=12" />
-  <link rel="stylesheet" href="css/temas.css?v=4" />
+  <link rel="stylesheet" href="css/style.css?v=13" />
+  <link rel="stylesheet" href="css/temas.css?v=5" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;display=swap">')}}catch(e){}</script>
 </head>
 <body>
   <div id="topo"></div>
 
-  <div class="hero">
-    <div class="wrap">
-      <div>
-        <h1>Mangás traduzidos com <span>carinho</span>, capítulo a capítulo.</h1>
-        <p id="slogan"></p>
-        <div class="botoes">
-          <a class="btn pri" href="#lancamentos">Últimos lançamentos</a>
-          <a class="btn" href="#obras">Ver todas as obras</a>
-        </div>
-      </div>
-      <div class="hero-capas" id="heroCapas"></div>
-    </div>
-  </div>
+  <section class="carrossel" id="carrossel" aria-roledescription="carrossel" aria-label="Destaques">
+    <div class="car-trilho" id="carTrilho"></div>
+    <button class="car-seta ant" id="carAnt" aria-label="Destaque anterior">‹</button>
+    <button class="car-seta prox" id="carProx" aria-label="Próximo destaque">›</button>
+    <div class="car-pontos" id="carPontos"></div>
+  </section>
 
   <main class="wrap">
     <section id="continuarSec" hidden>
@@ -83,10 +76,87 @@
     const { D, esc, capa, capsOrdenados, ultimoCap, tempoRelativo, header, footer } = DT;
     document.getElementById("topo").innerHTML = header("inicio");
     document.getElementById("rodape").innerHTML = footer();
-    document.getElementById("slogan").textContent = D.grupo.slogan + " Leia online, direto no navegador, no PC ou no celular.";
     document.getElementById("descricao").textContent = D.grupo.descricao;
     document.getElementById("links").innerHTML = D.grupo.links
       .map((l) => `<a class="btn" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.nome)} →</a>`).join("");
+
+
+    /* ---------- carrossel ---------- */
+    function montarCarrossel(itens) {
+      const trilho = document.getElementById("carTrilho"), pontos = document.getElementById("carPontos");
+      const car = document.getElementById("carrossel");
+      if (!itens.length) { car.hidden = true; return; }
+      trilho.innerHTML = itens.map(({ s, data, c }, i) => {
+        const novo = (Date.now() - new Date(data + "T12:00:00")) / 864e5 < 7;
+        const ler = DT.continuar(s) || { cap: capsOrdenados(s)[0], rotulo: "Começar a ler" };
+        const href = `serie.html?s=${encodeURIComponent(s.id)}`;
+        return `<article class="car-slide ${i ? "" : "on"}" data-i="${i}" data-sid="${esc(s.id)}" aria-hidden="${i ? "true" : "false"}">
+          <div class="car-fundo" style="background-image:url('${capa(s)}')"></div>
+          <div class="wrap car-conteudo">
+            <a class="car-capa" href="${href}" tabindex="-1"><img src="${capa(s)}" alt="${esc(s.titulo)}" ${i ? 'loading="lazy"' : ""} /></a>
+            <div class="car-info">
+              <div class="car-selos">
+                ${novo ? '<span class="selo-car novo">✦ Capítulo novo</span>' : ""}
+                <span class="selo-car">${esc(s.status || "")}</span>
+                ${(s.generos || []).slice(0, 2).map((g) => `<span class="selo-car leve">${esc(g)}</span>`).join("")}
+              </div>
+              <h2><a href="${href}">${esc(s.titulo)}</a></h2>
+              ${s.tituloOriginal ? `<p class="car-orig">${esc(s.tituloOriginal)}</p>` : ""}
+              <p class="car-meta">
+                <span>📚 ${s.capitulos.length} ${s.capitulos.length === 1 ? "capítulo" : "capítulos"}</span>
+                <span>🆕 Cap. ${c.numero} · ${tempoRelativo(data)}</span>
+                ${s.autor ? `<span>✍️ ${esc(s.autor)}</span>` : ""}
+                <span class="car-leituras" hidden></span>
+              </p>
+              <p class="car-sinopse">${esc(s.sinopse || "")}</p>
+              <div class="botoes">
+                ${ler.cap ? `<a class="btn pri" href="ler.html?s=${encodeURIComponent(s.id)}&c=${ler.cap.numero}">📖 ${esc(ler.rotulo || "Ler agora")}</a>` : ""}
+                <a class="btn" href="${href}">Detalhes</a>
+              </div>
+            </div>
+          </div>
+        </article>`;
+      }).join("");
+      pontos.innerHTML = itens.map((_, i) => `<button class="${i ? "" : "on"}" data-i="${i}" aria-label="Destaque ${i + 1}"></button>`).join("");
+      const slides = [...trilho.children];
+      let atual = 0, timer = null;
+      function ir(i) {
+        atual = (i + slides.length) % slides.length;
+        slides.forEach((el, k) => { el.classList.toggle("on", k === atual); el.setAttribute("aria-hidden", k === atual ? "false" : "true"); });
+        [...pontos.children].forEach((b, k) => b.classList.toggle("on", k === atual));
+        const prox = slides[(atual + 1) % slides.length].querySelector("img");
+        if (prox) prox.removeAttribute("loading");
+        reiniciar();
+      }
+      function reiniciar() {
+        clearTimeout(timer);
+        if (slides.length > 1 && !matchMedia("(prefers-reduced-motion: reduce)").matches) timer = setTimeout(() => ir(atual + 1), 7000);
+      }
+      document.getElementById("carAnt").onclick = () => ir(atual - 1);
+      document.getElementById("carProx").onclick = () => ir(atual + 1);
+      pontos.onclick = (e) => { const b = e.target.closest("button"); if (b) ir(+b.dataset.i); };
+      car.addEventListener("mouseenter", () => clearTimeout(timer));
+      car.addEventListener("mouseleave", reiniciar);
+      document.addEventListener("visibilitychange", () => document.hidden ? clearTimeout(timer) : reiniciar());
+      // arrastar no celular
+      let x0 = null;
+      car.addEventListener("touchstart", (e) => { x0 = e.touches[0].clientX; clearTimeout(timer); }, { passive: true });
+      car.addEventListener("touchend", (e) => {
+        if (x0 == null) return;
+        const dx = e.changedTouches[0].clientX - x0; x0 = null;
+        if (Math.abs(dx) > 40) ir(atual + (dx < 0 ? 1 : -1)); else reiniciar();
+      });
+      if (slides.length < 2) { car.classList.add("unico"); }
+      reiniciar();
+    }
+
+    // leituras do mês nos destaques
+    function leiturasNoCarrossel(top) {
+      for (const { s, n } of top) {
+        const el = document.querySelector(`.car-slide[data-sid="${CSS.escape(s.id)}"] .car-leituras`);
+        if (el) { el.textContent = `👁 ${n} ${n === 1 ? "leitura" : "leituras"} no mês`; el.hidden = false; }
+      }
+    }
 
     DT.iniciar(() => {
     // continuar lendo (com conta: ordem do histórico; sem conta: o que está no navegador)
@@ -124,10 +194,8 @@
       .sort((a, b) => b.data.localeCompare(a.data) || b.c.numero - a.c.numero)
       .slice(0, 8);
 
-    // capas no destaque: as obras com lançamento mais recente
-    const destaque = (recentes.length >= 3 ? recentes.map((r) => r.s) : D.series).slice(0, 3);
-    document.getElementById("heroCapas").innerHTML = destaque
-      .map((s) => `<a href="serie.html?s=${encodeURIComponent(s.id)}"><img src="${capa(s)}" alt="${esc(s.titulo)}" /></a>`).join("");
+    // carrossel de destaques: as obras com lançamento mais recente
+    montarCarrossel(recentes.slice(0, 8));
 
     document.getElementById("listaLanc").innerHTML = recentes.map(({ s, data, doDia, c }) => {
       const novo = (Date.now() - new Date(data + "T12:00:00")) / 864e5 < 7;
@@ -145,9 +213,11 @@
     }).join("");
 
     // populares do mês (leituras dos últimos 30 dias)
-    if (DT.sb) DT.sb.rpc("populares", { p_dias: 30, p_limite: 10 }).then(({ data }) => {
+    if (DT.sb) DT.sb.rpc("populares", { p_dias: 30, p_limite: 50 }).then(({ data }) => {
       const top = (data || []).map((p) => ({ s: DT.serie(p.serie_id), n: Number(p.leituras) })).filter((p) => p.s && p.n > 0);
+      leiturasNoCarrossel(top);
       if (top.length < 3) return;
+      top.splice(10);
       document.getElementById("popularesSec").hidden = false;
       document.getElementById("listaPop").style.setProperty("--linhas", Math.ceil(top.length / 2));
       document.getElementById("listaPop").innerHTML = top.map(({ s, n }, i) => {
