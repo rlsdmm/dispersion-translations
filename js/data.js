@@ -34,7 +34,7 @@ window.DISPERSION = {
     slogan: "Traduções feitas por fãs, para fãs.",
     descricao:
       "Somos um grupo de tradução de mangás sem fins lucrativos. Traduzimos obras que amamos e que ainda não têm versão em português. Se a obra for licenciada no Brasil, apoie o lançamento oficial!",
-    discord: "https://discord.gg/",
+    discord: "https://discord.gg/FxBMF3k",
     // Página "Apoie": chave Pix (CPF, e-mail, celular ou aleatória), nome e cidade de quem recebe
     // (o QR Code do Pix precisa do nome e da cidade). Sem chave, a página mostra "em breve".
     apoie: {
@@ -45,7 +45,7 @@ window.DISPERSION = {
       diasAntecipado: 3,     // quantos dias antes os VIP costumam ler (só aparece no texto da página)
     },
     links: [
-      { nome: "Discord", url: "https://discord.gg/" },
+      { nome: "Discord", url: "https://discord.gg/FxBMF3k" },
       { nome: "Twitter / X", url: "https://x.com/" },
     ],
   },
