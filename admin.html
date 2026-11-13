@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=19" />
+  <link rel="stylesheet" href="css/style.css?v=20" />
   <link rel="stylesheet" href="css/temas.css?v=6" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -70,6 +70,7 @@
         <button data-aba="capitulos">Capítulos</button>
         <button data-aba="obras">Obras</button>
         <button data-aba="apoios">💙 Apoios e VIP</button>
+        <button data-aba="denuncias">🚩 Denúncias</button>
       </div>
 
       <!-- ENVIAR -->
@@ -170,6 +171,27 @@
           <h2>Apoios registrados</h2>
           <div class="tabela" id="tabelaApoios"></div>
         </div>
+        <div class="painel-card" id="cardSelos">
+          <h2>Selos especiais</h2>
+          <p class="sub">Selos que aparecem no perfil e nos comentários (ex: primeiro apoiador). Ache a conta e marque.</p>
+          <label>Conta no site (apelido ou e-mail) <input type="search" id="seBusca" placeholder="digite pelo menos 2 letras" autocomplete="off" /></label>
+          <div class="resultados-conta" id="seResultados"></div>
+          <div id="seEditor" hidden>
+            <p><b id="seNome"></b></p>
+            <div class="selos-check" id="seChecks"></div>
+            <div class="acoes"><button class="btn pri" type="button" id="seSalvar">Salvar selos</button></div>
+            <p class="msg" id="seMsg"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- DENÚNCIAS -->
+      <section class="aba" id="aba-denuncias" hidden>
+        <div class="painel-card">
+          <h2>Mensagens denunciadas</h2>
+          <p class="sub">A equipe só vê as mensagens que alguém denunciou. Se for caso de bloquear, use "bloquear usuário" (a pessoa para de comentar e de mandar mensagens).</p>
+          <div class="tabela" id="tabelaDenuncias"></div>
+        </div>
       </section>
 
       <!-- OBRAS -->
@@ -209,7 +231,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js?v=5"></script>
-  <script src="js/app.js?v=8"></script>
-  <script src="js/admin.js?v=2"></script>
+  <script src="js/app.js?v=9"></script>
+  <script src="js/admin.js?v=3"></script>
 </body>
 </html>

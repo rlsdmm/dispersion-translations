@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mensagens · Dispersion Translations</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="favicon.ico" sizes="48x48" />
+  <link rel="icon" href="icone-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="theme-color" content="#070b16" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
+  <link rel="stylesheet" href="css/style.css?v=20" />
+  <link rel="stylesheet" href="css/temas.css?v=6" />
+  <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
+</head>
+<body>
+  <div id="topo"></div>
+
+  <main class="wrap">
+    <div class="painel-card login" id="deslogado" hidden>
+      <h1>Mensagens</h1>
+      <p class="sub">Entre na sua conta pra conversar com outros leitores.</p>
+      <a class="btn pri" href="conta.html?volta=mensagens.html">Entrar ou criar conta</a>
+    </div>
+
+    <div id="logado" hidden>
+      <div class="titulo-sec"><h2>Mensagens</h2><a class="sub" href="conta.html#perfilPublico">⚙ quem pode me mandar mensagem</a></div>
+      <div class="caixa-msg" id="caixa">
+        <aside class="conversas" id="conversas"><p class="sub">Carregando…</p></aside>
+        <section class="conversa" id="conversa">
+          <div class="vazio-conversa">
+            <p>✉️</p>
+            <p>Escolha uma conversa, ou clique no nome de alguém nos comentários e depois em <b>Mandar mensagem</b>.</p>
+          </div>
+        </section>
+      </div>
+      <p class="sub aviso-msg">🔒 Suas mensagens são privadas: a equipe só vê uma mensagem se você denunciar. Nunca passe senha, endereço ou dados pessoais pra ninguém.</p>
+    </div>
+  </main>
+
+  <div id="rodape"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js?v=5"></script>
+  <script src="js/app.js?v=9"></script>
+  <script>
+    const { esc, conta, avatar, sb } = DT;
+    const $ = (id) => document.getElementById(id);
+    $("topo").innerHTML = DT.header("mensagens");
+    $("rodape").innerHTML = DT.footer();
+
+    const quando = (iso) => {
+      const d = new Date(iso), hoje = new Date();
+      const hora = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+      if (d.toDateString() === hoje.toDateString()) return hora;
+      return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) + " " + hora;
+    };
+
+    DT.iniciar(async () => {
+      if (!sb || !conta.user) { $("deslogado").hidden = false; return; }
+      $("logado").hidden = false;
+      const eu = conta.user.id;
+      let atual = new URLSearchParams(location.search).get("com");
+      let conversas = [], bloqueados = new Set(), outroPerfil = null, ultimoId = 0, desenhado = null;
+
+      async function carregarLista() {
+        const [c, b] = await Promise.all([sb.rpc("minhas_conversas"), sb.from("bloqueios").select("bloqueado")]);
+        conversas = c.data || [];
+        bloqueados = new Set((b.data || []).map((x) => x.bloqueado));
+        renderLista();
+      }
+      function renderLista() {
+        const lista = [...conversas];
+        if (atual && outroPerfil && !lista.some((c) => c.outro === atual))
+          lista.unshift({ outro: atual, apelido: outroPerfil.apelido, vip: outroPerfil.vip, equipe: outroPerfil.equipe, ultima: "", nova: true });
+        $("conversas").innerHTML = lista.length ? lista.map((c) => `
+          <button type="button" class="conv ${c.outro === atual ? "on" : ""}" data-outro="${c.outro}">
+            ${avatar(c.apelido, c.outro)}
+            <span class="conv-txt">
+              <b class="${c.vip ? "nome-vip" : ""}">${esc(c.apelido)}</b>${bloqueados.has(c.outro) ? ' <small class="sub">(bloqueado)</small>' : ""}
+              <small>${c.nova ? "nova conversa" : (c.minha ? "Você: " : "") + esc(c.ultima.slice(0, 60))}</small>
+            </span>
+            ${c.ultima_em ? `<span class="conv-quando">${quando(c.ultima_em)}</span>` : ""}
+            ${c.nao_lidas > 0 && !bloqueados.has(c.outro) ? `<span class="conv-n">${c.nao_lidas}</span>` : ""}
+          </button>`).join("")
+          : `<p class="sub">Nenhuma conversa ainda.</p>`;
+        $("conversas").querySelectorAll(".conv").forEach((b) => (b.onclick = () => abrir(b.dataset.outro)));
+      }
+
+      async function abrir(outro, rolar = true) {
+        if (outro !== atual) { outroPerfil = null; ultimoId = 0; }
+        atual = outro;
+        history.replaceState(null, "", "?com=" + encodeURIComponent(outro));
+        $("caixa").classList.add("aberta");
+        if (!outroPerfil) {
+          const { data } = await sb.rpc("perfil_publico", { p_user: outro });
+          if (!data || data.banido) { $("conversa").innerHTML = `<p class="sub" style="padding:20px">Conta não encontrada.</p>`; return; }
+          outroPerfil = data;
+        }
+        const { data: msgs } = await sb.from("mensagens").select("id,de,para,texto,criado_em,lida_em")
+          .or(`and(de.eq.${eu},para.eq.${outro}),and(de.eq.${outro},para.eq.${eu})`)
+          .order("criado_em", { ascending: true }).limit(500);
+        const lista = msgs || [];
+        const ult = lista.length ? lista[lista.length - 1].id : 0;
+        const mudou = ult !== ultimoId;
+        ultimoId = ult;
+        if (lista.some((m) => m.para === eu && !m.lida_em)) sb.rpc("marcar_lidas", { p_de: outro }).then(() => { carregarLista(); DT.atualizarNav(); });
+        const p = outroPerfil, bloq = bloqueados.has(outro);
+        if (desenhado === outro && $("listaMsgs") && !mudou) return;
+        desenhado = outro;
+        const rascunho = $("textoMsg")?.value || "";
+        $("conversa").innerHTML = `
+          <header class="conv-topo">
+            <button type="button" class="btn mini-btn voltar-lista" id="voltarLista">←</button>
+            <a href="${DT.linkPerfil(outro)}" class="conv-quem">${avatar(p.apelido, outro)}
+              <span><b class="${p.vip ? "nome-vip" : ""}">${esc(p.apelido)}</b> ${DT.selosEspeciais(p.selos)}<small class="sub">ver perfil</small></span></a>
+            <button type="button" class="btn mini-btn ${bloq ? "" : "perigo"}" id="btnBloquear">${bloq ? "Desbloquear" : "Bloquear"}</button>
+          </header>
+          <div class="msgs" id="listaMsgs">${lista.length ? lista.map((m) => `
+            <div class="msg-bolha ${m.de === eu ? "minha" : ""}">
+              <p>${esc(m.texto)}</p>
+              <small>${quando(m.criado_em)}${m.de === eu && m.lida_em ? " · visto" : ""}${m.de !== eu ? ` · <button type="button" class="link" data-denunciar="${m.id}">denunciar</button>` : ""}</small>
+            </div>`).join("") : `<p class="sub vazio-msgs">Diga oi pra ${esc(p.apelido)}! 👋</p>`}</div>
+          ${bloq ? `<p class="sub aviso-bloq">Você bloqueou essa pessoa. Ela não consegue te mandar mensagens.</p>`
+            : !p.aceita_mensagens ? `<p class="sub aviso-bloq">${esc(p.apelido)} não está aceitando mensagens.</p>`
+            : `<form class="nova-msg" id="formMsg">
+                <textarea id="textoMsg" maxlength="2000" rows="2" placeholder="Escreva uma mensagem…" required></textarea>
+                <button class="btn pri" type="submit">Enviar</button>
+              </form><p class="msg" id="msgEnvio"></p>`}`;
+        if ($("textoMsg")) $("textoMsg").value = rascunho;
+        const box = $("listaMsgs");
+        if (rolar || mudou) box.scrollTop = box.scrollHeight;
+
+        $("voltarLista").onclick = () => $("caixa").classList.remove("aberta");
+        $("btnBloquear").onclick = async () => {
+          if (!bloq && !confirm(`Bloquear ${p.apelido}? Vocês não vão conseguir trocar mensagens.`)) return;
+          const r = bloq ? await sb.from("bloqueios").delete().eq("quem", eu).eq("bloqueado", outro)
+                         : await sb.from("bloqueios").insert({ bloqueado: outro });
+          if (r.error) return alert("Erro: " + r.error.message);
+          desenhado = null; await carregarLista(); abrir(outro);
+        };
+        box.querySelectorAll("[data-denunciar]").forEach((b) => (b.onclick = async () => {
+          const motivo = prompt("Denunciar esta mensagem pra equipe? Conte rapidinho o motivo (opcional):");
+          if (motivo === null) return;
+          const { error } = await sb.rpc("denunciar_mensagem", { p_id: Number(b.dataset.denunciar), p_motivo: motivo });
+          b.replaceWith(Object.assign(document.createElement("span"), { textContent: error ? "erro ao denunciar" : "denunciada ✓" }));
+        }));
+        const f = $("formMsg");
+        if (f) {
+          $("textoMsg").onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); f.requestSubmit(); } };
+          f.onsubmit = async (e) => {
+            e.preventDefault();
+            const texto = $("textoMsg").value.trim();
+            if (!texto) return;
+            f.querySelector("button").disabled = true;
+            const { error } = await sb.from("mensagens").insert({ para: outro, texto });
+            f.querySelector("button").disabled = false;
+            if (error) {
+              $("msgEnvio").textContent = /row-level|policy/i.test(error.message)
+                ? "Não deu pra enviar: a pessoa pode ter desativado as mensagens, ou você mandou muitas seguidas. Espere um pouco."
+                : "Não deu pra enviar: " + error.message;
+              $("msgEnvio").className = "msg erro";
+              return;
+            }
+            $("textoMsg").value = "";
+            await abrir(outro);
+            carregarLista();
+          };
+        }
+      }
+
+      await carregarLista();
+      if (atual && atual !== eu) await abrir(atual); else atual = null;
+      renderLista();
+      // atualiza sozinho
+      setInterval(() => {
+        if (document.hidden) return;
+        carregarLista();
+        if (atual && $("listaMsgs")) abrir(atual, false);
+      }, 15000);
+    });
+  </script>
+  <!-- Cloudflare Web Analytics (contagem anônima de visitas, sem cookies) --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "0950cd16f7fa48d592b6e8d109a58805"}'></script>
+</body>
+</html>

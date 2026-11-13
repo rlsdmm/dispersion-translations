@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=19" />
+  <link rel="stylesheet" href="css/style.css?v=20" />
   <link rel="stylesheet" href="css/temas.css?v=6" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -48,6 +48,8 @@
       <li>seu <b>apelido</b>, que aparece nos comentários;</li>
       <li>suas <b>obras favoritas</b>, seu <b>histórico de leitura</b> (capítulos e página onde parou) e as <b>preferências do leitor</b>;</li>
       <li>os <b>comentários</b> que você publicar, que ficam visíveis pra todo mundo.</li>
+      <li>o seu <b>perfil público</b>, se você preencher: bio e redes sociais. Isso fica visível pra todo mundo, junto com seu nível, XP e conquistas;</li>
+      <li>as <b>mensagens</b> que você troca com outros leitores. Só você e a outra pessoa veem. A equipe só vê uma mensagem se ela for <b>denunciada</b>, e aí vê apenas aquela mensagem. Você pode desativar o recebimento de mensagens e bloquear pessoas a qualquer momento.</li>
           <li>se você <b>apoiar o grupo</b>: o nome que vai no mural, o valor, a data e até quando vai o seu VIP. Isso é anotado pela equipe a partir do comprovante que você manda; não guardamos dados bancários.</li>
     </ul>
 
@@ -76,7 +78,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js?v=5"></script>
-  <script src="js/app.js?v=8"></script>
+  <script src="js/app.js?v=9"></script>
   <script>
     document.getElementById("topo").innerHTML = DT.header();
     document.getElementById("rodape").innerHTML = DT.footer();

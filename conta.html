@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=19" />
+  <link rel="stylesheet" href="css/style.css?v=20" />
   <link rel="stylesheet" href="css/temas.css?v=6" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -65,6 +65,8 @@
       <section class="xp-card" id="cardXp" hidden></section>
       <div class="atalhos">
         <a class="btn pri" href="biblioteca.html">📚 Minha biblioteca</a>
+        <a class="btn" href="#" id="linkMeuPerfil">👤 Ver meu perfil</a>
+        <a class="btn" href="mensagens.html">✉️ Mensagens</a>
         <a class="btn" href="admin.html" id="linkAdmin" hidden>⚙ Área do grupo</a>
         <button class="btn" id="sair">Sair</button>
       </div>
@@ -76,6 +78,19 @@
         <p class="msg" id="msgPerfil"></p>
       </form>
 
+      <form class="painel-card" id="perfilPublico">
+        <h2>Perfil público</h2>
+        <p class="sub">Aparece pra quem clicar no seu nome nos comentários ou no ranking. Tudo opcional.</p>
+        <label>Bio <textarea id="bio" maxlength="300" rows="3" placeholder="Conte um pouco sobre você, mangás favoritos..."></textarea></label>
+        <p class="sub contador-bio"><span id="contaBio">0</span>/300</p>
+        <h3 class="sub-titulo">Redes sociais</h3>
+        <p class="sub">Só o nome de usuário (sem @). Pode colar o link do perfil que a gente separa o usuário.</p>
+        <div class="campos" id="camposRedes"></div>
+        <label class="check"><input type="checkbox" id="aceitaMsg" /> Aceitar mensagens de outros leitores</label>
+        <div class="acoes"><button class="btn pri" type="submit">Salvar perfil público</button></div>
+        <p class="msg" id="msgPublico"></p>
+      </form>
+
       <form class="painel-card" id="formTrocaSenha">
         <h2>Trocar senha</h2>
         <label>Nova senha <input type="password" id="trocaSenha" minlength="8" required autocomplete="new-password" /></label>
@@ -85,7 +100,7 @@
 
       <div class="painel-card">
         <h2>Seus dados</h2>
-        <p class="sub">Guardamos só o necessário pra sua conta funcionar: e-mail, apelido, favoritos, histórico de leitura, preferências do leitor e seus comentários. <a class="link" href="privacidade.html">Saiba mais</a>.</p>
+        <p class="sub">Guardamos só o necessário pra sua conta funcionar: e-mail, apelido, perfil público (bio e redes, se você preencher), favoritos, histórico de leitura, preferências do leitor, seus comentários e suas mensagens. <a class="link" href="privacidade.html">Saiba mais</a>.</p>
         <div class="acoes">
           <button class="btn" id="baixarDados">Baixar meus dados</button>
           <button class="btn perigo" id="excluirConta">Excluir minha conta</button>
@@ -100,8 +115,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js?v=5"></script>
-  <script src="js/app.js?v=8"></script>
-  <script src="js/conta.js?v=2"></script>
+  <script src="js/app.js?v=9"></script>
+  <script src="js/conta.js?v=3"></script>
   <!-- Cloudflare Web Analytics (contagem anônima de visitas, sem cookies) --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "0950cd16f7fa48d592b6e8d109a58805"}'></script>
 </body>
 </html>

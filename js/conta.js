@@ -118,7 +118,39 @@
     $("formTrocaSenha").hidden = soSocial;
     mostrar("telaPerfil");
     renderXp();
+    renderPublico();
   }
+
+  /* ---------- perfil público: bio, redes, mensagens ---------- */
+  function renderPublico() {
+    const p = conta.perfil;
+    $("linkMeuPerfil").href = DT.linkPerfil(conta.user.id);
+    $("bio").value = p.bio || "";
+    $("contaBio").textContent = $("bio").value.length;
+    $("bio").oninput = () => ($("contaBio").textContent = $("bio").value.length);
+    $("camposRedes").innerHTML = DT.REDES.map(([k, nome, pre]) => `
+      <label>${nome}<input type="text" data-rede="${k}" maxlength="120" value="${DT.esc(p.redes?.[k] || "")}"
+        placeholder="${pre ? "seu usuário" : "seu usuário no Discord"}" autocomplete="off" spellcheck="false" /></label>`).join("");
+    $("aceitaMsg").checked = p.aceita_mensagens !== false;
+    if (location.hash === "#perfilPublico") setTimeout(() => $("perfilPublico").scrollIntoView({ behavior: "smooth" }), 200);
+  }
+  $("perfilPublico").onsubmit = async (e) => {
+    e.preventDefault();
+    const redes = {};
+    for (const inp of document.querySelectorAll("[data-rede]")) {
+      const u = DT.limparUsuario(inp.value);
+      inp.value = u;
+      if (!u) continue;
+      if (!DT.usuarioValido(u)) return msg("msgPublico", `O usuário de ${inp.closest("label").firstChild.textContent.trim()} tem caracteres inválidos.`, "erro");
+      redes[inp.dataset.rede] = u;
+    }
+    const dados = { bio: $("bio").value.trim() || null, redes, aceita_mensagens: $("aceitaMsg").checked };
+    const { error } = await DT.sb.from("perfis").update(dados).eq("user_id", conta.user.id);
+    if (error) return msg("msgPublico", "Não deu pra salvar: " + error.message, "erro");
+    Object.assign(conta.perfil, dados);
+    msg("msgPublico", "Perfil salvo! ", "ok");
+    $("msgPublico").insertAdjacentHTML("beforeend", `<a class="link" href="${DT.linkPerfil(conta.user.id)}">Ver como ficou →</a>`);
+  };
 
   /* ---------- XP, nível e conquistas ---------- */
   async function renderXp() {

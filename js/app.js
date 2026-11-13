@@ -226,7 +226,7 @@
       this.user = user;
       if (!user) return this;
       const [p, f, h, m] = await Promise.all([
-        sb.from("perfis").select("apelido,prefs,banido,vip_ate").eq("user_id", user.id).maybeSingle(),
+        sb.from("perfis").select("apelido,prefs,banido,vip_ate,bio,redes,selos,aceita_mensagens").eq("user_id", user.id).maybeSingle(),
         sb.from("favoritos").select("serie_id,criado_em").order("criado_em", { ascending: false }),
         sb.from("historico").select("serie_id,numero,pagina,total,concluido,lido_em").order("lido_em", { ascending: false }).limit(3000),
         sb.rpc("is_membro"),
@@ -335,6 +335,14 @@
       el.title = "Minha conta";
       const novos = D.series.filter((s) => conta.favoritos.has(s.id) && novosDesde(s).length).length;
       if (bib && novos && !bib.querySelector(".bolinha")) bib.insertAdjacentHTML("beforeend", `<span class="bolinha" title="Obras favoritas com capítulo novo">${novos}</span>`);
+      const msg = document.getElementById("navMsg");
+      if (msg) {
+        msg.hidden = false;
+        sb.rpc("nao_lidas").then(({ data }) => {
+          msg.querySelector(".bolinha")?.remove();
+          if (data > 0) msg.insertAdjacentHTML("beforeend", `<span class="bolinha" title="Mensagens não lidas">${data > 99 ? "99+" : data}</span>`);
+        });
+      }
     } else {
       el.textContent = "Entrar";
       el.href = conta.linkEntrar();
@@ -398,6 +406,7 @@
         <a href="index.html" class="so-desk-nav ${ativo === "inicio" ? "on" : ""}">Início</a>
         <a href="index.html#obras" class="so-desk-nav">Obras</a>
         <a href="biblioteca.html" id="navBib" class="${ativo === "biblioteca" ? "on" : ""}" title="Minha biblioteca">📚<span class="so-desk-nav"> Biblioteca</span></a>
+        <a href="mensagens.html" id="navMsg" class="nav-msg ${ativo === "mensagens" ? "on" : ""}" title="Mensagens" hidden>✉️</a>
         <a href="apoie.html" class="btn-apoie ${ativo === "apoie" ? "on" : ""}" title="Apoie o grupo">💙<span class="so-desk-nav"> Apoie</span></a>
         <a href="${esc(D.grupo.discord)}" target="_blank" rel="noopener" class="btn-discord">Discord</a>
         <span class="tema-wrap"><button type="button" id="btnTema" class="btn-tema" title="Mudar o visual do site" aria-label="Mudar o visual do site">🎨</button>
@@ -417,6 +426,33 @@
 
   /* barrinha da meta do mês ("já recebemos X de Y") — usada na página Apoie e na inicial */
   const MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  /* ---------- perfil público: selos especiais e redes sociais ---------- */
+  // selos que só a equipe dá (Área do grupo → Apoios e VIP → Selos especiais)
+  const SELOS = {
+    "primeiro-apoiador": ["🥇", "Primeiro apoiador", "A primeira pessoa a apoiar a Dispersion. Obrigado!"],
+    "pioneiro": ["🌟", "Pioneiro", "Entre os primeiros leitores do site"],
+    "colaborador": ["🛠️", "Colaborador", "Ajudou a equipe (tradução, revisão, edição...)"],
+    "parceiro": ["🤝", "Parceiro", "Grupo ou criador parceiro da Dispersion"],
+  };
+  const selosEspeciais = (lista, grande = false) => (lista || []).filter((s) => SELOS[s]).map((s) =>
+    `<span class="selo-especial ${grande ? "grande" : ""} se-${esc(s)}" title="${esc(SELOS[s][2])}">${SELOS[s][0]}${grande ? " " + esc(SELOS[s][1]) : ""}</span>`).join("");
+  // [chave, nome, prefixo do link (vazio = só mostra o usuário), cor]
+  const REDES = [
+    ["discord", "Discord", "", "#5865f2"],
+    ["x", "X / Twitter", "https://x.com/", "#111"],
+    ["instagram", "Instagram", "https://instagram.com/", "#d62976"],
+    ["tiktok", "TikTok", "https://www.tiktok.com/@", "#111"],
+    ["bluesky", "Bluesky", "https://bsky.app/profile/", "#0a7aff"],
+    ["youtube", "YouTube", "https://youtube.com/@", "#e62117"],
+    ["twitch", "Twitch", "https://twitch.tv/", "#9146ff"],
+    ["anilist", "AniList", "https://anilist.co/user/", "#02a9ff"],
+    ["myanimelist", "MyAnimeList", "https://myanimelist.net/profile/", "#2e51a2"],
+  ];
+  // aceita "@fulano", "fulano" ou o link inteiro e guarda só o usuário
+  const limparUsuario = (v) => String(v || "").trim().replace(/^https?:\/\/[^/]+\/(@|profile\/|user\/)?/i, "").replace(/^@/, "").replace(/[/?#].*$/, "").slice(0, 40);
+  const usuarioValido = (v) => /^[A-Za-z0-9._-]{1,40}$/.test(v);
+  const linkPerfil = (id) => `perfil.html?u=${encodeURIComponent(id)}`;
+
   /* ---------- XP: níveis e conquistas (o XP em si vem do banco: supabase/xp-e-conquistas.sql) ---------- */
   const NIVEIS = [
     [0, "Novato", "🌱"], [100, "Leitor", "📖"], [300, "Leitor Assíduo", "📚"], [700, "Devorador de Mangá", "🍙"],
@@ -477,6 +513,6 @@
 
   window.DT = {
     D, sb, carregar, iniciar, coresDe, esc, store, serie, capsOrdenados, ultimoCap, dataBR, tempoRelativo, capa, paginas,
-    lidos, continuar, novosDesde, conta, avatar, atualizarNav, header, footer, metaDoMes, nivel, seloNivel, NIVEIS, CONQUISTAS,
+    lidos, continuar, novosDesde, conta, avatar, atualizarNav, header, footer, metaDoMes, nivel, seloNivel, NIVEIS, CONQUISTAS, SELOS, selosEspeciais, REDES, limparUsuario, usuarioValido, linkPerfil,
   };
 })();

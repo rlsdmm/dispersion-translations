@@ -73,6 +73,7 @@
     if (nome === "capitulos") renderCapitulos();
     if (nome === "importar") prepararImportador();
     if (nome === "apoios") renderApoios();
+    if (nome === "denuncias") renderDenuncias();
   }
 
   /* ============ UTILIDADES ============ */
@@ -617,6 +618,68 @@
     $("apDias").value = 30; $("apResultados").innerHTML = ""; contaApoio = null;
     renderApoios();
   };
+
+  /* ============ SELOS ESPECIAIS ============ */
+  let contaSelo = null, buscaSeloT = null;
+  $("seBusca").oninput = () => {
+    clearTimeout(buscaSeloT);
+    const q = $("seBusca").value.trim();
+    if (q.length < 2) { $("seResultados").innerHTML = ""; return; }
+    buscaSeloT = setTimeout(async () => {
+      const { data, error } = await sb.rpc("buscar_contas", { p_q: q });
+      if (error) { $("seResultados").innerHTML = `<p class="msg erro">${esc(error.message)}</p>`; return; }
+      $("seResultados").innerHTML = (data || []).map((c) => `
+        <button type="button" class="conta-op" data-id="${c.user_id}" data-apelido="${esc(c.apelido)}"><b>${esc(c.apelido)}</b> <span class="sub">${esc(c.email || "")}</span></button>`).join("")
+        || `<p class="sub">Nenhuma conta encontrada.</p>`;
+    }, 300);
+  };
+  $("seResultados").onclick = async (e) => {
+    const b = e.target.closest(".conta-op"); if (!b) return;
+    contaSelo = b.dataset.id;
+    $("seResultados").querySelectorAll(".conta-op").forEach((x) => x.classList.toggle("on", x === b));
+    const { data } = await sb.from("perfis").select("selos").eq("user_id", contaSelo).maybeSingle();
+    const tem = new Set(data?.selos || []);
+    $("seNome").textContent = b.dataset.apelido;
+    $("seChecks").innerHTML = Object.entries(DT.SELOS).map(([id, [emoji, nome, desc]]) => `
+      <label class="check"><input type="checkbox" value="${id}" ${tem.has(id) ? "checked" : ""} /> ${emoji} <b>${nome}</b> <span class="sub">— ${desc}</span></label>`).join("");
+    $("seEditor").hidden = false; msg("seMsg", "");
+  };
+  $("seSalvar").onclick = async () => {
+    if (!contaSelo) return;
+    const selos = [...$("seChecks").querySelectorAll("input:checked")].map((i) => i.value);
+    const { error } = await sb.rpc("definir_selos", { p_user: contaSelo, p_selos: selos });
+    msg("seMsg", error ? "Erro: " + error.message : "Selos salvos!", error ? "erro" : "ok");
+  };
+
+  /* ============ DENÚNCIAS ============ */
+  async function renderDenuncias() {
+    const t = $("tabelaDenuncias");
+    t.innerHTML = `<p class="vazio">Carregando…</p>`;
+    const { data, error } = await sb.rpc("listar_denuncias");
+    if (error) { t.innerHTML = `<p class="msg erro">${esc(error.message)}</p>`; return; }
+    t.innerHTML = (data || []).length ? data.map((d) => `
+      <div class="linha ${d.resolvida ? "resolvida" : ""}">
+        <div><b>${esc(d.denunciado_apelido || "conta apagada")}</b> <span class="sub">denunciado por ${esc(d.quem || "?")} · ${dataHora(d.criado_em)}</span>
+          <div class="denuncia-texto">“${esc(d.texto || "")}”</div>
+          ${d.motivo ? `<div class="sub">Motivo: ${esc(d.motivo)}</div>` : ""}</div>
+        <div class="acoes">
+          ${d.denunciado ? `<a class="btn mini-btn" href="${DT.linkPerfil(d.denunciado)}" target="_blank">Perfil</a>
+          <button class="btn mini-btn perigo" data-banir="${d.denunciado}" data-nome="${esc(d.denunciado_apelido || "")}">Bloquear usuário</button>` : ""}
+          ${d.resolvida ? `<span class="sub">resolvida ✓</span>` : `<button class="btn mini-btn" data-resolver="${d.id}">Marcar resolvida</button>`}
+        </div>
+      </div>`).join("") : `<p class="vazio">Nenhuma denúncia. 🎉</p>`;
+    t.querySelectorAll("[data-resolver]").forEach((b) => (b.onclick = async () => {
+      const { error } = await sb.rpc("resolver_denuncia", { p_id: Number(b.dataset.resolver) });
+      if (error) return alert("Erro: " + error.message);
+      renderDenuncias();
+    }));
+    t.querySelectorAll("[data-banir]").forEach((b) => (b.onclick = async () => {
+      if (!confirm(`Bloquear ${b.dataset.nome}? A pessoa não vai mais poder comentar nem mandar mensagens, e os comentários dela serão apagados.`)) return;
+      const { error } = await sb.rpc("banir", { p_user: b.dataset.banir, p_banido: true });
+      if (error) return alert("Erro: " + error.message);
+      alert("Usuário bloqueado.");
+    }));
+  }
 
   async function renderApoios() {
     const t = $("tabelaApoios");

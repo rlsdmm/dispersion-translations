@@ -256,7 +256,7 @@ DT.iniciar(function () {
   let equipe = null;
   const ehVip = (c) => !!c.perfis?.vip_ate && new Date(c.perfis.vip_ate) > new Date();
   const xpDe = new Map(); // user_id -> XP (selo de nível)
-  const nomeAutor = (c) => `<b class="${ehVip(c) ? "nome-vip" : ""}">${esc(c.perfis?.apelido || "leitor")}</b>${
+  const nomeAutor = (c) => `<a class="nome-autor" href="${DT.linkPerfil(c.user_id)}"><b class="${ehVip(c) ? "nome-vip" : ""}">${esc(c.perfis?.apelido || "leitor")}</b></a>${DT.selosEspeciais(c.perfis?.selos)}${
     xpDe.has(c.user_id) ? DT.seloNivel(xpDe.get(c.user_id)) : ""}${
     equipe?.has(c.user_id) ? '<span class="selo-equipe">Equipe</span>' : ehVip(c) ? '<span class="selo-vip">VIP</span>' : ""}`;
   async function buscarXp(lista) {
@@ -284,7 +284,7 @@ DT.iniciar(function () {
 
   async function carregarComentarios() {
     const [r, e] = await Promise.all([
-      DT.sb.from("comentarios").select("id,texto,criado_em,user_id,pagina,perfis(apelido,vip_ate)")
+      DT.sb.from("comentarios").select("id,texto,criado_em,user_id,pagina,perfis(apelido,vip_ate,selos)")
         .eq("serie_id", s.id).eq("numero", cap.numero).order("criado_em", { ascending: true }).limit(500),
       equipe ? { data: null } : DT.sb.rpc("equipe_ids"),
     ]);
@@ -480,7 +480,7 @@ DT.iniciar(function () {
       $("msgPag").textContent = error.code === "42501" ? "Calma! Espere uns segundos." : "Não deu: " + error.message;
       return;
     }
-    const c = { ...data, perfis: { apelido: conta.perfil?.apelido, vip_ate: conta.perfil?.vip_ate } };
+    const c = { ...data, perfis: { apelido: conta.perfil?.apelido, vip_ate: conta.perfil?.vip_ate, selos: conta.perfil?.selos } };
     todos.push(c); indexar();
     inp.value = "";
     abaPainel = "pag";
@@ -495,7 +495,7 @@ DT.iniciar(function () {
   };
 
   Promise.all([
-    DT.sb.from("comentarios").select("id,texto,criado_em,user_id,pagina,perfis(apelido,vip_ate)")
+    DT.sb.from("comentarios").select("id,texto,criado_em,user_id,pagina,perfis(apelido,vip_ate,selos)")
       .eq("serie_id", s.id).eq("numero", cap.numero).order("criado_em", { ascending: true }).limit(2000),
     DT.sb.rpc("equipe_ids"),
   ]).then(([r, e]) => {

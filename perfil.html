@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Perfil · Dispersion Translations</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="favicon.ico" sizes="48x48" />
+  <link rel="icon" href="icone-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="theme-color" content="#070b16" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
+  <link rel="stylesheet" href="css/style.css?v=20" />
+  <link rel="stylesheet" href="css/temas.css?v=6" />
+  <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
+</head>
+<body>
+  <div id="topo"></div>
+  <main class="wrap perfil-pub" id="conteudo"><p class="sub">Carregando…</p></main>
+  <div id="rodape"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js?v=5"></script>
+  <script src="js/app.js?v=9"></script>
+  <script>
+    const { esc, conta, avatar } = DT;
+    document.getElementById("topo").innerHTML = DT.header();
+    document.getElementById("rodape").innerHTML = DT.footer();
+    const el = document.getElementById("conteudo");
+    const id = new URLSearchParams(location.search).get("u");
+
+    DT.iniciar(async () => {
+      if (!DT.sb || !id) { el.innerHTML = `<p class="erro-pag">Perfil não encontrado.</p>`; return; }
+      const { data: p, error } = await DT.sb.rpc("perfil_publico", { p_user: id });
+      if (error || !p || p.banido) { el.innerHTML = `<p class="erro-pag">Perfil não encontrado. <a class="link" href="index.html">Voltar ao início</a></p>`; return; }
+      document.title = `${p.apelido} · Dispersion Translations`;
+      const eu = conta.user?.id === p.user_id;
+      const x = p.xp || { xp: 0, caps: 0, obras: 0, comentarios: 0, melhor_seq: 0 };
+      const v = DT.nivel(x.xp);
+      const conq = DT.CONQUISTAS.filter((c) => c[4](x));
+      const redes = DT.REDES.filter(([k]) => p.redes?.[k] && DT.usuarioValido(p.redes[k]));
+      const desde = new Date(p.criado_em).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+
+      el.innerHTML = `
+        <section class="pp-topo">
+          ${avatar(p.apelido, p.user_id, "enorme")}
+          <div class="pp-info">
+            <h1 class="${p.vip ? "nome-vip" : ""}">${esc(p.apelido)}</h1>
+            <div class="pp-selos">
+              ${p.equipe ? '<span class="selo-equipe">Equipe</span>' : ""}
+              ${p.vip ? '<span class="selo-vip">VIP</span>' : ""}
+              ${DT.seloNivel(x.xp)}
+              ${DT.selosEspeciais(p.selos, true)}
+            </div>
+            <p class="sub">Lendo na Dispersion desde ${desde}</p>
+            ${p.bio ? `<p class="pp-bio">${esc(p.bio)}</p>` : eu ? `<p class="sub">Você ainda não escreveu uma bio. <a class="link" href="conta.html#perfilPublico">Escrever agora</a></p>` : ""}
+            <div class="pp-acoes">
+              ${eu ? `<a class="btn" href="conta.html#perfilPublico">✏️ Editar perfil</a>`
+                : conta.user ? (p.aceita_mensagens ? `<a class="btn pri" href="mensagens.html?com=${encodeURIComponent(p.user_id)}">✉️ Mandar mensagem</a>` : `<span class="sub">Não recebe mensagens.</span>`)
+                : `<a class="btn" href="${conta.linkEntrar()}">Entre pra mandar mensagem</a>`}
+            </div>
+          </div>
+        </section>
+
+        ${redes.length ? `<section class="pp-redes">${redes.map(([k, nome, pre, cor]) => {
+          const u = p.redes[k];
+          return pre
+            ? `<a class="rede" style="--cor:${cor}" href="${pre}${encodeURIComponent(u)}" target="_blank" rel="noopener nofollow ugc"><b>${nome}</b><span>@${esc(u)}</span></a>`
+            : `<button type="button" class="rede" style="--cor:${cor}" data-copiar="${esc(u)}" title="Copiar"><b>${nome}</b><span>${esc(u)} 📋</span></button>`;
+        }).join("")}</section>` : ""}
+
+        <section class="pp-grade">
+          <div class="xp-card">
+            <div class="xp-topo">
+              <div class="xp-nivel nv${Math.min(v.n, 8)}"><span>${v.emoji}</span><small>Nível</small><b>${v.n}</b></div>
+              <div class="xp-info">
+                <h2>${v.nome}</h2>
+                <div class="xp-barra"><div style="width:${v.pct}%"></div></div>
+                <p class="sub"><b class="xp-num">${v.xp.toLocaleString("pt-BR")} XP</b></p>
+              </div>
+            </div>
+            <div class="xp-stats">
+              <div><b>${x.caps}</b><small>capítulos lidos</small></div>
+              <div><b>${x.obras}</b><small>obras terminadas</small></div>
+              <div><b>${x.comentarios}</b><small>comentários</small></div>
+              <div><b>${x.melhor_seq}</b><small>dias seguidos (recorde)</small></div>
+            </div>
+            <h3>Conquistas <span class="sub">${conq.length} de ${DT.CONQUISTAS.length}</span></h3>
+            <div class="conquistas">${conq.length ? conq.map(([, e, nome, desc]) => `
+              <div class="conquista ok" title="${desc}"><span>${e}</span><b>${nome}</b><small>${desc}</small></div>`).join("")
+              : `<p class="sub">Nenhuma conquista ainda.</p>`}</div>
+          </div>
+        </section>`;
+
+      el.querySelectorAll("[data-copiar]").forEach((b) => (b.onclick = async () => {
+        try { await navigator.clipboard.writeText(b.dataset.copiar); b.querySelector("span").textContent = "copiado! ✓"; } catch {}
+      }));
+    });
+  </script>
+  <!-- Cloudflare Web Analytics (contagem anônima de visitas, sem cookies) --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "0950cd16f7fa48d592b6e8d109a58805"}'></script>
+</body>
+</html>
