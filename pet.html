@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Meu pet · Dispersion Translations</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="favicon.ico" sizes="48x48" />
+  <link rel="icon" href="icone-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="theme-color" content="#070b16" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
+  <link rel="stylesheet" href="css/style.css?v=21" />
+  <link rel="stylesheet" href="css/temas.css?v=6" />
+  <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
+</head>
+<body>
+  <div id="topo"></div>
+
+  <main class="wrap pagina-pet">
+    <div class="painel-card login" id="deslogado" hidden>
+      <div class="pet-palco pequeno" id="ovoDeslogado"></div>
+      <h1>Ganhe um ovinho! 🥚</h1>
+      <p class="sub">Crie uma conta grátis, cuide do seu ovo e descubra qual bichinho vai nascer. Tem até pet lendário!</p>
+      <a class="btn pri" href="conta.html?volta=pet.html">Entrar ou criar conta</a>
+    </div>
+
+    <div id="logado" hidden>
+      <section class="pet-card" id="petCard"><p class="sub">Carregando…</p></section>
+
+      <section class="pet-dex">
+        <div class="titulo-sec"><h2>Bichinhos que podem nascer</h2></div>
+        <p class="sub">O bicho e a cor são sorteados quando o ovo choca. Tem 2% de chance de nascer <b>brilhante ✨</b>.</p>
+        <div class="dex" id="dex"></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="rodape"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js?v=5"></script>
+  <script src="js/app.js?v=10"></script>
+  <script src="js/pets.js?v=1"></script>
+  <script>
+    const { esc, conta, sb } = DT;
+    const $ = (id) => document.getElementById(id);
+    $("topo").innerHTML = DT.header("pet");
+    $("rodape").innerHTML = DT.footer();
+    const CHANCE = { comum: 60, incomum: 25, raro: 12, lendario: 3 };
+    const POR_RARIDADE = Object.values(PETS.ESPECIES).reduce((a, [, r]) => ((a[r] = (a[r] || 0) + 1), a), {});
+    const estagio = (calor) => (calor >= 100 ? 3 : calor >= 70 ? 2 : calor >= 35 ? 1 : 0);
+    const espera = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    DT.iniciar(async () => {
+      if (!sb || !conta.user) {
+        $("ovoDeslogado").innerHTML = PETS.desenharOvo(1, 210);
+        $("deslogado").hidden = false;
+        return;
+      }
+      $("logado").hidden = false;
+      const hue = PETS.corOvo(conta.user.id);
+      let pet = (await sb.rpc("meu_pet")).data;
+      render();
+
+      function renderDex() {
+        $("dex").innerHTML = Object.entries(PETS.ESPECIES).map(([id, [nome, rar]]) => {
+          const meu = pet?.especie === id;
+          const [rnome, rcor] = PETS.RARIDADES[rar];
+          const chance = (CHANCE[rar] / POR_RARIDADE[rar]).toLocaleString("pt-BR", { maximumFractionDigits: 1 });
+          return `<div class="dex-item ${meu ? "meu" : ""}">
+            <div class="dex-img">${PETS.desenharPet({ especie: id, cor: meu ? pet.cor : 210, brilhante: meu && pet.brilhante }, meu ? "" : "silhueta")}</div>
+            <b>${meu ? nome : "???"}</b>
+            <small style="color:${rcor}">${rnome} · ${chance}%</small>
+          </div>`;
+        }).join("");
+      }
+
+      function render() {
+        renderDex();
+        if (!pet) { $("petCard").innerHTML = `<p class="msg erro">Não deu pra carregar seu pet. Tente recarregar a página.</p>`; return; }
+        if (!pet.nasceu_em) return renderOvo();
+        renderPet();
+      }
+
+      function renderOvo() {
+        const c = pet.calor, pronto = c >= 100;
+        const falta = Math.max(0, 100 - c);
+        $("petCard").innerHTML = `
+          <div class="pet-palco" id="palco">${PETS.desenharOvo(estagio(c), hue)}</div>
+          <div class="pet-lado">
+            <h1>${pronto ? "O ovo está rachando! 🐣" : "Seu ovinho"}</h1>
+            <p class="sub">${pronto ? "Ele está pronto pra nascer. Toque no botão pra chocar!"
+              : "Mantenha o ovo quentinho pra ele chocar. Ninguém sabe o que tem aí dentro…"}</p>
+            <div class="calor">
+              <div class="calor-topo"><b>🔥 Calor</b><span>${c}/100</span></div>
+              <div class="xp-barra calor-barra"><div style="width:${c}%"></div></div>
+            </div>
+            <button class="btn pri grande" id="btnAquecer" ${pet.aqueceu_hoje && !pronto ? "disabled" : ""}>
+              ${pronto ? "🐣 Chocar o ovo!" : pet.aqueceu_hoje ? "✓ Já aqueceu hoje" : "🔥 Aquecer o ovo (+15)"}</button>
+            <ul class="como-aquecer">
+              <li><b>+15</b> por dia que você aquece o ovo (1 vez por dia) <span class="sub">· ${pet.dias} ${pet.dias === 1 ? "dia" : "dias"}</span></li>
+              <li><b>+10</b> por capítulo que você termina de ler <span class="sub">· ${pet.caps} ${pet.caps === 1 ? "capítulo" : "capítulos"}</span></li>
+            </ul>
+            ${!pronto ? `<p class="sub">Faltam <b>${falta}</b> de calor: dá pra chocar lendo ${Math.ceil(falta / 10)} ${Math.ceil(falta / 10) === 1 ? "capítulo" : "capítulos"}. <a class="link" href="index.html#obras">Ir ler →</a></p>` : ""}
+          </div>`;
+        $("btnAquecer").onclick = aquecer;
+      }
+
+      async function aquecer() {
+        const b = $("btnAquecer"); b.disabled = true;
+        const ovo = $("palco").querySelector(".ovo-svg");
+        ovo.classList.add("chocando");
+        const [r] = await Promise.all([sb.rpc("aquecer_ovo"), espera(900)]);
+        ovo.classList.remove("chocando");
+        if (r.error) { b.disabled = false; return alert("Não deu: " + r.error.message); }
+        pet = r.data;
+        if (!pet.nasceu_agora) return render();
+        // nascimento!
+        $("palco").innerHTML = PETS.desenharOvo(3, hue, "chocando");
+        await espera(1600);
+        $("palco").classList.add("flash");
+        await espera(350);
+        renderPet(true);
+        renderDex();
+      }
+
+      function renderPet(nasceuAgora = false) {
+        const [nome, rar, desc] = PETS.ESPECIES[pet.especie] || ["?", "comum", ""];
+        const [rnome, rcor] = PETS.RARIDADES[rar];
+        const nasc = new Date(pet.nasceu_em).toLocaleDateString("pt-BR");
+        $("petCard").innerHTML = `
+          <div class="pet-palco ${nasceuAgora ? "revela" : ""}" id="palco" title="Fazer carinho">${PETS.desenharPet(pet)}</div>
+          <div class="pet-lado">
+            ${nasceuAgora ? `<p class="nasceu">🎉 Nasceu!</p>` : ""}
+            <h1>${esc(pet.nome || nome)}</h1>
+            <div class="pet-tags">
+              <span class="pet-rar" style="--rc:${rcor}">${rnome}</span>
+              <span class="pet-esp">${nome}</span>
+              ${pet.brilhante ? `<span class="pet-rar brilho" style="--rc:#fde68a">✨ Brilhante</span>` : ""}
+            </div>
+            <p>${desc}</p>
+            <p class="sub">Nasceu em ${nasc}. Aparece no seu <a class="link" href="${DT.linkPerfil(conta.user.id)}">perfil</a>.</p>
+            <form class="pet-nome" id="formNome">
+              <label>${pet.nome ? "Nome do pet" : "Dê um nome pro seu pet!"}
+                <input type="text" id="nomePet" maxlength="20" value="${esc(pet.nome || "")}" placeholder="ex: ${nome}" /></label>
+              <button class="btn" type="submit">Salvar nome</button>
+            </form>
+            <p class="msg" id="msgNome"></p>
+            <p class="sub dica-carinho">💡 Clique no ${nome.toLowerCase()} pra fazer carinho.</p>
+          </div>`;
+        $("palco").onclick = (e) => {
+          const svg = $("palco").querySelector(".pet-svg");
+          svg.classList.remove("feliz"); void svg.offsetWidth; svg.classList.add("feliz");
+          const c = document.createElement("span");
+          c.className = "coracao-pet"; c.textContent = ["💖", "💕", "✨", "💗"][Math.floor(Math.random() * 4)];
+          const r = $("palco").getBoundingClientRect();
+          c.style.left = e.clientX - r.left - 10 + "px"; c.style.top = e.clientY - r.top - 20 + "px";
+          $("palco").appendChild(c); setTimeout(() => c.remove(), 1300);
+        };
+        $("formNome").onsubmit = async (e) => {
+          e.preventDefault();
+          const n = $("nomePet").value.trim();
+          const { error } = await sb.rpc("nomear_pet", { p_nome: n });
+          if (error) { $("msgNome").textContent = "Não deu pra salvar: " + error.message; $("msgNome").className = "msg erro"; return; }
+          pet.nome = n || null;
+          renderPet();
+          $("msgNome").textContent = "Nome salvo! 💕"; $("msgNome").className = "msg ok";
+        };
+      }
+    });
+  </script>
+  <!-- Cloudflare Web Analytics (contagem anônima de visitas, sem cookies) --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "0950cd16f7fa48d592b6e8d109a58805"}'></script>
+</body>
+</html>

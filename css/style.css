@@ -967,3 +967,71 @@ html[data-tema="papel"] .xp-fogo, html[data-tema="fofinho"] .xp-fogo { color: #c
 .linha.resolvida { opacity: .55; }
 .pp-grade .xp-stats div:last-child { grid-column: auto; }
 .conv-quem span > .selo-especial { align-self: flex-start; margin: 2px 0; }
+
+/* ---------- pets ---------- */
+.pet-svg, .ovo-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.pet-svg .corpo { transform-box: fill-box; transform-origin: 50% 100%; animation: pet-respira 2.6s ease-in-out infinite; }
+.pet-svg .corpo.flutua { animation: pet-flutua 3.2s ease-in-out infinite; }
+.pet-svg .olhos { transform-box: fill-box; transform-origin: 50% 50%; animation: pet-pisca 4.5s infinite; }
+.pet-svg .brilhante path, .pet-svg .brilhinhos path { transform-box: fill-box; transform-origin: center; animation: pet-cintila 1.8s ease-in-out infinite; }
+.pet-svg .brilhante path:nth-child(2n), .pet-svg .brilhinhos path:nth-child(2n) { animation-delay: .9s; }
+.pet-svg.feliz .corpo { animation: pet-pula .5s ease-in-out 3; }
+@keyframes pet-respira { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.035, .965); } }
+@keyframes pet-flutua { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes pet-pisca { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@keyframes pet-cintila { 0%, 100% { transform: scale(.6); opacity: .5; } 50% { transform: scale(1.1); opacity: 1; } }
+@keyframes pet-pula { 0%, 100% { transform: translateY(0) scale(1, 1); } 40% { transform: translateY(-14px) scale(.95, 1.06); } 70% { transform: translateY(0) scale(1.08, .92); } }
+.ovo-svg .casca { transform-box: fill-box; transform-origin: 50% 100%; }
+.ovo-svg.e1 .casca { animation: ovo-balanca 4s ease-in-out infinite; }
+.ovo-svg.e2 .casca { animation: ovo-balanca 2.2s ease-in-out infinite; }
+.ovo-svg.e3 .casca { animation: ovo-balanca 1s ease-in-out infinite; }
+.ovo-svg .aura { animation: pet-cintila 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.ovo-svg.chocando .casca { animation: ovo-treme .12s linear infinite; }
+@keyframes ovo-balanca { 0%, 70%, 100% { transform: rotate(0); } 78% { transform: rotate(-6deg); } 86% { transform: rotate(6deg); } 93% { transform: rotate(-3deg); } }
+@keyframes ovo-treme { 0% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } 100% { transform: rotate(-4deg); } }
+.coracao-pet { position: absolute; pointer-events: none; font-size: 22px; animation: coracao-sobe 1.2s ease-out forwards; }
+@keyframes coracao-sobe { from { transform: translateY(0) scale(.6); opacity: 1; } to { transform: translateY(-70px) scale(1.2); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .pet-svg *, .ovo-svg * { animation: none !important; } }
+.pagina-pet { padding-top: 30px; padding-bottom: 40px; }
+.pet-card { display: grid; grid-template-columns: minmax(220px, 320px) 1fr; gap: 34px; align-items: center; padding: 28px; border-radius: var(--raio); border: 1px solid var(--borda); background: radial-gradient(circle at 25% 40%, rgba(59, 130, 246, .14), transparent 60%), var(--card); }
+.pet-palco { position: relative; max-width: 300px; width: 100%; margin: 0 auto; cursor: pointer; user-select: none; }
+.pet-palco.pequeno { max-width: 140px; cursor: default; }
+.pet-palco.flash::after { content: ""; position: absolute; inset: -20%; border-radius: 50%; background: radial-gradient(circle, #fff, transparent 65%); animation: flash-ovo .4s ease-out forwards; }
+@keyframes flash-ovo { from { opacity: 0; transform: scale(.5); } 50% { opacity: 1; } to { opacity: 0; transform: scale(1.3); } }
+.pet-palco.revela .pet-svg { animation: pet-revela .8s cubic-bezier(.34, 1.6, .64, 1) both; }
+@keyframes pet-revela { from { transform: scale(.2) translateY(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+.pet-lado h1 { font-size: 32px; line-height: 1.1; margin-bottom: 8px; }
+.pet-lado > p { margin-bottom: 10px; }
+.nasceu { font-weight: 900; font-size: 18px; color: var(--acc2); animation: pet-revela .6s both; }
+.calor { margin: 18px 0 14px; max-width: 420px; }
+.calor-topo { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; }
+.calor-barra div { background: linear-gradient(90deg, #fb923c, #f43f5e); }
+.btn.grande { padding: 13px 22px; font-size: 16px; }
+.btn:disabled { opacity: .55; cursor: default; }
+.como-aquecer { margin: 16px 0 10px 18px; display: grid; gap: 4px; font-size: 14px; }
+.pet-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.pet-rar { font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px; color: var(--rc); border: 1px solid var(--rc); background: color-mix(in srgb, var(--rc) 14%, transparent); }
+.pet-rar.brilho { animation: pet-cintila 2s ease-in-out infinite; }
+.pet-esp { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--bg2); border: 1px solid var(--borda); color: var(--sub); }
+.pet-nome { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-top: 16px; }
+.pet-nome label { display: grid; gap: 6px; font-size: 13px; font-weight: 700; }
+.pet-nome input { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--borda); background: var(--bg); color: var(--txt); font: inherit; min-width: 200px; }
+.dica-carinho { margin-top: 12px; font-size: 13px; }
+.pet-dex { margin-top: 36px; }
+.dex { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-top: 14px; }
+.dex-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px; border-radius: 14px; background: var(--card); border: 1px solid var(--borda); text-align: center; }
+.dex-item.meu { border-color: var(--acc); box-shadow: 0 0 0 1px var(--acc) inset; }
+.dex-img { width: 86px; }
+.pet-svg.silhueta { filter: brightness(0) opacity(.35); }
+.pet-svg.silhueta * { animation: none !important; }
+.dex-item small { font-size: 11px; font-weight: 700; }
+.pp-pet { display: flex; align-items: center; gap: 18px; margin-top: 18px; padding: 16px 20px; border-radius: var(--raio); border: 1px solid var(--borda); background: var(--card); }
+.pp-pet .pet-palco { max-width: 110px; margin: 0; flex-shrink: 0; }
+.pp-pet h3 { font-size: 18px; }
+@media (max-width: 760px) {
+  .pet-card { grid-template-columns: 1fr; padding: 20px; gap: 16px; text-align: center; }
+  .pet-palco { max-width: 220px; }
+  .pet-tags, .pet-nome { justify-content: center; }
+  .como-aquecer { text-align: left; }
+  .calor { margin-left: auto; margin-right: auto; }
+}

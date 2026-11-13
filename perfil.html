@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=20" />
+  <link rel="stylesheet" href="css/style.css?v=21" />
   <link rel="stylesheet" href="css/temas.css?v=6" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -25,7 +25,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js?v=5"></script>
-  <script src="js/app.js?v=9"></script>
+  <script src="js/app.js?v=10"></script>
+  <script src="js/pets.js?v=1"></script>
   <script>
     const { esc, conta, avatar } = DT;
     document.getElementById("topo").innerHTML = DT.header();
@@ -35,7 +36,10 @@
 
     DT.iniciar(async () => {
       if (!DT.sb || !id) { el.innerHTML = `<p class="erro-pag">Perfil não encontrado.</p>`; return; }
-      const { data: p, error } = await DT.sb.rpc("perfil_publico", { p_user: id });
+      const [{ data: p, error }, { data: petRow }] = await Promise.all([
+        DT.sb.rpc("perfil_publico", { p_user: id }),
+        DT.sb.from("pets").select("*").eq("user_id", id).maybeSingle(),
+      ]);
       if (error || !p || p.banido) { el.innerHTML = `<p class="erro-pag">Perfil não encontrado. <a class="link" href="index.html">Voltar ao início</a></p>`; return; }
       document.title = `${p.apelido} · Dispersion Translations`;
       const eu = conta.user?.id === p.user_id;
@@ -72,6 +76,17 @@
             ? `<a class="rede" style="--cor:${cor}" href="${pre}${encodeURIComponent(u)}" target="_blank" rel="noopener nofollow ugc"><b>${nome}</b><span>@${esc(u)}</span></a>`
             : `<button type="button" class="rede" style="--cor:${cor}" data-copiar="${esc(u)}" title="Copiar"><b>${nome}</b><span>${esc(u)} 📋</span></button>`;
         }).join("")}</section>` : ""}
+
+        ${petRow ? (() => {
+          if (!petRow.nasceu_em) return `<section class="pp-pet"><div class="pet-palco">${PETS.desenharOvo(1, PETS.corOvo(p.user_id))}</div>
+            <div><h3>Um ovinho 🥚</h3><p class="sub">Ainda não chocou. O que será que vai nascer?</p>${eu ? `<a class="link" href="pet.html">Cuidar do ovo →</a>` : ""}</div></section>`;
+          const [en, rar] = PETS.ESPECIES[petRow.especie] || ["?", "comum"];
+          const [rn, rc] = PETS.RARIDADES[rar];
+          return `<section class="pp-pet"><div class="pet-palco">${PETS.desenharPet(petRow)}</div>
+            <div><h3>${esc(petRow.nome || en)}</h3>
+            <div class="pet-tags"><span class="pet-rar" style="--rc:${rc}">${rn}</span><span class="pet-esp">${en}</span>${petRow.brilhante ? `<span class="pet-rar brilho" style="--rc:#fde68a">✨ Brilhante</span>` : ""}</div>
+            ${eu ? `<a class="link" href="pet.html">Ver meu pet →</a>` : ""}</div></section>`;
+        })() : eu ? `<section class="pp-pet"><div class="pet-palco">${PETS.desenharOvo(0, PETS.corOvo(p.user_id))}</div><div><h3>Tem um ovo te esperando! 🥚</h3><a class="link" href="pet.html">Pegar meu ovo →</a></div></section>` : ""}
 
         <section class="pp-grade">
           <div class="xp-card">
