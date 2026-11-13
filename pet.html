@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=21" />
+  <link rel="stylesheet" href="css/style.css?v=22" />
   <link rel="stylesheet" href="css/temas.css?v=6" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -45,7 +45,7 @@
   <script src="js/config.js"></script>
   <script src="js/data.js?v=5"></script>
   <script src="js/app.js?v=10"></script>
-  <script src="js/pets.js?v=1"></script>
+  <script src="js/pets.js?v=2"></script>
   <script>
     const { esc, conta, sb } = DT;
     const $ = (id) => document.getElementById(id);
@@ -65,6 +65,8 @@
       $("logado").hidden = false;
       const hue = PETS.corOvo(conta.user.id);
       let pet = (await sb.rpc("meu_pet")).data;
+      const msg = (id, t, tipo) => { $(id).innerHTML = t; $(id).className = "msg " + tipo; };
+      let humorForcado = null;
       render();
 
       function renderDex() {
@@ -134,7 +136,7 @@
         const [rnome, rcor] = PETS.RARIDADES[rar];
         const nasc = new Date(pet.nasceu_em).toLocaleDateString("pt-BR");
         $("petCard").innerHTML = `
-          <div class="pet-palco ${nasceuAgora ? "revela" : ""}" id="palco" title="Fazer carinho">${PETS.desenharPet(pet)}</div>
+          <div class="pet-palco ${nasceuAgora ? "revela" : ""}" id="palco" title="Fazer carinho"></div>
           <div class="pet-lado">
             ${nasceuAgora ? `<p class="nasceu">🎉 Nasceu!</p>` : ""}
             <h1>${esc(pet.nome || nome)}</h1>
@@ -143,34 +145,120 @@
               <span class="pet-esp">${nome}</span>
               ${pet.brilhante ? `<span class="pet-rar brilho" style="--rc:#fde68a">✨ Brilhante</span>` : ""}
             </div>
-            <p>${desc}</p>
-            <p class="sub">Nasceu em ${nasc}. Aparece no seu <a class="link" href="${DT.linkPerfil(conta.user.id)}">perfil</a>.</p>
-            <form class="pet-nome" id="formNome">
-              <label>${pet.nome ? "Nome do pet" : "Dê um nome pro seu pet!"}
-                <input type="text" id="nomePet" maxlength="20" value="${esc(pet.nome || "")}" placeholder="ex: ${nome}" /></label>
-              <button class="btn" type="submit">Salvar nome</button>
-            </form>
-            <p class="msg" id="msgNome"></p>
-            <p class="sub dica-carinho">💡 Clique no ${nome.toLowerCase()} pra fazer carinho.</p>
+            <div id="statusPet"></div>
+            <div class="pet-comida">
+              <div class="pc-topo"><b>🍱 Petiscos: <span id="nPetiscos"></span></b><button type="button" class="btn mini-btn" id="btnPresente"></button></div>
+              <div class="bandeja">${Object.entries(PETS.COMIDAS).map(([id, [e, n]]) => `
+                <button type="button" class="comida" data-comida="${id}" title="Dar ${n}"><span>${e}</span><small>${n}</small></button>`).join("")}</div>
+              <p class="sub">Cada capítulo que você termina vale <b>1 petisco</b>, e tem 1 de presente por dia. Cada pet tem uma comida favorita… descubra qual! 👀</p>
+              <p class="msg" id="msgComida"></p>
+            </div>
+            <details class="pet-sobre">
+              <summary>Sobre ${esc(pet.nome || nome)} e nome</summary>
+              <p>${desc}</p>
+              <p class="sub">Nasceu em ${nasc}. Aparece no seu <a class="link" href="${DT.linkPerfil(conta.user.id)}">perfil</a>.</p>
+              <form class="pet-nome" id="formNome">
+                <label>${pet.nome ? "Nome do pet" : "Dê um nome pro seu pet!"}
+                  <input type="text" id="nomePet" maxlength="20" value="${esc(pet.nome || "")}" placeholder="ex: ${nome}" /></label>
+                <button class="btn" type="submit">Salvar nome</button>
+              </form>
+              <p class="msg" id="msgNome"></p>
+            </details>
           </div>`;
-        $("palco").onclick = (e) => {
-          const svg = $("palco").querySelector(".pet-svg");
-          svg.classList.remove("feliz"); void svg.offsetWidth; svg.classList.add("feliz");
-          const c = document.createElement("span");
-          c.className = "coracao-pet"; c.textContent = ["💖", "💕", "✨", "💗"][Math.floor(Math.random() * 4)];
-          const r = $("palco").getBoundingClientRect();
-          c.style.left = e.clientX - r.left - 10 + "px"; c.style.top = e.clientY - r.top - 20 + "px";
-          $("palco").appendChild(c); setTimeout(() => c.remove(), 1300);
+        if (!pet.nome || nasceuAgora) $("petCard").querySelector(".pet-sobre").open = true;
+        renderStatus();
+
+        $("palco").onclick = async (e) => {
+          coracao(e);
+          pular();
+          const antes = pet.carinhos_hoje || 0;
+          const { data } = await sb.rpc("carinho_pet");
+          if (data) {
+            pet = data; renderStatus();
+            if (antes >= 5) msg("msgComida", `${esc(pet.nome || nome)} adora carinho! (a felicidade extra vale até 5 carinhos por dia)`, "");
+          }
         };
+        $("btnPresente").onclick = async () => {
+          $("btnPresente").disabled = true;
+          const { data, error } = await sb.rpc("presente_pet");
+          if (error) return msg("msgComida", "Não deu: " + esc(error.message), "erro");
+          pet = data; renderStatus(); msg("msgComida", "🎁 +1 petisco! Volte amanhã pra pegar outro.", "ok");
+        };
+        $("petCard").querySelectorAll(".comida").forEach((b) => (b.onclick = () => alimentar(b)));
         $("formNome").onsubmit = async (e) => {
           e.preventDefault();
           const n = $("nomePet").value.trim();
           const { error } = await sb.rpc("nomear_pet", { p_nome: n });
-          if (error) { $("msgNome").textContent = "Não deu pra salvar: " + error.message; $("msgNome").className = "msg erro"; return; }
+          if (error) return msg("msgNome", "Não deu pra salvar: " + esc(error.message), "erro");
           pet.nome = n || null;
-          renderPet();
-          $("msgNome").textContent = "Nome salvo! 💕"; $("msgNome").className = "msg ok";
+          $("petCard").querySelector(".pet-lado h1").textContent = n || nome;
+          msg("msgNome", "Nome salvo! 💕", "ok");
         };
+      }
+
+
+      // barras, humor e botões (sem redesenhar a página toda)
+      function renderStatus() {
+        const humor = humorForcado || PETS.humorDe(pet);
+        const [he, hn] = PETS.HUMORES[humor];
+        const corBarra = (v) => (v < 20 ? "#f87171" : v < 50 ? "#fbbf24" : "#34d399");
+        const svgAtual = $("palco").querySelector(".pet-svg");
+        if (!svgAtual || !svgAtual.classList.contains("humor-" + humor)) {
+          if (svgAtual) svgAtual.remove();
+          $("palco").insertAdjacentHTML("afterbegin", PETS.desenharPet(pet, "", humor));
+        }
+        const dica = humor === "fome" ? "Tá com fome! Dá uma comidinha 🍙"
+          : humor === "triste" ? "Tá carente… faz um carinho ou dá a comida favorita."
+          : humor === "dormindo" ? "Shhh… tá dormindo. Dá pra cuidar mesmo assim."
+          : humor === "radiante" ? "Super feliz com você! 💕" : "Tranquilo e de barriguinha cheia.";
+        $("statusPet").innerHTML = `
+          <div class="pet-humor"><span>${he}</span><div><b>${hn}</b><small>${dica}</small></div></div>
+          <div class="barra-pet"><span>🍙 Barriga</span><div class="xp-barra"><div style="width:${pet.saciedade}%;background:${corBarra(pet.saciedade)}"></div></div><b>${pet.saciedade}</b></div>
+          <div class="barra-pet"><span>💖 Felicidade</span><div class="xp-barra"><div style="width:${pet.felicidade}%;background:${corBarra(pet.felicidade)}"></div></div><b>${pet.felicidade}</b></div>
+          <p class="sub dica-carinho">💡 Clique no pet pra fazer carinho <span>(${Math.min(5, pet.carinhos_hoje || 0)}/5 hoje)</span></p>`;
+        $("nPetiscos").textContent = pet.petiscos;
+        $("btnPresente").disabled = pet.presente_hoje;
+        $("btnPresente").textContent = pet.presente_hoje ? "🎁 Presente de hoje já pego" : "🎁 Pegar presente do dia";
+        $("petCard").querySelectorAll(".comida").forEach((b) => (b.disabled = pet.petiscos < 1));
+      }
+
+      function pular() {
+        const svg = $("palco").querySelector(".pet-svg");
+        svg.classList.remove("feliz"); void svg.getBoundingClientRect(); svg.classList.add("feliz");
+      }
+      function coracao(e, txt) {
+        const c = document.createElement("span");
+        c.className = "coracao-pet"; c.textContent = txt || ["💖", "💕", "✨", "💗"][Math.floor(Math.random() * 4)];
+        const r = $("palco").getBoundingClientRect();
+        const x = e ? e.clientX - r.left : r.width / 2, y = e ? e.clientY - r.top : r.height / 3;
+        c.style.left = x - 10 + "px"; c.style.top = y - 20 + "px";
+        $("palco").appendChild(c); setTimeout(() => c.remove(), 1300);
+      }
+
+      async function alimentar(botao) {
+        const id = botao.dataset.comida, [emoji, nomeC] = PETS.COMIDAS[id];
+        $("petCard").querySelectorAll(".comida").forEach((b) => (b.disabled = true));
+        const { data, error } = await sb.rpc("alimentar_pet", { p_comida: id });
+        if (error) {
+          renderStatus();
+          return msg("msgComida", /cheio/.test(error.message) ? "Tá cheinho! Espera a barriga baixar um pouco. 😴"
+            : /petisco/.test(error.message) ? "Sem petiscos: leia um capítulo ou pegue o presente do dia." : "Não deu: " + esc(error.message), "erro");
+        }
+        // a comidinha voa até o pet
+        const de = botao.getBoundingClientRect(), ate = $("palco").getBoundingClientRect();
+        const voa = Object.assign(document.createElement("span"), { className: "comida-voando", textContent: emoji });
+        voa.style.left = de.left + de.width / 2 - 16 + "px"; voa.style.top = de.top + "px";
+        document.body.appendChild(voa);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          voa.style.transform = `translate(${ate.left + ate.width / 2 - de.left - de.width / 2}px, ${ate.top + ate.height * 0.55 - de.top}px) scale(.4)`;
+          voa.style.opacity = ".2";
+        }));
+        await espera(650); voa.remove();
+        pet = data;
+        humorForcado = "radiante"; renderStatus(); pular();
+        coracao(null, data.favorita ? "❤️" : "😋");
+        msg("msgComida", data.favorita ? `❤️ <b>${nomeC}</b> é a comida favorita! Ganhou felicidade em dobro.` : `Nham! ${emoji} Que delícia.`, "ok");
+        setTimeout(() => { humorForcado = null; renderStatus(); }, 2500);
       }
     });
   </script>

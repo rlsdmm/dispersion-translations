@@ -25,15 +25,34 @@
   const hsl = (h, s, l) => `hsl(${h} ${s}% ${l}%)`;
   const paleta = (h) => ({ c1: hsl(h, 75, 74), c2: hsl(h, 60, 60), c3: hsl(h, 90, 91), linha: hsl(h, 35, 28) });
 
-  // rostinho padrão: olhos brilhantes, bochechas e boquinha "w"
-  function rosto(cx, cy, linha, { boca = true, e = 1 } = {}) {
-    const dx = 13 * e;
-    const olho = (x) => `<ellipse cx="${x}" cy="${cy}" rx="${5.5 * e}" ry="${7 * e}" fill="#2b1d2e"/>
+  // humor do desenho atual: feliz | radiante | triste | fome | dormindo
+  let HUMOR = "feliz";
+
+  // rostinho padrão: olhos brilhantes, bochechas e boquinha "w" (muda com o humor)
+  function rosto(cx, cy, linha, { boca = true, e = 1, olhoCor = "#2b1d2e" } = {}) {
+    const dx = 13 * e, h = HUMOR;
+    const arco = (x, baixo) => `<path d="M${x - 6 * e} ${cy + (baixo ? -1 : 2) * e} q${6 * e} ${(baixo ? 6 : -8) * e} ${12 * e} 0" stroke="${olhoCor}" stroke-width="${3 * e}" fill="none" stroke-linecap="round"/>`;
+    const olho = (x) => `<ellipse cx="${x}" cy="${cy}" rx="${5.5 * e}" ry="${7 * e}" fill="${olhoCor}"/>
       <circle cx="${x + 1.8 * e}" cy="${cy - 2.6 * e}" r="${2.3 * e}" fill="#fff"/><circle cx="${x - 1.6 * e}" cy="${cy + 2.4 * e}" r="${1 * e}" fill="#fff" opacity=".8"/>`;
-    return `<g class="olhos">${olho(cx - dx)}${olho(cx + dx)}</g>
-      <ellipse cx="${cx - 21 * e}" cy="${cy + 8 * e}" rx="${5 * e}" ry="${3 * e}" fill="#ff8fab" opacity=".55"/>
-      <ellipse cx="${cx + 21 * e}" cy="${cy + 8 * e}" rx="${5 * e}" ry="${3 * e}" fill="#ff8fab" opacity=".55"/>
-      ${boca ? `<path d="M${cx - 5} ${cy + 7 * e} q2.5 3.5 5 0 q2.5 3.5 5 0" stroke="${linha}" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` : ""}`;
+    const olhos = h === "radiante" ? arco(cx - dx) + arco(cx + dx)
+      : h === "dormindo" ? arco(cx - dx, true) + arco(cx + dx, true)
+      : olho(cx - dx) + olho(cx + dx);
+    const sobrancelhas = h === "triste" || h === "fome"
+      ? `<path d="M${cx - dx - 6 * e} ${cy - 10 * e} l${9 * e} ${-3.5 * e} M${cx + dx + 6 * e} ${cy - 10 * e} l${-9 * e} ${-3.5 * e}" stroke="${olhoCor}" stroke-width="${2.2 * e}" stroke-linecap="round"/>` : "";
+    const traco = `stroke="${linha}" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"`;
+    const bocas = {
+      feliz: `<path d="M${cx - 5} ${cy + 7 * e} q2.5 3.5 5 0 q2.5 3.5 5 0" ${traco}/>`,
+      radiante: `<path d="M${cx - 6} ${cy + 6 * e} q6 9 12 0z" fill="#8a2a43" stroke="${linha}" stroke-width="2" stroke-linejoin="round"/><path d="M${cx - 3} ${cy + 10 * e} q3 2 6 0" fill="#ff8fab"/>`,
+      triste: `<path d="M${cx - 5} ${cy + 11 * e} q5 -5 10 0" ${traco}/>`,
+      fome: `<ellipse cx="${cx}" cy="${cy + 9 * e}" rx="3.5" ry="4.5" fill="#8a2a43" stroke="${linha}" stroke-width="2"/>`,
+      dormindo: `<path d="M${cx - 3} ${cy + 8 * e} q3 2 6 0" ${traco}/>`,
+    };
+    const extra = h === "triste" ? `<path d="M${cx - dx - 1} ${cy + 7 * e} q-3.5 6 0 8.5 q3.5 -2.5 0 -8.5z" fill="#7cc4ff" stroke="#3b82c4" stroke-width="1"/>`
+      : h === "fome" ? `<path d="M${cx + 4} ${cy + 13 * e} q-1.5 4 0 6 q1.5 -2 0 -6z" fill="#bfe6ff"/>` : "";
+    return `<g class="olhos">${olhos}</g>${sobrancelhas}
+      <ellipse cx="${cx - 21 * e}" cy="${cy + 8 * e}" rx="${5 * e}" ry="${3 * e}" fill="#ff8fab" opacity="${h === "radiante" ? ".8" : ".55"}"/>
+      <ellipse cx="${cx + 21 * e}" cy="${cy + 8 * e}" rx="${5 * e}" ry="${3 * e}" fill="#ff8fab" opacity="${h === "radiante" ? ".8" : ".55"}"/>
+      ${boca === "nunca" ? "" : boca || h !== "feliz" ? bocas[h] || bocas.feliz : ""}${extra}`;
   }
   const sombra = `<ellipse class="sombra" cx="60" cy="110" rx="32" ry="4.5" fill="#000" opacity=".14"/>`;
   const brilho = (x, y, r = 5, cor = "#fff") =>
@@ -64,7 +83,7 @@
       <circle cx="60" cy="70" r="35" fill="${p.c1}" stroke="${p.linha}" stroke-width="3"/>
       <ellipse cx="60" cy="86" rx="21" ry="15" fill="${p.c3}"/>
       <ellipse cx="44" cy="50" rx="8" ry="5" fill="#fff" opacity=".6" transform="rotate(-30 44 50)"/>
-      ${rosto(60, 64, p.linha, { boca: false })}
+      ${rosto(60, 64, p.linha, { boca: "nunca" })}
       <path d="M54 72 l6 7 l6 -7z" fill="#fbbf24" stroke="${p.linha}" stroke-width="2" stroke-linejoin="round"/></g>`,
 
     mochi: (p) => `${sombra}<g class="corpo">
@@ -113,13 +132,13 @@
         <path d="M22 70 C22 44 40 30 60 30 C80 30 98 44 98 70 L98 92 C98 99 91 99 91 92 C91 99 83 102 81 94 C80 105 71 107 69 97 C67 103 59 102 59 95 C57 106 45 105 46 95 C44 101 36 99 36 91 C34 97 23 97 23 89 Z"
           fill="${tinta}" stroke="${escuro}" stroke-width="3" stroke-linejoin="round"/>
         <path d="M36 50 C40 42 48 38 54 38" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".35"/>
-        <g class="olhos">
+        ${HUMOR === "feliz" ? `<g class="olhos">
           <ellipse cx="46" cy="68" rx="10" ry="12" fill="#fff"/><ellipse cx="48" cy="70" rx="5" ry="6.5" fill="${escuro}"/><circle cx="50" cy="67" r="2" fill="#fff"/>
           <ellipse cx="74" cy="68" rx="10" ry="12" fill="#fff"/><ellipse cx="76" cy="70" rx="5" ry="6.5" fill="${escuro}"/><circle cx="78" cy="67" r="2" fill="#fff"/>
-        </g>
+        </g>` : rosto(60, 70, "#fff", { olhoCor: "#fff", e: 1.1 })}
         <ellipse cx="34" cy="82" rx="5" ry="3" fill="${hsl(p.h, 80, 70)}" opacity=".5"/>
         <ellipse cx="86" cy="82" rx="5" ry="3" fill="${hsl(p.h, 80, 70)}" opacity=".5"/>
-        <path d="M56 84 q4 4 8 0" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".85"/></g>
+        ${HUMOR === "feliz" ? `<path d="M56 84 q4 4 8 0" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".85"/>` : ""}</g>
         <circle cx="16" cy="104" r="3.5" fill="${tinta}"/><circle cx="106" cy="102" r="2.5" fill="${tinta}"/><circle cx="100" cy="110" r="1.8" fill="${tinta}"/>`;
     },
 
@@ -138,17 +157,42 @@
       <ellipse cx="46" cy="104" rx="7" ry="4.5" fill="${p.c2}" stroke="${p.linha}" stroke-width="2.5"/>
       <ellipse cx="74" cy="104" rx="7" ry="4.5" fill="${p.c2}" stroke="${p.linha}" stroke-width="2.5"/>
       <ellipse cx="42" cy="58" rx="7" ry="4.5" fill="#fff" opacity=".6" transform="rotate(-30 42 58)"/>
-      ${rosto(60, 68, p.linha, { boca: false })}
+      ${HUMOR === "feliz" ? `${rosto(60, 68, p.linha, { boca: false })}
       <path d="M55 75 q5 4 10 0" stroke="${p.linha}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <path d="M62 76 l1.5 3.5 l1.5 -3.5" fill="#fff" stroke="${p.linha}" stroke-width="1"/></g>`,
+      <path d="M62 76 l1.5 3.5 l1.5 -3.5" fill="#fff" stroke="${p.linha}" stroke-width="1"/>` : rosto(60, 68, p.linha)}</g>`,
   };
 
-  function desenharPet(pet, classe = "") {
+  function desenharPet(pet, classe = "", humor = "feliz") {
     const esp = DESENHOS[pet.especie] ? pet.especie : "bolinho";
     const p = { ...paleta(pet.cor ?? 200), h: pet.cor ?? 200 };
+    HUMOR = HUMORES[humor] ? humor : "feliz";
     const brilhos = pet.brilhante
       ? `<g class="brilhante">${brilho(14, 20, 7, "#fde68a")}${brilho(108, 26, 5, "#fde68a")}${brilho(18, 92, 4, "#fde68a")}${brilho(104, 96, 6, "#fde68a")}</g>` : "";
-    return `<svg class="pet-svg ${esp} ${classe}" viewBox="0 0 120 120" role="img" aria-label="${ESPECIES[esp][0]}">${DESENHOS[esp](p)}${brilhos}</svg>`;
+    const zz = HUMOR === "dormindo" ? `<g class="zz" fill="${p.linha}" font-weight="900" font-family="system-ui,sans-serif"><text x="90" y="34" font-size="15">z</text><text x="100" y="22" font-size="11">z</text><text x="107" y="13" font-size="8">z</text></g>` : "";
+    const svg = `<svg class="pet-svg ${esp} humor-${HUMOR} ${classe}" viewBox="0 0 120 120" role="img" aria-label="${ESPECIES[esp][0]}">${DESENHOS[esp](p)}${brilhos}${zz}</svg>`;
+    HUMOR = "feliz";
+    return svg;
+  }
+
+  /* ---------- fome e humor (as contas valem iguais às do banco: supabase/pets-comida.sql) ---------- */
+  const HUMORES = {
+    radiante: ["✨", "Radiante"], feliz: ["😊", "Contente"], triste: ["🥺", "Tristinho"],
+    fome: ["🍽️", "Com fome"], dormindo: ["💤", "Dormindo"],
+  };
+  const COMIDAS = { onigiri: ["🍙", "Onigiri"], dango: ["🍡", "Dango"], pudim: ["🍮", "Pudim"], morango: ["🍓", "Morango"] };
+  // valores de agora a partir do que está salvo (barriga -2/h, felicidade -1/h)
+  function valoresAgora(row) {
+    const desde = new Date(row.atualizado_em || row.nasceu_em || Date.now());
+    const horas = Math.max(0, (Date.now() - desde) / 36e5);
+    return { saciedade: Math.max(0, (row.saciedade ?? 70) - Math.floor(horas * 2)), felicidade: Math.max(0, (row.felicidade ?? 80) - Math.floor(horas)) };
+  }
+  function humorDe(v) {
+    const hora = new Date().getHours();
+    if (hora < 6) return "dormindo";
+    if (v.saciedade < 20) return "fome";
+    if (v.felicidade < 35) return "triste";
+    if (v.felicidade >= 75 && v.saciedade >= 50) return "radiante";
+    return "feliz";
   }
 
   // cor do ovo: sai do id da pessoa (o bicho de dentro só é sorteado quando nasce)
@@ -179,5 +223,5 @@
       </g></svg>`;
   }
 
-  window.PETS = { ESPECIES, RARIDADES, desenharPet, desenharOvo, corOvo };
+  window.PETS = { ESPECIES, RARIDADES, HUMORES, COMIDAS, desenharPet, desenharOvo, corOvo, valoresAgora, humorDe };
 })();

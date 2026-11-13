@@ -1035,3 +1035,38 @@ html[data-tema="papel"] .xp-fogo, html[data-tema="fofinho"] .xp-fogo { color: #c
   .como-aquecer { text-align: left; }
   .calor { margin-left: auto; margin-right: auto; }
 }
+
+.pet-humor { display: flex; align-items: center; gap: 12px; margin: 4px 0 12px; }
+.pet-humor > span { font-size: 30px; }
+.pet-humor b { display: block; font-size: 16px; }
+.pet-humor small { color: var(--sub); font-size: 13px; }
+.barra-pet { display: grid; grid-template-columns: 110px 1fr 34px; gap: 10px; align-items: center; margin-bottom: 8px; max-width: 460px; font-size: 13px; font-weight: 700; }
+.barra-pet .xp-barra { margin: 0; height: 10px; }
+.barra-pet .xp-barra div { transition: width .6s ease, background .6s; }
+.barra-pet b { text-align: right; color: var(--sub); }
+.pet-comida { margin-top: 16px; padding: 14px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--borda); max-width: 520px; }
+.pc-topo { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.bandeja { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+.comida { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 4px; border-radius: 12px; border: 1px solid var(--borda); background: var(--card); color: var(--txt); font: inherit; cursor: pointer; transition: transform .15s, border-color .15s; }
+.comida span { font-size: 28px; line-height: 1.1; }
+.comida small { font-size: 11px; font-weight: 700; color: var(--sub); }
+.comida:hover:not(:disabled) { transform: translateY(-3px) rotate(-3deg); border-color: var(--acc); }
+.comida:disabled { opacity: .45; cursor: default; }
+.comida-voando { position: fixed; z-index: 300; font-size: 32px; pointer-events: none; transition: transform .6s cubic-bezier(.3, -.4, .6, 1), opacity .6s; }
+.pet-comida .sub { font-size: 12px; }
+.pet-sobre { margin-top: 14px; }
+.pet-sobre summary { cursor: pointer; font-weight: 700; color: var(--acc); font-size: 14px; }
+.pet-sobre > p { margin: 8px 0; }
+.pet-svg.humor-dormindo .corpo { animation-duration: 4.5s; }
+.pet-svg.humor-dormindo .olhos { animation: none; }
+.pet-svg.humor-triste .corpo { animation-duration: 3.6s; }
+.pet-svg .zz text { animation: pet-zz 2.4s ease-in-out infinite; }
+.pet-svg .zz text:nth-child(2) { animation-delay: .4s; }
+.pet-svg .zz text:nth-child(3) { animation-delay: .8s; }
+@keyframes pet-zz { 0%, 100% { opacity: .2; } 50% { opacity: 1; } }
+.pp-pet .pet-humor { margin: 6px 0 0; }
+.pp-pet .pet-humor > span { font-size: 20px; }
+@media (max-width: 760px) {
+  .pet-comida, .barra-pet { margin-left: auto; margin-right: auto; text-align: left; }
+  .pet-humor { justify-content: center; text-align: left; }
+}
