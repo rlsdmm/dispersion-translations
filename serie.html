@@ -4,6 +4,21 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Obra · Dispersion Translations</title>
+  <meta name="description" content="Leia mangás traduzidos para o português de graça na Dispersion Translations: Black Paradox, Houseki no Kuni, Yuusha ga Shinda!, Hinowa ga Yuku! e muito mais, feitos por fãs." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Dispersion Translations" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:title" content="Dispersion Translations" />
+  <meta property="og:description" content="Leia mangás traduzidos para o português de graça na Dispersion Translations: Black Paradox, Houseki no Kuni, Yuusha ga Shinda!, Hinowa ga Yuku! e muito mais, feitos por fãs." />
+  <meta property="og:image" content="https://dispersiontl.com.br/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="favicon.ico" sizes="48x48" />
+  <link rel="icon" href="icone-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="theme-color" content="#070b16" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
@@ -34,6 +49,15 @@
       el.innerHTML = `<div class="wrap"><p class="erro-pag">Obra não encontrada. <a href="index.html" style="color:var(--acc)">Voltar ao início</a></p></div>`;
     } else {
       document.title = `${s.titulo} · Dispersion Translations`;
+      // descrição e prévia de link da obra (Google, Discord, WhatsApp...)
+      const meta = (sel, attr, v) => { let m = document.head.querySelector(sel); if (!m) { m = document.createElement(sel.startsWith("link") ? "link" : "meta"); const [, k, n] = sel.match(/\[(\w+)="([^"]+)"/); m.setAttribute(k, n); document.head.appendChild(m); } m.setAttribute(attr, v); };
+      const url = `https://dispersiontl.com.br/serie.html?s=${encodeURIComponent(s.id)}`;
+      const descMeta = `Leia ${s.titulo} em português${s.autor ? ", de " + s.autor : ""}. ${(s.sinopse || "").replace(/\s+/g, " ")}`.slice(0, 300);
+      meta('meta[name="description"]', "content", descMeta);
+      meta('meta[property="og:title"]', "content", `${s.titulo} · Dispersion Translations`);
+      meta('meta[property="og:description"]', "content", descMeta);
+      meta('meta[property="og:url"]', "content", url);
+      meta('link[rel="canonical"]', "href", url);
       const caps = capsOrdenados(s);
       const cont = continuar(s);
 

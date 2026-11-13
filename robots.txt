@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /conta.html
+Disallow: /biblioteca.html
+
+Sitemap: https://dispersiontl.com.br/sitemap.xml
