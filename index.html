@@ -224,11 +224,13 @@
         return { s, data, doDia, c: doDia[doDia.length - 1] };
       })
       .filter(Boolean)
-      .sort((a, b) => b.data.localeCompare(a.data) || b.c.numero - a.c.numero)
-      .slice(0, 9);
+      .sort((a, b) => b.data.localeCompare(a.data) || b.c.numero - a.c.numero);
+    const todosRecentes = recentes.splice(0); // lista completa (o carrossel filtra dela)
+    recentes.push(...todosRecentes.slice(0, 9));
 
-    // carrossel de destaques: as obras com lançamento mais recente
-    montarCarrossel(recentes.slice(0, 8));
+    // carrossel de destaques: as obras com lançamento mais recente, só obras que o grupo ainda está levando (sem "Cancelado")
+    const FORA_DO_DESTAQUE = ["Cancelado"];
+    montarCarrossel(todosRecentes.filter((r) => !FORA_DO_DESTAQUE.includes(r.s.status)).slice(0, 8));
 
     const ehNovo = (d) => d && (Date.now() - new Date(d + "T12:00:00")) / 864e5 < 7;
     document.getElementById("listaLanc").innerHTML = recentes.map(({ s }) => {
