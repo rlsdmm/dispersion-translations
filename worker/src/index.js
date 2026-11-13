@@ -10,7 +10,8 @@
  */
 
 // paginas/<obra>/<capitulo>/001.webp   ou   capas/<obra>-<data>.webp
-const CAMINHO_OK = /^(paginas\/[a-z0-9][a-z0-9-]*\/[0-9]+(\.[0-9]+)?\/[0-9]{3,4}|capas\/[a-z0-9][a-z0-9-]*)\.(webp|jpe?g|png|gif|avif)$/;
+// capítulo antecipado (VIP) vai numa pasta com sufixo aleatório: paginas/obra/12-k3j9x2ab/001.webp
+const CAMINHO_OK = /^(paginas\/[a-z0-9][a-z0-9-]*\/[0-9]+(\.[0-9]+)?(-[a-z0-9]{8,32})?\/[0-9]{3,4}|capas\/[a-z0-9][a-z0-9-]*)\.(webp|jpe?g|png|gif|avif)$/;
 const TIPOS = { webp: "image/webp", jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", gif: "image/gif", avif: "image/avif" };
 const MAX_BYTES = 25 * 1024 * 1024;
 

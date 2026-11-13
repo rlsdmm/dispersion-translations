@@ -9,6 +9,22 @@ DT.iniciar(function () {
   const idx = caps.findIndex((c) => String(c.numero) === qs.get("c"));
   const cap = caps[idx];
 
+  const travado = s && !cap && (s.antecipados || []).find((a) => String(a.numero) === qs.get("c"));
+  if (travado) {
+    const libera = new Date(travado.publicoEm);
+    $("paginas").innerHTML = `<div class="cap-bloqueado">
+      <span class="selo-vip grande">VIP</span>
+      <h2>Capítulo ${travado.numero} ainda é antecipado</h2>
+      <p>Quem apoia o grupo já está lendo. Ele libera pra todo mundo em <b>${libera.toLocaleDateString("pt-BR")}</b> às ${libera.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}.</p>
+      <div class="botoes"><a class="btn pri" href="apoie.html#vip">Quero ser VIP</a><a class="btn" href="serie.html?s=${encodeURIComponent(s.id)}">Voltar pra obra</a></div>
+      ${conta.user ? "" : `<p class="sub">Já é VIP? <a href="${conta.linkEntrar()}">Entre na sua conta</a>.</p>`}
+    </div>`;
+    $("tituloSerie").textContent = s.titulo;
+    $("tituloCap").textContent = `Capítulo ${travado.numero} · antecipado VIP`;
+    $("voltar").href = `serie.html?s=${encodeURIComponent(s.id)}`;
+    document.querySelectorAll(".ctrl").forEach((e) => (e.style.display = "none"));
+    return;
+  }
   if (!s || !cap) {
     $("paginas").innerHTML = `<p class="erro-pag">Capítulo não encontrado. <a href="index.html" style="color:var(--acc)">Voltar ao início</a></p>`;
     $("tituloSerie").textContent = "Dispersion Translations";
@@ -228,6 +244,9 @@ DT.iniciar(function () {
   const caixa = $("comentarios");
   if (!DT.sb) { caixa.remove(); return; }
   let equipe = null;
+  const ehVip = (c) => !!c.perfis?.vip_ate && new Date(c.perfis.vip_ate) > new Date();
+  const nomeAutor = (c) => `<b class="${ehVip(c) ? "nome-vip" : ""}">${esc(c.perfis?.apelido || "leitor")}</b>${
+    equipe?.has(c.user_id) ? '<span class="selo-equipe">Equipe</span>' : ehVip(c) ? '<span class="selo-vip">VIP</span>' : ""}`;
   const quando = (iso) => {
     const min = Math.floor((Date.now() - new Date(iso)) / 6e4);
     if (min < 1) return "agora";
@@ -247,7 +266,7 @@ DT.iniciar(function () {
 
   async function carregarComentarios() {
     const [r, e] = await Promise.all([
-      DT.sb.from("comentarios").select("id,texto,criado_em,user_id,pagina,perfis(apelido)")
+      DT.sb.from("comentarios").select("id,texto,criado_em,user_id,pagina,perfis(apelido,vip_ate)")
         .eq("serie_id", s.id).eq("numero", cap.numero).order("criado_em", { ascending: true }).limit(500),
       equipe ? { data: null } : DT.sb.rpc("equipe_ids"),
     ]);
@@ -269,7 +288,7 @@ DT.iniciar(function () {
         <div class="coment">
           ${DT.avatar(c.perfis?.apelido, c.user_id)}
           <div>
-            <div class="cab"><b>${esc(c.perfis?.apelido || "leitor")}</b>${equipe.has(c.user_id) ? '<span class="selo-equipe">Equipe</span>' : ""}${c.pagina != null ? `<button class="tag-pag ir" data-ir-fim="${c.pagina}" title="Ir até a página ${c.pagina + 1}">pág. ${c.pagina + 1} ↑</button>` : ""}<span class="sub">${quando(c.criado_em)}</span></div>
+            <div class="cab">${nomeAutor(c)}${c.pagina != null ? `<button class="tag-pag ir" data-ir-fim="${c.pagina}" title="Ir até a página ${c.pagina + 1}">pág. ${c.pagina + 1} ↑</button>` : ""}<span class="sub">${quando(c.criado_em)}</span></div>
             <p>${esc(c.texto)}</p>
             ${eu && (eu === c.user_id || conta.membro) ? `<div class="acoes-coment">
               <button class="link" data-apagar="${c.id}">apagar</button>
@@ -332,7 +351,7 @@ DT.iniciar(function () {
     let f = faixas.findIndex((t) => !t || t < agora);
     if (f === -1) f = faixas.length < NFAIXAS ? faixas.length : faixas.indexOf(Math.min(...faixas));
     const el = document.createElement("div");
-    el.className = "bala" + (meu ? " minha" : "") + (equipe?.has(c.user_id) ? " equipe" : "");
+    el.className = "bala" + (meu ? " minha" : "") + (equipe?.has(c.user_id) ? " equipe" : ehVip(c) ? " vip" : "");
     el.textContent = c.texto;
     el.style.top = `calc(${f} * var(--faixa))`;
     camada.appendChild(el);
@@ -388,7 +407,7 @@ DT.iniciar(function () {
     const podeIr = comLink && (c.pagina != null || pref.modo === "vertical");
     return `<div class="pc">
       ${comLink ? (podeIr ? `<button class="tag-pag ir" data-ir="${c.pagina ?? "fim"}" title="Ir até ${onde}">${onde} →</button>` : `<span class="tag-pag">${onde}</span>`) : ""}
-      <b>${esc(c.perfis?.apelido || "leitor")}</b>${equipe?.has(c.user_id) ? '<span class="selo-equipe">Equipe</span>' : ""}
+      ${nomeAutor(c)}
       <span>${esc(c.texto)}</span>
       ${eu && (eu === c.user_id || conta.membro) ? `<button class="link" data-apagar-pag="${c.id}">apagar</button>` : ""}</div>`;
   }
@@ -442,7 +461,7 @@ DT.iniciar(function () {
       $("msgPag").textContent = error.code === "42501" ? "Calma! Espere uns segundos." : "Não deu: " + error.message;
       return;
     }
-    const c = { ...data, perfis: { apelido: conta.perfil?.apelido } };
+    const c = { ...data, perfis: { apelido: conta.perfil?.apelido, vip_ate: conta.perfil?.vip_ate } };
     todos.push(c); indexar();
     inp.value = "";
     abaPainel = "pag";
@@ -457,7 +476,7 @@ DT.iniciar(function () {
   };
 
   Promise.all([
-    DT.sb.from("comentarios").select("id,texto,criado_em,user_id,pagina,perfis(apelido)")
+    DT.sb.from("comentarios").select("id,texto,criado_em,user_id,pagina,perfis(apelido,vip_ate)")
       .eq("serie_id", s.id).eq("numero", cap.numero).order("criado_em", { ascending: true }).limit(2000),
     DT.sb.rpc("equipe_ids"),
   ]).then(([r, e]) => {

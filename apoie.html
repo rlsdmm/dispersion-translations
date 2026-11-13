@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Apoie · Dispersion Translations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
+  <link rel="stylesheet" href="css/style.css?v=14" />
+  <link rel="stylesheet" href="css/temas.css?v=5" />
+  <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;display=swap">')}}catch(e){}</script>
+</head>
+<body>
+  <div id="topo"></div>
+
+  <div class="apoie-hero">
+    <div class="wrap">
+      <span class="selo-car">💙 Apoie o grupo</span>
+      <h1>Ajude a <span>Dispersion</span> a continuar traduzindo</h1>
+      <p>A gente traduz por amor, mas manter o site no ar custa: domínio, armazenamento das páginas e as horas da equipe.
+        Qualquer valor ajuda, e quem apoia ganha umas vantagens como agradecimento.</p>
+    </div>
+  </div>
+
+  <main class="wrap apoie">
+    <div class="apoie-grade">
+      <!-- PIX -->
+      <section class="painel-card apoie-pix" id="pix">
+        <h2>Doe pelo Pix</h2>
+        <p class="sub">Qualquer valor, sem taxa, cai direto pro grupo.</p>
+        <div id="pixConteudo"></div>
+      </section>
+
+      <!-- VIP -->
+      <section class="painel-card apoie-vip" id="vip">
+        <div class="vip-topo">
+          <span class="selo-vip grande">VIP</span>
+          <div>
+            <h2>Seja VIP</h2>
+            <p class="sub"><b id="precoVip"></b> a cada 30 dias. Sem renovação automática: você apoia quando quiser.</p>
+          </div>
+        </div>
+        <ul class="vantagens">
+          <li><span>⏩</span><div><b>Capítulos antecipados</b><small id="txtAntecipado">Leia os lançamentos antes de todo mundo.</small></div></li>
+          <li><span>✨</span><div><b>Selo VIP e nome dourado</b><small>Nos comentários e nos balões que passam pelas páginas.</small></div></li>
+          <li><span>🎨</span><div><b>Temas exclusivos</b><small>Neon e Sakura, no botão 🎨 do topo.</small></div></li>
+          <li><span>💙</span><div><b>Seu nome no mural</b><small>Com um recado, se quiser (e o valor, só se você deixar).</small></div></li>
+        </ul>
+        <div class="como">
+          <h3>Como virar VIP</h3>
+          <ol>
+            <li><a href="conta.html" id="linkConta">Crie sua conta</a> no site (pode ser com o Discord).</li>
+            <li>Faça o Pix de <b id="precoVip2"></b> (ou mais, pra mais dias).</li>
+            <li>Mande o comprovante no nosso <a id="linkDiscord" target="_blank" rel="noopener">Discord</a> junto com o seu apelido do site.</li>
+            <li>A equipe libera seu VIP, normalmente no mesmo dia.</li>
+          </ol>
+        </div>
+        <p class="status-vip" id="statusVip"></p>
+      </section>
+    </div>
+
+    <!-- MURAL -->
+    <section id="mural">
+      <div class="titulo-sec"><h2>Mural de apoiadores</h2></div>
+      <div class="mural" id="listaMural"><p class="sub">Carregando…</p></div>
+    </section>
+  </main>
+
+  <div id="rodape"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js?v=4"></script>
+  <script>
+    const { D, esc, conta, header, footer, tempoRelativo } = DT;
+    const A = D.grupo.apoie || {};
+    document.getElementById("topo").innerHTML = header("apoie");
+    document.getElementById("rodape").innerHTML = footer();
+    const real = (v) => Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    document.getElementById("precoVip").textContent = real(A.vipMensal || 5);
+    document.getElementById("precoVip2").textContent = real(A.vipMensal || 5);
+    document.getElementById("linkDiscord").href = D.grupo.discord;
+    if (A.diasAntecipado) document.getElementById("txtAntecipado").textContent =
+      `Os lançamentos chegam pra você até ${A.diasAntecipado} dias antes de todo mundo.`;
+
+    /* ---------- Pix: chave + QR Code (padrão BR Code do Banco Central) ---------- */
+    function campo(id, v) { return id + String(v.length).padStart(2, "0") + v; }
+    function limpo(t, max) { return t.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9 ]/g, "").toUpperCase().slice(0, max).trim(); }
+    function crc16(s) {
+      let c = 0xffff;
+      for (let i = 0; i < s.length; i++) {
+        c ^= s.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) c = c & 0x8000 ? ((c << 1) ^ 0x1021) & 0xffff : (c << 1) & 0xffff;
+      }
+      return c.toString(16).toUpperCase().padStart(4, "0");
+    }
+    function pixCopiaECola(chave, nome, cidade, valor) {
+      let p = campo("00", "01") + campo("26", campo("00", "br.gov.bcb.pix") + campo("01", chave)) +
+        campo("52", "0000") + campo("53", "986") + (valor ? campo("54", Number(valor).toFixed(2)) : "") +
+        campo("58", "BR") + campo("59", limpo(nome, 25) || "DISPERSION") + campo("60", limpo(cidade, 15) || "BRASIL") +
+        campo("62", campo("05", "***")) + "6304";
+      return p + crc16(p);
+    }
+    const caixa = document.getElementById("pixConteudo");
+    if (!A.pixChave) {
+      caixa.innerHTML = `<div class="pix-embreve">🚧 A chave Pix vai aparecer aqui em breve. Enquanto isso, fala com a gente no <a href="${esc(D.grupo.discord)}" target="_blank" rel="noopener">Discord</a>.</div>`;
+    } else {
+      const valores = [A.vipMensal || 5, 10, 20];
+      caixa.innerHTML = `
+        <div class="pix-valores" role="group" aria-label="Valor">
+          <button type="button" class="chip on" data-v="">Qualquer valor</button>
+          ${[...new Set(valores)].map((v) => `<button type="button" class="chip" data-v="${v}">${real(v)}</button>`).join("")}
+        </div>
+        <div class="pix-qr" id="pixQr" aria-label="QR Code do Pix"></div>
+        <label class="pix-chave">Chave Pix<div><input readonly value="${esc(A.pixChave)}" id="pixChave" /><button class="btn" type="button" data-copiar="pixChave">Copiar</button></div></label>
+        <label class="pix-chave">Pix copia e cola<div><input readonly id="pixCola" /><button class="btn" type="button" data-copiar="pixCola">Copiar</button></div></label>
+        <p class="sub pix-nome">Recebedor: <b>${esc(A.pixNome)}</b></p>`;
+      function gerar(valor) {
+        const codigo = pixCopiaECola(A.pixChave, A.pixNome, A.pixCidade, valor);
+        document.getElementById("pixCola").value = codigo;
+        const qr = qrcode(0, "M"); qr.addData(codigo); qr.make();
+        document.getElementById("pixQr").innerHTML = qr.createSvgTag({ cellSize: 5, margin: 3, scalable: true });
+      }
+      gerar("");
+      caixa.querySelector(".pix-valores").onclick = (e) => {
+        const b = e.target.closest(".chip"); if (!b) return;
+        caixa.querySelectorAll(".pix-valores .chip").forEach((x) => x.classList.toggle("on", x === b));
+        gerar(b.dataset.v);
+      };
+      caixa.addEventListener("click", async (e) => {
+        const b = e.target.closest("[data-copiar]"); if (!b) return;
+        const el = document.getElementById(b.dataset.copiar);
+        try { await navigator.clipboard.writeText(el.value); } catch { el.select(); document.execCommand("copy"); }
+        const t = b.textContent; b.textContent = "Copiado ✓"; setTimeout(() => (b.textContent = t), 1600);
+      });
+    }
+
+    /* ---------- status do VIP de quem está logado ---------- */
+    conta.pronto.then(() => {
+      const st = document.getElementById("statusVip");
+      if (!conta.user) { st.innerHTML = `Você ainda não entrou. <a href="${conta.linkEntrar()}">Entrar ou criar conta</a>`; return; }
+      document.getElementById("linkConta").textContent = "Sua conta";
+      const ate = conta.perfil?.vip_ate && new Date(conta.perfil.vip_ate);
+      if (conta.membro) st.innerHTML = `Você é da equipe, então já tem tudo liberado 😉`;
+      else if (ate && ate > new Date()) { st.className = "status-vip ativo"; st.innerHTML = `✨ Você é VIP até <b>${ate.toLocaleDateString("pt-BR")}</b>. Valeu demais!`; }
+      else st.innerHTML = `Seu apelido no site: <b>${esc(conta.perfil?.apelido || "")}</b> (mande ele junto com o comprovante).`;
+    });
+
+    /* ---------- mural ---------- */
+    if (DT.sb) DT.sb.rpc("mural_apoios", { p_limite: 120 }).then(({ data, error }) => {
+      const el = document.getElementById("listaMural");
+      if (error || !data || !data.length) { el.innerHTML = `<p class="sub">Ainda ninguém por aqui. Que tal ser a primeira pessoa? 💙</p>`; return; }
+      el.innerHTML = data.map((a) => `<div class="apoiador ${a.vip ? "vip" : ""}">
+          ${DT.avatar(a.nome, a.nome)}
+          <div><b class="${a.vip ? "nome-vip" : ""}">${esc(a.nome)}</b>${a.vip ? '<span class="selo-vip">VIP</span>' : ""}
+            ${a.valor != null ? `<span class="valor">${real(a.valor)}</span>` : ""}
+            ${a.mensagem ? `<p>${esc(a.mensagem)}</p>` : ""}
+            <small class="sub">${tempoRelativo(a.criado_em.slice(0, 10))}</small></div>
+        </div>`).join("");
+    });
+  </script>
+</body>
+</html>

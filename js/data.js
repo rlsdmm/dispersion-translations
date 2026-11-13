@@ -35,6 +35,15 @@ window.DISPERSION = {
     descricao:
       "Somos um grupo de tradução de mangás sem fins lucrativos. Traduzimos obras que amamos e que ainda não têm versão em português. Se a obra for licenciada no Brasil, apoie o lançamento oficial!",
     discord: "https://discord.gg/",
+    // Página "Apoie": chave Pix (CPF, e-mail, celular ou aleatória), nome e cidade de quem recebe
+    // (o QR Code do Pix precisa do nome e da cidade). Sem chave, a página mostra "em breve".
+    apoie: {
+      pixChave: "",
+      pixNome: "",
+      pixCidade: "",
+      vipMensal: 5,          // R$ por 30 dias de VIP (sugestão que o painel usa pra calcular os dias)
+      diasAntecipado: 3,     // quantos dias antes os VIP costumam ler (só aparece no texto da página)
+    },
     links: [
       { nome: "Discord", url: "https://discord.gg/" },
       { nome: "Twitter / X", url: "https://x.com/" },

@@ -40,12 +40,17 @@
         if (r.data.length < N) return { data: total };
       }
     }
-    const [r1, r2] = await Promise.all([
+    const [r1, r2, r3] = await Promise.all([
       sb.from("series").select("*").order("titulo"),
       todosCaps(),
+      sb.rpc("caps_antecipados"),
     ]);
     if (r1.error) throw r1.error;
     if (r2.error) throw r2.error;
+    // capítulos antecipados pra VIP: quem é VIP recebe no r2; os outros só veem o "cadeado"
+    const antec = {};
+    for (const a of r3.data || []) (antec[a.serie_id] = antec[a.serie_id] || []).push({
+      numero: Number(a.numero), titulo: a.titulo, data: a.data, publicoEm: a.publico_em });
     D.series = r1.data.map((s) => ({
       id: s.id,
       titulo: s.titulo,
@@ -56,9 +61,11 @@
       sinopse: s.sinopse,
       capa: s.capa_url,
       cores: s.cores && s.cores.length === 2 ? s.cores : coresDe(s.id),
-      capitulos: r2.data.filter((c) => c.serie_id === s.id).map((c) => ({
-        numero: Number(c.numero), titulo: c.titulo, data: c.data, urls: c.paginas,
-      })),
+      capitulos: r2.data.filter((c) => c.serie_id === s.id).map((c) => {
+        const a = (antec[s.id] || []).find((x) => x.numero === Number(c.numero));
+        return { numero: Number(c.numero), titulo: c.titulo, data: c.data, urls: c.paginas, ...(a ? { vip: true, publicoEm: a.publicoEm } : {}) };
+      }),
+      antecipados: (antec[s.id] || []).filter((a) => !r2.data.some((c) => c.serie_id === s.id && Number(c.numero) === a.numero)),
     }));
     return D.series;
   }
@@ -208,6 +215,8 @@
   /* ---------- Conta do leitor ---------- */
   const conta = {
     user: null, perfil: null, membro: false, favoritos: new Set(), historico: [], pronto: null,
+    /* VIP: quem apoiou (vip_ate no futuro) ou é da equipe */
+    get vip() { return !!this.user && (this.membro || (!!this.perfil?.vip_ate && new Date(this.perfil.vip_ate) > new Date())); },
 
     async carregar() {
       if (!sb) return this;
@@ -216,7 +225,7 @@
       this.user = user;
       if (!user) return this;
       const [p, f, h, m] = await Promise.all([
-        sb.from("perfis").select("apelido,prefs,banido").eq("user_id", user.id).maybeSingle(),
+        sb.from("perfis").select("apelido,prefs,banido,vip_ate").eq("user_id", user.id).maybeSingle(),
         sb.from("favoritos").select("serie_id,criado_em").order("criado_em", { ascending: false }),
         sb.from("historico").select("serie_id,numero,pagina,total,concluido,lido_em").order("lido_em", { ascending: false }).limit(3000),
         sb.rpc("is_membro"),
@@ -307,6 +316,7 @@
   addEventListener("pagehide", () => conta.descarregar());
   addEventListener("visibilitychange", () => document.visibilityState === "hidden" && conta.descarregar());
   conta.pronto = conta.carregar().catch((e) => { console.warn(e); return conta; });
+  conta.pronto.then(() => aplicarTema(temaAtual())); // tema exclusivo de VIP volta pro padrão se não for VIP
 
   function avatar(nome, id, cls = "") {
     const [a, b] = coresDe(id || nome || "?");
@@ -335,10 +345,15 @@
     ["azul", "Azul", "#070b16", "#3b82f6", "#22d3ee"],
     ["roxo", "Roxo", "#0d0d14", "#8b5cf6", "#ec4899"],
     ["papel", "Papel", "#f4efe6", "#c1272d", "#1d1a16"],
-    ["neon", "Neon", "#050505", "#a3e635", "#22d3ee"],
-    ["sakura", "Sakura", "#1a1018", "#f472b6", "#fb923c"],
+    ["neon", "Neon", "#050505", "#a3e635", "#22d3ee", true],
+    ["sakura", "Sakura", "#1a1018", "#f472b6", "#fb923c", true],
   ];
-  const temaAtual = () => { const t = store.get("tema", "azul"); return TEMAS.some((x) => x[0] === t) ? t : "azul"; };
+  const temaVip = (t) => TEMAS.some((x) => x[0] === t && x[5]);
+  const temaAtual = () => {
+    const t = store.get("tema", "azul");
+    if (!TEMAS.some((x) => x[0] === t)) return "azul";
+    return temaVip(t) && !conta.vip ? "azul" : t;
+  };
   function aplicarTema(t) {
     const raiz = document.documentElement;
     if (!t || t === "azul" || t === "padrao") { delete raiz.dataset.tema; return; }
@@ -352,15 +367,22 @@
   }
   function menuTema() {
     const at = temaAtual();
-    return TEMAS.map(([id, nome, bg, a, b]) => `<button type="button" class="op-tema ${id === at ? "on" : ""}" data-tema="${id}">
-      <span class="amostra" style="background:${bg}"><i style="background:linear-gradient(135deg,${a},${b})"></i></span>${nome}${id === "azul" ? " <small>padrão</small>" : ""}</button>`).join("");
+    return TEMAS.map(([id, nome, bg, a, b, vip]) => {
+      const travado = vip && !conta.vip;
+      return `<button type="button" class="op-tema ${id === at ? "on" : ""} ${travado ? "travado" : ""}" data-tema="${id}" ${travado ? 'title="Tema exclusivo para apoiadores VIP"' : ""}>
+      <span class="amostra" style="background:${bg}"><i style="background:linear-gradient(135deg,${a},${b})"></i></span>${nome}${
+        id === "azul" ? " <small>padrão</small>" : vip ? ` <small class="${travado ? "" : "vip-ok"}">${travado ? "🔒 VIP" : "VIP"}</small>` : ""}</button>`;
+    }).join("");
   }
   document.addEventListener("click", (e) => {
     const menu = document.getElementById("menuTema");
     if (!menu) return;
     if (e.target.closest("#btnTema")) { menu.hidden = !menu.hidden; if (!menu.hidden) menu.innerHTML = menuTema(); return; }
     const op = e.target.closest(".op-tema");
-    if (op) { conta.salvarPref("tema", op.dataset.tema); aplicarTema(op.dataset.tema); menu.innerHTML = menuTema(); return; }
+    if (op) {
+      if (op.classList.contains("travado")) { location.href = "apoie.html#vip"; return; }
+      conta.salvarPref("tema", op.dataset.tema); aplicarTema(op.dataset.tema); menu.innerHTML = menuTema(); return;
+    }
     if (!e.target.closest("#menuTema")) menu.hidden = true;
   });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") { const m = document.getElementById("menuTema"); if (m) m.hidden = true; } });
@@ -373,6 +395,7 @@
         <a href="index.html" class="so-desk-nav ${ativo === "inicio" ? "on" : ""}">Início</a>
         <a href="index.html#obras" class="so-desk-nav">Obras</a>
         <a href="biblioteca.html" id="navBib" class="${ativo === "biblioteca" ? "on" : ""}" title="Minha biblioteca">📚<span class="so-desk-nav"> Biblioteca</span></a>
+        <a href="apoie.html" class="btn-apoie ${ativo === "apoie" ? "on" : ""}" title="Apoie o grupo">💙<span class="so-desk-nav"> Apoie</span></a>
         <a href="${esc(D.grupo.discord)}" target="_blank" rel="noopener" class="btn-discord">Discord</a>
         <span class="tema-wrap"><button type="button" id="btnTema" class="btn-tema" title="Mudar o visual do site" aria-label="Mudar o visual do site">🎨</button>
           <div class="menu-tema" id="menuTema" hidden></div></span>

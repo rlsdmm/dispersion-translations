@@ -72,6 +72,7 @@
     document.querySelectorAll(".aba").forEach((x) => (x.hidden = x.id !== "aba-" + nome));
     if (nome === "capitulos") renderCapitulos();
     if (nome === "importar") prepararImportador();
+    if (nome === "apoios") renderApoios();
   }
 
   /* ============ UTILIDADES ============ */
@@ -212,6 +213,7 @@
     arquivos = [];
     $("capNumero").value = ""; $("capTitulo").value = ""; $("capData").value = hoje();
     $("dicaEditar").hidden = true; $("capNumero").readOnly = false; $("capSerie").disabled = false;
+    $("capVip").value = "0"; $("capVip").querySelector('[value="-1"]').hidden = true;
     msg("capMsg", ""); renderMiniaturas();
   }
   $("btnLimpar").onclick = limparForm;
@@ -229,19 +231,23 @@
     if (!serieId) return msg("capMsg", "Cadastre uma obra primeiro, na aba Obras.", "erro");
 
     const { data: existente, error: e0 } = await sb.from("capitulos")
-      .select("id,paginas").eq("serie_id", serieId).eq("numero", numero).maybeSingle();
+      .select("id,paginas,publico_em").eq("serie_id", serieId).eq("numero", numero).maybeSingle();
     if (e0) return msg("capMsg", "Erro: " + e0.message, "erro");
 
     if (!arquivos.length && !existente) return msg("capMsg", "Adicione as páginas do capítulo.", "erro");
     if (arquivos.length && existente && $("dicaEditar").hidden &&
         !confirm(`O capítulo ${numStr(numero)} já existe. Substituir as páginas dele pelas novas?`)) return;
 
+    const vipDias = Number($("capVip").value);
     $("btnEnviar").disabled = true;
     try {
       let paginas = existente ? existente.paginas : [];
       if (arquivos.length) {
         const comprimirOn = $("capComprimir").checked;
-        const pasta = `paginas/${serieId}/${numStr(numero)}`;
+        // antecipado pra VIP: pasta com sufixo aleatório, pra ninguém adivinhar o endereço das páginas
+        const token = vipDias > 0 || (vipDias < 0 && existente?.publico_em && new Date(existente.publico_em) > new Date())
+          ? "-" + Array.from(crypto.getRandomValues(new Uint8Array(10)), (b) => "abcdefghijklmnopqrstuvwxyz0123456789"[b % 36]).join("") : "";
+        const pasta = `paginas/${serieId}/${numStr(numero)}${token}`;
         const novas = new Array(arquivos.length);
         let feitas = 0;
         progresso(0, arquivos.length, "Preparando…");
@@ -269,14 +275,14 @@
       }
 
       progresso(1, 1, "Salvando…");
-      const { error } = await sb.from("capitulos").upsert({
-        serie_id: serieId, numero, titulo: $("capTitulo").value.trim() || null, data: $("capData").value, paginas,
-      }, { onConflict: "serie_id,numero" });
+      const linha = { serie_id: serieId, numero, titulo: $("capTitulo").value.trim() || null, data: $("capData").value, paginas };
+      if (vipDias >= 0) linha.publico_em = vipDias > 0 ? new Date(Date.now() + vipDias * 864e5).toISOString() : null;
+      const { error } = await sb.from("capitulos").upsert(linha, { onConflict: "serie_id,numero" });
       if (error) throw error;
 
       const link = `ler.html?s=${encodeURIComponent(serieId)}&c=${numStr(numero)}`;
       limparForm();
-      $("capMsg").innerHTML = `✓ Capítulo ${numStr(numero)} publicado! <a href="${link}" target="_blank">Abrir no leitor</a>`;
+      $("capMsg").innerHTML = `✓ Capítulo ${numStr(numero)} publicado${vipDias > 0 ? ` só pra VIP: libera pra todo mundo em ${new Date(linha.publico_em).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}` : ""}! <a href="${link}" target="_blank">Abrir no leitor</a>`;
       $("capMsg").className = "msg ok";
     } catch (err) {
       console.error(err);
@@ -429,27 +435,36 @@
   /* ============ LISTA DE CAPÍTULOS ============ */
   $("listaSerie").onchange = renderCapitulos;
 
+  const vipAinda = (c) => c.publico_em && new Date(c.publico_em) > new Date();
   async function renderCapitulos() {
     const serieId = $("listaSerie").value;
     const t = $("tabelaCaps");
     if (!serieId) { t.innerHTML = `<p class="vazio">Nenhuma obra cadastrada.</p>`; return; }
     t.innerHTML = `<p class="vazio">Carregando…</p>`;
-    const { data, error } = await sb.from("capitulos").select("numero,titulo,data,paginas").eq("serie_id", serieId).order("numero", { ascending: false });
+    const { data, error } = await sb.from("capitulos").select("numero,titulo,data,paginas,publico_em").eq("serie_id", serieId).order("numero", { ascending: false });
     if (error) { t.innerHTML = `<p class="msg erro">${esc(error.message)}</p>`; return; }
     t.innerHTML = data.length ? data.map((c) => `
       <div class="linha">
-        <div><b>Cap. ${numStr(c.numero)}</b> ${c.titulo ? `<span class="sub">${esc(c.titulo)}</span>` : ""}
-          <div class="sub">${c.data.split("-").reverse().join("/")} · ${c.paginas.length} páginas</div></div>
+        <div><b>Cap. ${numStr(c.numero)}</b>${vipAinda(c) ? '<span class="cap-vip">VIP</span>' : ""} ${c.titulo ? `<span class="sub">${esc(c.titulo)}</span>` : ""}
+          <div class="sub">${c.data.split("-").reverse().join("/")} · ${c.paginas.length} páginas${vipAinda(c) ? ` · libera pra todos em ${new Date(c.publico_em).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}` : ""}</div></div>
         <div class="acoes">
+          ${vipAinda(c) ? `<button class="btn mini-btn" data-liberar="${c.numero}">Liberar agora</button>` : ""}
           <a class="btn mini-btn" href="ler.html?s=${encodeURIComponent(serieId)}&c=${numStr(c.numero)}" target="_blank">Ler</a>
           <button class="btn mini-btn" data-editar="${c.numero}">Editar</button>
           <button class="btn mini-btn perigo" data-excluir="${c.numero}">Excluir</button>
         </div>
       </div>`).join("") : `<p class="vazio">Nenhum capítulo ainda.</p>`;
 
+    t.querySelectorAll("[data-liberar]").forEach((b) => (b.onclick = async () => {
+      b.disabled = true;
+      const { error } = await sb.from("capitulos").update({ publico_em: null }).eq("serie_id", serieId).eq("numero", b.dataset.liberar);
+      if (error) { alert("Erro: " + error.message); b.disabled = false; return; }
+      renderCapitulos();
+    }));
     t.querySelectorAll("[data-editar]").forEach((b) => (b.onclick = () => {
       const c = data.find((x) => String(x.numero) === b.dataset.editar);
       limparForm();
+      $("capVip").querySelector('[value="-1"]').hidden = false; $("capVip").value = "-1";
       $("capSerie").value = serieId; $("capSerie").disabled = true;
       $("capNumero").value = numStr(c.numero); $("capNumero").readOnly = true;
       $("capTitulo").value = c.titulo || ""; $("capData").value = c.data;
@@ -554,4 +569,73 @@
     await recarregarSeries();
     msg("obraMsg", "Obra excluída.", "ok");
   };
+
+  /* ============ APOIOS E VIP ============ */
+  const APOIE = (window.DT && DT.D.grupo.apoie) || {};
+  const reais = (v) => v == null ? "—" : Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const dataHora = (d) => new Date(d).toLocaleDateString("pt-BR");
+  let contaApoio = null, buscaTimer = null;
+
+  $("apBusca").oninput = () => {
+    clearTimeout(buscaTimer);
+    contaApoio = null;
+    const q = $("apBusca").value.trim();
+    if (q.length < 2) { $("apResultados").innerHTML = ""; return; }
+    buscaTimer = setTimeout(async () => {
+      const { data, error } = await sb.rpc("buscar_contas", { p_q: q });
+      if (error) { $("apResultados").innerHTML = `<p class="msg erro">${esc(error.message)}</p>`; return; }
+      $("apResultados").innerHTML = (data || []).length ? data.map((c) => `
+        <button type="button" class="conta-op" data-id="${c.user_id}" data-apelido="${esc(c.apelido)}">
+          <b>${esc(c.apelido)}</b> <span class="sub">${esc(c.email || "")}</span>
+          ${c.vip_ate && new Date(c.vip_ate) > new Date() ? `<span class="selo-vip">VIP até ${dataHora(c.vip_ate)}</span>` : ""}
+        </button>`).join("") : `<p class="sub">Nenhuma conta encontrada. A pessoa precisa criar conta no site primeiro (ou registre sem conta, só pro mural).</p>`;
+    }, 300);
+  };
+  $("apResultados").onclick = (e) => {
+    const b = e.target.closest(".conta-op"); if (!b) return;
+    contaApoio = b.dataset.id;
+    $("apResultados").querySelectorAll(".conta-op").forEach((x) => x.classList.toggle("on", x === b));
+    if (!$("apNome").value) $("apNome").value = b.dataset.apelido;
+  };
+  // valor → dias de VIP (R$ vipMensal = 30 dias)
+  $("apValor").oninput = () => {
+    const v = Number($("apValor").value), mes = APOIE.vipMensal || 5;
+    if (v > 0) $("apDias").value = Math.floor((v / mes) * 30);
+  };
+  $("formApoio").onsubmit = async (e) => {
+    e.preventDefault();
+    const dias = Number($("apDias").value) || 0;
+    if (dias > 0 && !contaApoio) return msg("apMsg", "Pra dar VIP, escolha a conta da pessoa na busca (ou coloque 0 dias).", "erro");
+    const { data, error } = await sb.rpc("registrar_apoio", {
+      p_user: contaApoio, p_nome: $("apNome").value.trim(), p_valor: $("apValor").value === "" ? null : Number($("apValor").value),
+      p_dias_vip: dias, p_mostrar_valor: $("apMostrarValor").checked, p_no_mural: $("apMural").checked,
+      p_mensagem: $("apMensagem").value.trim() || null,
+    });
+    if (error) return msg("apMsg", "Erro: " + error.message, "erro");
+    msg("apMsg", data ? `✓ Registrado! VIP até ${dataHora(data)}.` : "✓ Apoio registrado!", "ok");
+    ["apBusca", "apNome", "apValor", "apMensagem"].forEach((id) => ($(id).value = ""));
+    $("apDias").value = 30; $("apResultados").innerHTML = ""; contaApoio = null;
+    renderApoios();
+  };
+
+  async function renderApoios() {
+    const t = $("tabelaApoios");
+    t.innerHTML = `<p class="vazio">Carregando…</p>`;
+    const { data, error } = await sb.rpc("listar_apoios");
+    if (error) { t.innerHTML = `<p class="msg erro">${esc(error.message)}</p>`; return; }
+    const total = (data || []).reduce((a, x) => a + Number(x.valor || 0), 0);
+    t.innerHTML = (data || []).length ? `<p class="sub">${data.length} apoios · ${reais(total)} no total</p>` + data.map((a) => `
+      <div class="linha">
+        <div><b>${esc(a.nome)}</b>${a.apelido && a.apelido !== a.nome ? ` <span class="sub">(${esc(a.apelido)})</span>` : ""}
+          ${a.vip_ate && new Date(a.vip_ate) > new Date() ? `<span class="selo-vip">VIP até ${dataHora(a.vip_ate)}</span>` : ""}
+          <div class="sub">${dataHora(a.criado_em)} · ${reais(a.valor)}${a.dias_vip ? ` · ${a.dias_vip} dias de VIP` : ""}${a.no_mural ? " · no mural" : ""}${a.mensagem ? ` · “${esc(a.mensagem)}”` : ""}</div></div>
+        <div class="acoes"><button class="btn mini-btn perigo" data-apagar-apoio="${a.id}">Apagar</button></div>
+      </div>`).join("") : `<p class="vazio">Nenhum apoio registrado ainda.</p>`;
+    t.querySelectorAll("[data-apagar-apoio]").forEach((b) => (b.onclick = async () => {
+      if (!confirm("Apagar este registro? (o VIP que já foi dado continua; dá pra tirar pela busca)")) return;
+      const { error } = await sb.rpc("apagar_apoio", { p_id: Number(b.dataset.apagarApoio) });
+      if (error) return alert("Erro: " + error.message);
+      renderApoios();
+    }));
+  }
 })();

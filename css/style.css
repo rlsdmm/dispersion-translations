@@ -638,3 +638,69 @@ html[data-tema="papel"] .selo-car.novo { background: var(--grad); border-color: 
   .car-info .botoes .btn { padding: 8px 12px; font-size: 13px; white-space: nowrap; }
   .car-info h2 { font-size: 21px; }
 }
+
+/* ---------- VIP ---------- */
+:root { --vip1: #fde68a; --vip2: #f59e0b; }
+.selo-vip {
+  display: inline-block; font-size: 10px; font-weight: 900; letter-spacing: .5px; padding: 2px 6px; border-radius: 6px; margin-left: 6px; vertical-align: middle;
+  background: linear-gradient(135deg, var(--vip1), var(--vip2)); color: #3b2300;
+}
+.selo-vip.grande { font-size: 15px; padding: 8px 12px; border-radius: 12px; margin: 0; box-shadow: 0 6px 20px rgba(245, 158, 11, .35); }
+.nome-vip { background: linear-gradient(135deg, var(--vip1), var(--vip2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+html[data-tema="papel"] { --vip1: #b45309; --vip2: #92400e; }
+html[data-tema="papel"] .selo-vip { color: #fff; }
+.bala.vip { border-color: var(--vip2); box-shadow: 0 0 12px rgba(245, 158, 11, .35); }
+.bala.vip { color: var(--vip1); }
+.topo nav .btn-apoie { color: var(--txt); border: 1px solid var(--borda); }
+.topo nav .btn-apoie:hover, .topo nav .btn-apoie.on { border-color: var(--acc); }
+.op-tema.travado { opacity: .7; }
+.op-tema small.vip-ok { color: var(--vip2); font-weight: 800; }
+.cap-vip { font-size: 10px; font-weight: 900; padding: 2px 6px; border-radius: 6px; margin-left: 8px; background: linear-gradient(135deg, var(--vip1), var(--vip2)); color: #3b2300; vertical-align: middle; }
+.cap.travado, a.cap-travado { opacity: .75; }
+
+/* ---------- página Apoie ---------- */
+.apoie-hero { position: relative; overflow: hidden; padding: 64px 0 40px; text-align: center; }
+.apoie-hero::before { content: ""; position: absolute; inset: -50% -10% auto; height: 480px; background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, .3), transparent 60%); filter: blur(30px); pointer-events: none; }
+.apoie-hero .wrap { position: relative; }
+.apoie-hero h1 { font-size: clamp(30px, 5vw, 52px); font-weight: 900; line-height: 1.05; margin: 16px auto 14px; max-width: 760px; letter-spacing: -1px; }
+.apoie-hero h1 span { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.apoie-hero p { color: var(--sub); max-width: 620px; margin: 0 auto; font-size: 17px; }
+.apoie-grade { display: grid; grid-template-columns: 1fr 1.2fr; gap: 22px; align-items: start; }
+.apoie .painel-card h2 { font-size: 24px; }
+.pix-valores { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.pix-qr { background: #fff; border-radius: 14px; padding: 8px; width: min(260px, 100%); margin: 0 auto 16px; }
+.pix-qr svg { display: block; width: 100%; height: auto; }
+.pix-chave { display: block; font-size: 13px; color: var(--sub); margin-bottom: 10px; }
+.pix-chave div { display: flex; gap: 8px; margin-top: 4px; }
+.pix-chave input { flex: 1; min-width: 0; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--borda); background: var(--bg); color: var(--txt); font: inherit; font-size: 13px; }
+.pix-chave .btn { padding: 8px 14px; }
+.pix-embreve { margin-top: 16px; padding: 18px; border-radius: 12px; border: 1px dashed var(--borda); color: var(--sub); }
+.pix-embreve a { color: var(--acc); }
+.apoie-vip { border-color: rgba(245, 158, 11, .45); background: linear-gradient(160deg, rgba(245, 158, 11, .08), transparent 45%), var(--card); }
+.vip-topo { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
+.vantagens { list-style: none; display: grid; gap: 12px; margin-bottom: 20px; }
+.vantagens li { display: flex; gap: 12px; align-items: flex-start; }
+.vantagens li > span { font-size: 20px; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: var(--bg2); flex-shrink: 0; }
+.vantagens small { display: block; color: var(--sub); font-size: 13px; }
+.como { border-top: 1px solid var(--borda); padding-top: 16px; }
+.como h3 { font-size: 16px; margin-bottom: 8px; }
+.como ol { padding-left: 20px; display: grid; gap: 6px; color: var(--sub); }
+.como a { color: var(--acc); }
+.status-vip { margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: var(--bg2); font-size: 14px; color: var(--sub); }
+.status-vip a { color: var(--acc); }
+.status-vip.ativo { color: var(--txt); border: 1px solid var(--vip2); }
+.mural { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.apoiador { display: flex; gap: 12px; padding: 14px; border-radius: var(--raio); background: var(--card); border: 1px solid var(--borda); }
+.apoiador.vip { border-color: rgba(245, 158, 11, .5); }
+.apoiador p { font-size: 14px; margin: 4px 0; }
+.apoiador .valor { margin-left: 8px; font-size: 12px; color: var(--acc2); font-weight: 700; }
+@media (max-width: 860px) { .apoie-grade { grid-template-columns: 1fr; } .apoie-hero { padding: 40px 0 24px; } }
+.cap-bloqueado { max-width: 520px; margin: 18vh auto 0; padding: 28px; text-align: center; border-radius: var(--raio); background: var(--card); border: 1px solid rgba(245, 158, 11, .45); }
+.cap-bloqueado h2 { margin: 16px 0 8px; font-size: 22px; }
+.cap-bloqueado p { color: var(--sub); margin-bottom: 18px; }
+.cap-bloqueado .botoes { justify-content: center; }
+.cap-bloqueado a:not(.btn) { color: var(--acc); }
+.resultados-conta { display: grid; gap: 6px; }
+.conta-op { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; text-align: left; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--borda); background: var(--bg2); color: var(--txt); font: inherit; font-size: 14px; cursor: pointer; }
+.conta-op:hover { border-color: var(--acc); }
+.conta-op.on { border-color: var(--acc); box-shadow: inset 0 0 0 1px var(--acc); }

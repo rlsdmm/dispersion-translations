@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=13" />
+  <link rel="stylesheet" href="css/style.css?v=14" />
   <link rel="stylesheet" href="css/temas.css?v=5" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -19,7 +19,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
-  <script src="js/app.js?v=3"></script>
+  <script src="js/app.js?v=4"></script>
   <script>
     const { esc, serie, capa, capsOrdenados, dataBR, lidos, header, footer, store, conta, continuar } = DT;
     document.getElementById("topo").innerHTML = header();
@@ -84,11 +84,18 @@
 
       let desc = store.get("ordemDesc", true);
       function renderLista() {
-        const l = desc ? [...caps].reverse() : caps;
+        // capítulos antecipados que a pessoa ainda não pode ler aparecem com cadeado
+        const todosCaps = [...caps, ...(s.antecipados || []).map((a) => ({ ...a, travado: true }))].sort((a, b) => a.numero - b.numero);
+        const l = desc ? [...todosCaps].reverse() : todosCaps;
+        const libera = (c) => { const d = Math.max(0, Math.ceil((new Date(c.publicoEm) - Date.now()) / 864e5)); return d <= 1 ? "libera amanhã" : `libera em ${d} dias`; };
         document.getElementById("ordem").textContent = desc ? "↓ Mais novos" : "↑ Mais antigos";
-        document.getElementById("lista").innerHTML = l.length ? l.map((c) => `
+        document.getElementById("lista").innerHTML = l.length ? l.map((c) => c.travado ? `
+          <a href="apoie.html#vip" class="cap-travado" title="Capítulo antecipado para apoiadores VIP">
+            <span><span class="n">🔒 Capítulo ${c.numero}</span><span class="cap-vip">VIP</span><span class="t">${libera(c)} pra todo mundo</span></span>
+            <span class="d">${dataBR(c.data)}</span>
+          </a>` : `
           <a href="ler.html?s=${encodeURIComponent(s.id)}&c=${c.numero}" class="${lidos.foiLido(s.id, c.numero) ? "lido" : ""}">
-            <span><span class="n">Capítulo ${c.numero}</span>${c.titulo ? `<span class="t">${esc(c.titulo)}</span>` : ""}</span>
+            <span><span class="n">Capítulo ${c.numero}</span>${c.vip ? '<span class="cap-vip">VIP</span>' : ""}${c.titulo ? `<span class="t">${esc(c.titulo)}</span>` : ""}</span>
             <span class="d">${dataBR(c.data)}</span>
           </a>`).join("") : `<p class="vazio">Nenhum capítulo ainda. Em breve!</p>`;
       }

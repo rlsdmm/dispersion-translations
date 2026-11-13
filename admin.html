@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=13" />
+  <link rel="stylesheet" href="css/style.css?v=14" />
   <link rel="stylesheet" href="css/temas.css?v=5" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -63,6 +63,7 @@
         <button data-aba="importar">Importar em lote</button>
         <button data-aba="capitulos">Capítulos</button>
         <button data-aba="obras">Obras</button>
+        <button data-aba="apoios">💙 Apoios e VIP</button>
       </div>
 
       <!-- ENVIAR -->
@@ -73,6 +74,17 @@
             <label>Número <input type="number" id="capNumero" step="any" min="0" required placeholder="ex: 12 ou 12.5" /></label>
             <label>Data <input type="date" id="capData" required /></label>
             <label class="largo">Título do capítulo <input type="text" id="capTitulo" placeholder="opcional" /></label>
+            <label class="largo">Antecipado pra VIP
+              <select id="capVip">
+                <option value="-1" hidden>Manter como está</option>
+                <option value="0" selected>Não: libera pra todo mundo agora</option>
+                <option value="1">Sim, 1 dia antes de todo mundo</option>
+                <option value="2">Sim, 2 dias antes</option>
+                <option value="3">Sim, 3 dias antes</option>
+                <option value="5">Sim, 5 dias antes</option>
+                <option value="7">Sim, 7 dias antes</option>
+              </select>
+            </label>
           </div>
 
           <div class="soltar" id="soltar">
@@ -128,6 +140,32 @@
         </div>
       </section>
 
+      <!-- APOIOS E VIP -->
+      <section class="aba" id="aba-apoios" hidden>
+        <form class="painel-card" id="formApoio">
+          <h2>Registrar apoio</h2>
+          <p class="sub">Quando alguém mandar o comprovante do Pix: ache a conta, coloque o valor e os dias de VIP. O VIP soma com o que a pessoa já tinha.</p>
+          <div class="campos">
+            <label class="largo">Conta no site (apelido ou e-mail)
+              <input type="search" id="apBusca" placeholder="digite pelo menos 2 letras" autocomplete="off" />
+            </label>
+            <div class="largo resultados-conta" id="apResultados"></div>
+            <label>Nome no mural <input type="text" id="apNome" maxlength="40" required placeholder="como vai aparecer" /></label>
+            <label>Valor (R$) <input type="number" id="apValor" min="0" step="0.01" placeholder="ex: 10" /></label>
+            <label>Dias de VIP <input type="number" id="apDias" min="0" step="1" value="30" /></label>
+            <label class="largo">Recado no mural <input type="text" id="apMensagem" maxlength="140" placeholder="opcional" /></label>
+          </div>
+          <label class="check"><input type="checkbox" id="apMural" checked /> Mostrar no mural de apoiadores</label>
+          <label class="check"><input type="checkbox" id="apMostrarValor" /> Mostrar o valor no mural (só se a pessoa deixar)</label>
+          <div class="acoes"><button class="btn pri" type="submit">Registrar</button></div>
+          <p class="msg" id="apMsg"></p>
+        </form>
+        <div class="painel-card">
+          <h2>Apoios registrados</h2>
+          <div class="tabela" id="tabelaApoios"></div>
+        </div>
+      </section>
+
       <!-- OBRAS -->
       <section class="aba" id="aba-obras" hidden>
         <form class="painel-card" id="formObra">
@@ -165,7 +203,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
-  <script src="js/app.js?v=3"></script>
-  <script src="js/admin.js"></script>
+  <script src="js/app.js?v=4"></script>
+  <script src="js/admin.js?v=2"></script>
 </body>
 </html>
