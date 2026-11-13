@@ -1095,3 +1095,11 @@ html[data-tema="papel"] .xp-fogo, html[data-tema="fofinho"] .xp-fogo { color: #c
 .serie-topo .nomes-alt .mais-nomes { font-weight: 400; color: inherit; opacity: 1; margin: 0; }
 .serie-topo .nomes-alt .mais-nomes::after { content: none; }
 .serie-topo .nomes-alt .ver-nomes { font-size: 12px; font-weight: 700; text-decoration: none; }
+
+/* ---------- zoom no modo paginado ---------- */
+.paginas.paginado { --base-alt: 80px; }
+.paginas.paginado img { max-height: calc((100vh - var(--base-alt)) * var(--zoom, 1)); }
+.paginas.paginado.com-zoom { display: block; height: auto; min-height: 100vh; overflow-x: auto; overscroll-behavior-x: contain; }
+.paginas.paginado.com-zoom img.atual { height: calc((100vh - var(--base-alt)) * var(--zoom, 1)); max-height: none; max-width: none; width: auto; margin: 0 auto; }
+.pl-dica { margin-top: 8px; font-size: 11px; color: var(--sub); line-height: 1.4; }
+@media (max-width: 560px) { .paginas.paginado { --base-alt: 120px; } }

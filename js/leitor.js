@@ -46,6 +46,7 @@ DT.iniciar(function () {
     modo: store.get("modo", "vertical"),        // vertical | paginado
     largura: larguraPct(store.get("largura", 50)), // % da tela no modo vertical
     rtl: store.get("rtl", false),                 // direita → esquerda (estilo mangá)
+    zoom: Math.min(300, Math.max(50, Number(store.get("zoom", 100)) || 100)), // % no modo paginado (100 = caber na tela)
   };
 
   /* cabeçalho */
@@ -132,6 +133,7 @@ DT.iniciar(function () {
     if (i >= urls.length) { if (proximo) location.href = link(proximo); else marcarLido(); return; }
     atual = i;
     imgs.forEach((im, k) => im.classList.toggle("atual", k === i));
+    cont.scrollLeft = pref.rtl ? cont.scrollWidth : 0;
     // pré-carrega as próximas
     [i + 1, i + 2].forEach((k) => imgs[k] && imgs[k].removeAttribute("loading"));
     scrollTo(0, 0);
@@ -146,6 +148,8 @@ DT.iniciar(function () {
     $("larguraWrap").style.display = pref.modo === "vertical" ? "" : "none";
     $("btnDirecao").textContent = pref.rtl ? "← Mangá (D→E)" : "→ Ocidental (E→D)";
     $("btnDirecao").style.display = pref.modo === "paginado" ? "" : "none";
+    $("zoomWrap").style.display = pref.modo === "paginado" ? "" : "none";
+    aplicarZoom();
     if (pref.modo === "paginado") irPara(atual);
     else {
       imgs.forEach((im) => im.classList.remove("atual"));
@@ -176,6 +180,31 @@ DT.iniciar(function () {
   painelLarg.querySelectorAll("[data-larg]").forEach((b) => (b.onclick = () => {
     slider.value = b.dataset.larg; mudarLargura(b.dataset.larg); conta.salvarPref("largura", pref.largura);
   }));
+  /* zoom no modo paginado: 100% = página inteira cabendo na tela */
+  const painelZoom = $("painelZoom"), sliderZoom = $("sliderZoom");
+  function aplicarZoom() {
+    const z = pref.modo === "paginado" ? pref.zoom : 100;
+    cont.style.setProperty("--zoom", z / 100);
+    cont.classList.toggle("com-zoom", pref.modo === "paginado" && z > 100);
+    $("btnZoom").textContent = `🔍 ${pref.zoom}%`;
+    $("valZoom").textContent = pref.zoom === 100 ? "100% (caber)" : pref.zoom + "%";
+  }
+  function mudarZoom(v, salvar = true) {
+    pref.zoom = Math.min(300, Math.max(50, Math.round(Number(v) / 10) * 10));
+    sliderZoom.value = pref.zoom;
+    aplicarZoom();
+    if (salvar) conta.salvarPref("zoom", pref.zoom);
+  }
+  $("btnZoom").onclick = (e) => {
+    e.stopPropagation();
+    painelZoom.hidden = !painelZoom.hidden;
+    sliderZoom.value = pref.zoom;
+  };
+  document.addEventListener("click", (e) => { if (!painelZoom.hidden && !e.target.closest("#zoomWrap")) painelZoom.hidden = true; });
+  sliderZoom.oninput = () => mudarZoom(sliderZoom.value, false);
+  sliderZoom.onchange = () => conta.salvarPref("zoom", pref.zoom);
+  painelZoom.querySelectorAll("[data-zoom]").forEach((b) => (b.onclick = () => mudarZoom(b.dataset.zoom)));
+
   $("btnDirecao").onclick = () => { pref.rtl = !pref.rtl; conta.salvarPref("rtl", pref.rtl); aplicarPref(); };
 
   /* clique no modo paginado: laterais viram a página, centro mostra/esconde a barra */
@@ -195,6 +224,9 @@ DT.iniciar(function () {
     if (k === "q" && anterior) return (location.href = link(anterior));
     if (k === "e" && proximo) return (location.href = link(proximo));
     if (pref.modo !== "paginado") return;
+    if (k === "+" || k === "=") { e.preventDefault(); return mudarZoom(pref.zoom + 25); }
+    if (k === "-" || k === "_") { e.preventDefault(); return mudarZoom(pref.zoom - 25); }
+    if (k === "0") { e.preventDefault(); return mudarZoom(100); }
     const avancar = pref.rtl ? "arrowleft" : "arrowright";
     const voltar = pref.rtl ? "arrowright" : "arrowleft";
     if (k === avancar || k === " " || k === "d") { e.preventDefault(); irPara(atual + 1); }
@@ -208,6 +240,11 @@ DT.iniciar(function () {
     if (pref.modo !== "paginado" || tx === null) return;
     const dx = e.changedTouches[0].clientX - tx; tx = null;
     if (Math.abs(dx) < 50) return;
+    // com zoom, deslizar primeiro rola a página pros lados; só vira quando chega na borda
+    if (cont.classList.contains("com-zoom") && cont.scrollWidth > cont.clientWidth + 2) {
+      const naEsq = cont.scrollLeft <= 2, naDir = cont.scrollLeft + cont.clientWidth >= cont.scrollWidth - 2;
+      if ((dx < 0 && !naDir) || (dx > 0 && !naEsq)) return;
+    }
     const frente = pref.rtl ? dx > 0 : dx < 0;
     irPara(atual + (frente ? 1 : -1));
   });

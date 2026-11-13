@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=27" />
+  <link rel="stylesheet" href="css/style.css?v=28" />
   <link rel="stylesheet" href="css/temas.css?v=6" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -34,9 +34,9 @@
       <div><strong id="tituloSerie">Carregando…</strong><small id="tituloCap"></small></div>
     </a>
     <div class="ctrl">
-      <button id="ant" title="Capítulo anterior (Q)">‹ Ant.</button>
+      <button id="ant" title="Capítulo anterior (Q)">‹ Cap. ant.</button>
       <select id="selCap" title="Escolher capítulo"></select>
-      <button id="prox" title="Próximo capítulo (E)">Próx. ›</button>
+      <button id="prox" title="Próximo capítulo (E)">Próx. cap. ›</button>
     </div>
     <div class="ctrl">
       <button id="btnModo" title="Alternar modo de leitura (M)"></button>
@@ -46,6 +46,15 @@
           <div class="pl-topo"><span>Largura das páginas</span><b id="valLargura"></b></div>
           <input type="range" id="sliderLargura" min="20" max="100" step="5" aria-label="Largura das páginas em porcentagem da tela" />
           <div class="pl-atalhos"><button data-larg="35">35%</button><button data-larg="50">50%</button><button data-larg="75">75%</button><button data-larg="100">100%</button></div>
+        </div>
+      </span>
+      <span class="largura-wrap so-desk" id="zoomWrap">
+        <button id="btnZoom" title="Zoom da página (+ e −)"></button>
+        <div class="painel-largura" id="painelZoom" hidden>
+          <div class="pl-topo"><span>Zoom da página</span><b id="valZoom"></b></div>
+          <input type="range" id="sliderZoom" min="50" max="300" step="10" aria-label="Zoom da página em porcentagem" />
+          <div class="pl-atalhos"><button data-zoom="100">Caber</button><button data-zoom="150">150%</button><button data-zoom="200">200%</button><button data-zoom="300">300%</button></div>
+          <p class="pl-dica">Com zoom, role a página pra ver o resto. Teclas + e − também funcionam.</p>
         </div>
       </span>
       <button id="btnDirecao" title="Direção da leitura no modo paginado"></button>
@@ -71,7 +80,7 @@
   <script src="js/config.js"></script>
   <script src="js/data.js?v=5"></script>
   <script src="js/app.js?v=12"></script>
-  <script src="js/leitor.js?v=11"></script>
+  <script src="js/leitor.js?v=12"></script>
   <!-- Cloudflare Web Analytics (contagem anônima de visitas, sem cookies) --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "0950cd16f7fa48d592b6e8d109a58805"}'></script>
 </body>
 </html>
