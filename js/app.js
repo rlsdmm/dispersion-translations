@@ -416,6 +416,40 @@
 
   /* barrinha da meta do mês ("já recebemos X de Y") — usada na página Apoie e na inicial */
   const MESES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  /* ---------- XP: níveis e conquistas (o XP em si vem do banco: supabase/xp-e-conquistas.sql) ---------- */
+  const NIVEIS = [
+    [0, "Novato", "🌱"], [100, "Leitor", "📖"], [300, "Leitor Assíduo", "📚"], [700, "Devorador de Mangá", "🍙"],
+    [1500, "Otaku", "⭐"], [3000, "Veterano", "🗡️"], [6000, "Sensei", "🎴"], [12000, "Lenda da Dispersion", "🐉"],
+  ];
+  function nivel(xp) {
+    xp = Number(xp) || 0;
+    let i = 0;
+    while (i + 1 < NIVEIS.length && xp >= NIVEIS[i + 1][0]) i++;
+    const [de, nome, emoji] = NIVEIS[i], prox = NIVEIS[i + 1];
+    return { n: i + 1, nome, emoji, xp, de, ate: prox ? prox[0] : null, proxNome: prox ? prox[1] : null,
+      pct: prox ? Math.min(100, Math.round(((xp - de) / (prox[0] - de)) * 100)) : 100 };
+  }
+  const seloNivel = (xp) => {
+    const v = nivel(xp);
+    return `<span class="selo-nivel nv${Math.min(v.n, 8)}" title="Nível ${v.n} · ${v.nome} · ${v.xp} XP">${v.emoji} Nv ${v.n}</span>`;
+  };
+  // [id, emoji, nome, descrição, teste(stats)]
+  const CONQUISTAS = [
+    ["cap1", "📖", "Primeiro capítulo", "Terminou de ler um capítulo", (x) => x.caps >= 1],
+    ["cap50", "📚", "Maratonista", "Terminou 50 capítulos", (x) => x.caps >= 50],
+    ["cap250", "🏃", "Devorador", "Terminou 250 capítulos", (x) => x.caps >= 250],
+    ["cap1000", "🐉", "Mil capítulos", "Terminou 1000 capítulos", (x) => x.caps >= 1000],
+    ["obra1", "🏁", "Do começo ao fim", "Leu todos os capítulos de uma obra", (x) => x.obras >= 1],
+    ["obra10", "🏆", "Colecionador", "Terminou 10 obras", (x) => x.obras >= 10],
+    ["com1", "💬", "Primeira palavra", "Deixou o primeiro comentário", (x) => x.comentarios >= 1],
+    ["com50", "🗣️", "Tagarela", "Fez 50 comentários", (x) => x.comentarios >= 50],
+    ["seq7", "🔥", "Uma semana seguida", "Leu ou comentou 7 dias seguidos", (x) => x.melhor_seq >= 7],
+    ["seq30", "☄️", "Um mês sem parar", "Leu ou comentou 30 dias seguidos", (x) => x.melhor_seq >= 30],
+    ["fav10", "♥", "Coração grande", "Favoritou 10 obras", (x) => x.favoritos >= 10],
+    ["coruja", "🌙", "Coruja", "Terminou um capítulo entre meia-noite e 5h", (x) => x.coruja],
+    ["apoio", "💙", "Apoiador", "Apoiou a Dispersion", (x) => x.apoiador],
+  ];
+
   async function metaDoMes(el, { compacta = false } = {}) {
     const A = D.grupo.apoie || {};
     if (!el || !sb || !A.metaMensal) return;
@@ -442,6 +476,6 @@
 
   window.DT = {
     D, sb, carregar, iniciar, coresDe, esc, store, serie, capsOrdenados, ultimoCap, dataBR, tempoRelativo, capa, paginas,
-    lidos, continuar, novosDesde, conta, avatar, atualizarNav, header, footer, metaDoMes,
+    lidos, continuar, novosDesde, conta, avatar, atualizarNav, header, footer, metaDoMes, nivel, seloNivel, NIVEIS, CONQUISTAS,
   };
 })();

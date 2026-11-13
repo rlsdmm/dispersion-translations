@@ -245,8 +245,16 @@ DT.iniciar(function () {
   if (!DT.sb) { caixa.remove(); return; }
   let equipe = null;
   const ehVip = (c) => !!c.perfis?.vip_ate && new Date(c.perfis.vip_ate) > new Date();
+  const xpDe = new Map(); // user_id -> XP (selo de nível)
   const nomeAutor = (c) => `<b class="${ehVip(c) ? "nome-vip" : ""}">${esc(c.perfis?.apelido || "leitor")}</b>${
+    xpDe.has(c.user_id) ? DT.seloNivel(xpDe.get(c.user_id)) : ""}${
     equipe?.has(c.user_id) ? '<span class="selo-equipe">Equipe</span>' : ehVip(c) ? '<span class="selo-vip">VIP</span>' : ""}`;
+  async function buscarXp(lista) {
+    const faltam = [...new Set(lista.map((c) => c.user_id))].filter((u) => !xpDe.has(u));
+    if (!faltam.length) return;
+    const { data } = await DT.sb.rpc("xp_de", { p_users: faltam.slice(0, 200) });
+    for (const r of data || []) xpDe.set(r.user_id, r.xp);
+  }
   const quando = (iso) => {
     const min = Math.floor((Date.now() - new Date(iso)) / 6e4);
     if (min < 1) return "agora";
@@ -272,6 +280,7 @@ DT.iniciar(function () {
     ]);
     if (!equipe) equipe = new Set(e.data || []);
     const lista = r.data || [];
+    await buscarXp(lista);
     if (!r.error) { todos = lista; indexar(); renderBtnPag(); }
     const eu = conta.user?.id;
     caixa.innerHTML = `

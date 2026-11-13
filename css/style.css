@@ -831,3 +831,56 @@ html[data-tema="papel"] .selo-vip { color: #fff; }
   .meta.compacta .meta-topo > span:last-child { grid-column: 2; }
   .meta.compacta .meta-pe { grid-row: 3; }
 }
+
+/* ---------- XP, níveis e conquistas ---------- */
+.selo-nivel {
+  display: inline-block; margin-left: 6px; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px; white-space: nowrap;
+  background: rgba(148, 163, 184, .16); color: var(--sub); border: 1px solid rgba(148, 163, 184, .25); vertical-align: 1px;
+}
+.selo-nivel.nv3, .selo-nivel.nv4 { background: rgba(59, 130, 246, .16); color: #93c5fd; border-color: rgba(59, 130, 246, .35); }
+.selo-nivel.nv5, .selo-nivel.nv6 { background: rgba(168, 85, 247, .18); color: #d8b4fe; border-color: rgba(168, 85, 247, .4); }
+.selo-nivel.nv7, .selo-nivel.nv8 { background: linear-gradient(135deg, var(--vip1), var(--vip2)); color: #3b2300; border-color: transparent; }
+.coment .cab .selo-nivel { margin-right: -2px; }
+
+.xp-card { margin: 18px 0; padding: 22px; border-radius: var(--raio); border: 1px solid var(--borda); background: var(--card); }
+.xp-topo { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.xp-nivel {
+  width: 92px; height: 92px; border-radius: 22px; flex-shrink: 0; display: grid; place-items: center; align-content: center; gap: 0;
+  background: var(--grad); color: var(--on-acc); box-shadow: 0 10px 30px rgba(59, 130, 246, .3); text-align: center; line-height: 1;
+}
+.xp-nivel span { font-size: 22px; }
+.xp-nivel small { font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: .85; margin-top: 4px; }
+.xp-nivel b { font-size: 34px; font-weight: 900; }
+.xp-nivel.nv7, .xp-nivel.nv8 { background: linear-gradient(135deg, var(--vip1), var(--vip2)); color: #3b2300; }
+.xp-info { flex: 1; min-width: 200px; }
+.xp-info h2 { font-size: 24px; margin-bottom: 8px; }
+.xp-barra { height: 12px; border-radius: 999px; background: rgba(148, 163, 184, .15); overflow: hidden; margin-bottom: 8px; }
+.xp-barra div { height: 100%; border-radius: inherit; background: var(--grad); min-width: 6px; transition: width .8s ease; }
+.xp-num { color: var(--txt); }
+.xp-fogo { padding: 8px 14px; border-radius: 999px; font-weight: 800; font-size: 14px; background: rgba(249, 115, 22, .15); color: #fdba74; border: 1px solid rgba(249, 115, 22, .35); }
+.xp-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
+.xp-stats div { padding: 12px; border-radius: 12px; background: var(--bg2); border: 1px solid var(--borda); text-align: center; }
+.xp-stats b { display: block; font-size: 22px; font-weight: 800; }
+.xp-stats small { font-size: 12px; color: var(--sub); }
+.xp-card h3 { font-size: 17px; margin-bottom: 12px; }
+.conquistas { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.conquista { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 3px; padding: 14px 10px; border-radius: 14px; border: 1px dashed var(--borda); opacity: .5; }
+.conquista span { font-size: 26px; filter: grayscale(1); }
+.conquista b { font-size: 13px; }
+.conquista small { font-size: 11px; color: var(--sub); line-height: 1.3; }
+.conquista.ok { opacity: 1; border-style: solid; border-color: var(--acc); background: linear-gradient(180deg, rgba(59, 130, 246, .12), transparent); }
+.conquista.ok span { filter: none; }
+.xp-como { margin-top: 18px; font-size: 14px; }
+.xp-como summary { cursor: pointer; font-weight: 700; color: var(--acc); }
+.xp-como ul { margin: 10px 0 8px 20px; display: grid; gap: 4px; }
+.xp-como .sub { font-size: 12px; line-height: 1.6; }
+@media (max-width: 700px) {
+  .xp-card { padding: 16px; }
+  .xp-nivel { width: 74px; height: 74px; border-radius: 18px; }
+  .xp-nivel b { font-size: 26px; }
+  .xp-stats { grid-template-columns: repeat(2, 1fr); }
+  .xp-stats div:last-child { grid-column: span 2; }
+}
+html[data-tema="papel"] .selo-nivel.nv3, html[data-tema="papel"] .selo-nivel.nv4, html[data-tema="fofinho"] .selo-nivel.nv3, html[data-tema="fofinho"] .selo-nivel.nv4 { color: #1d4ed8; }
+html[data-tema="papel"] .selo-nivel.nv5, html[data-tema="papel"] .selo-nivel.nv6, html[data-tema="fofinho"] .selo-nivel.nv5, html[data-tema="fofinho"] .selo-nivel.nv6 { color: #7e22ce; }
+html[data-tema="papel"] .xp-fogo, html[data-tema="fofinho"] .xp-fogo { color: #c2410c; }

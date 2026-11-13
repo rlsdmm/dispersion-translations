@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=17" />
+  <link rel="stylesheet" href="css/style.css?v=18" />
   <link rel="stylesheet" href="css/temas.css?v=6" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -65,7 +65,7 @@
     </section>
 
     <section id="rankingSec" hidden>
-      <div class="titulo-sec"><h2>Leitores mais ativos</h2><span class="sub">quem mais comentou nos últimos 30 dias</span></div>
+      <div class="titulo-sec"><h2>Ranking dos leitores</h2><a class="sub" href="conta.html">quem tem mais XP · ver o seu →</a></div>
       <ol class="podio" id="listaRanking"></ol>
     </section>
 
@@ -102,7 +102,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js?v=4"></script>
-  <script src="js/app.js?v=6"></script>
+  <script src="js/app.js?v=7"></script>
   <script>
     const { D, esc, capa, capsOrdenados, ultimoCap, tempoRelativo, header, footer } = DT;
     document.getElementById("topo").innerHTML = header("inicio");
@@ -329,8 +329,8 @@
       };
     }
 
-    // pódio de leitores (quem mais comentou)
-    if (DT.sb) DT.sb.rpc("top_comentaristas", { p_dias: 30, p_limite: 5 }).then(({ data }) => {
+    // pódio de leitores (quem tem mais XP)
+    if (DT.sb) DT.sb.rpc("top_xp", { p_limite: 5 }).then(({ data }) => {
       const top = data || [];
       if (top.length < 3) return;
       document.getElementById("rankingSec").hidden = false;
@@ -341,7 +341,7 @@
           ${DT.avatar(u.apelido, u.user_id, "grande")}
           <b class="${u.vip ? "nome-vip" : ""}">${esc(u.apelido)}</b>
           ${u.equipe ? '<span class="selo-equipe">Equipe</span>' : u.vip ? '<span class="selo-vip">VIP</span>' : ""}
-          <span class="sub">${u.comentarios} ${Number(u.comentarios) === 1 ? "comentário" : "comentários"}</span>
+          <span class="sub">${DT.nivel(u.xp).emoji} ${DT.nivel(u.xp).nome} · ${Number(u.xp).toLocaleString("pt-BR")} XP</span>
         </li>`).join("");
     });
     selOrdem.addEventListener("change", () => {

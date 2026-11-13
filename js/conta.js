@@ -117,6 +117,53 @@
     const soSocial = !(conta.user.identities || []).some((i) => i.provider === "email");
     $("formTrocaSenha").hidden = soSocial;
     mostrar("telaPerfil");
+    renderXp();
+  }
+
+  /* ---------- XP, nível e conquistas ---------- */
+  async function renderXp() {
+    const el = $("cardXp");
+    const { data: x, error } = await DT.sb.rpc("meu_xp");
+    if (error || !x) return;
+    const v = DT.nivel(x.xp);
+    const feitas = DT.CONQUISTAS.filter((c) => c[4](x)).length;
+    const num = (n, um, varios) => `<div><b>${n}</b><small>${n === 1 ? um : varios}</small></div>`;
+    el.innerHTML = `
+      <div class="xp-topo">
+        <div class="xp-nivel nv${Math.min(v.n, 8)}"><span>${v.emoji}</span><small>Nível</small><b>${v.n}</b></div>
+        <div class="xp-info">
+          <h2>${v.nome}</h2>
+          <div class="xp-barra" role="progressbar" aria-valuemin="${v.de}" aria-valuemax="${v.ate ?? v.xp}" aria-valuenow="${v.xp}"><div style="width:${v.pct}%"></div></div>
+          <p class="sub"><b class="xp-num">${v.xp.toLocaleString("pt-BR")} XP</b> · ${v.ate
+            ? `faltam ${(v.ate - v.xp).toLocaleString("pt-BR")} XP pra <b>${v.proxNome}</b>`
+            : "nível máximo, você é lenda!"}</p>
+        </div>
+        ${x.seq_atual > 1 ? `<div class="xp-fogo" title="Dias seguidos lendo ou comentando">🔥 ${x.seq_atual} dias seguidos</div>` : ""}
+      </div>
+      <div class="xp-stats">
+        ${num(x.caps, "capítulo lido", "capítulos lidos")}
+        ${num(x.obras, "obra terminada", "obras terminadas")}
+        ${num(x.comentarios, "comentário", "comentários")}
+        ${num(x.dias, "dia ativo", "dias ativos")}
+        ${num(x.melhor_seq, "dia (maior sequência)", "dias (maior sequência)")}
+      </div>
+      <h3>Conquistas <span class="sub">${feitas} de ${DT.CONQUISTAS.length}</span></h3>
+      <div class="conquistas">${DT.CONQUISTAS.map(([id, emoji, nome, desc, ok]) => `
+        <div class="conquista ${ok(x) ? "ok" : ""}" title="${desc}">
+          <span>${ok(x) ? emoji : "🔒"}</span><b>${nome}</b><small>${desc}</small>
+        </div>`).join("")}</div>
+      <details class="xp-como">
+        <summary>Como ganhar XP</summary>
+        <ul>
+          <li><b>+10</b> por capítulo que você termina de ler (até 150 por dia)</li>
+          <li><b>+5</b> por comentário (até 10 por dia)</li>
+          <li><b>+50</b> quando termina todos os capítulos de uma obra</li>
+          <li><b>+5</b> por dia em que você lê ou comenta</li>
+          <li>💙 <b>VIP ganha XP em dobro</b> em capítulos e comentários. <a class="link" href="apoie.html#vip">Saiba mais</a></li>
+        </ul>
+        <p class="sub">Níveis: ${DT.NIVEIS.map(([de, nome, e], i) => `${e} ${i + 1} ${nome} (${de.toLocaleString("pt-BR")})`).join(" · ")}</p>
+      </details>`;
+    el.hidden = false;
   }
 
   $("formPerfil").onsubmit = async (e) => {
