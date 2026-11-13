@@ -207,9 +207,6 @@ body.leitor { background: #05080f; }
 }
 
 .paginas { padding-top: 64px; margin: 0 auto; }
-.paginas.largura-p { max-width: 640px; }
-.paginas.largura-m { max-width: 900px; }
-.paginas.largura-g { max-width: 100%; }
 .paginas img { width: 100%; height: auto; background: #111; min-height: 200px; }
 .paginas.vertical img + img { margin-top: var(--espaco, 0px); }
 
@@ -547,3 +544,17 @@ body.na-ultima .paginas.paginado ~ .fim-cap { display: block; }
 .op-tema small { color: var(--sub); font-size: 11px; margin-left: auto; }
 .amostra { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; border: 1px solid rgba(128, 128, 128, .35); flex-shrink: 0; }
 .amostra i { width: 12px; height: 12px; border-radius: 50%; }
+
+/* leitor: slider de largura */
+.largura-wrap { position: relative; display: inline-flex; }
+.painel-largura {
+  position: absolute; right: 0; top: calc(100% + 10px); z-index: 80; width: 240px; padding: 12px 14px;
+  background: var(--bg2); border: 1px solid var(--borda); border-radius: 12px; box-shadow: 0 14px 40px rgba(0, 0, 0, .5);
+}
+.painel-largura[hidden] { display: none; }
+.pl-topo { display: flex; justify-content: space-between; font-size: 13px; color: var(--sub); margin-bottom: 8px; }
+.pl-topo b { color: var(--txt); }
+.painel-largura input[type=range] { width: 100%; accent-color: var(--acc); cursor: pointer; }
+.pl-atalhos { display: flex; gap: 6px; margin-top: 8px; }
+.pl-atalhos button { flex: 1; padding: 5px 0; font-size: 12px; border-radius: 8px; border: 1px solid var(--borda); background: var(--card); color: var(--txt); cursor: pointer; font-family: inherit; }
+.pl-atalhos button:hover { border-color: var(--acc); }

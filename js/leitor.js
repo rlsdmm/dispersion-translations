@@ -22,9 +22,13 @@ DT.iniciar(function () {
   const urls = paginas(s, cap);
 
   /* preferências salvas */
+  function larguraPct(v) {
+    if (v in { p: 1, m: 1, g: 1 }) v = { p: 35, m: 50, g: 100 }[v]; // valores antigos P/M/G
+    return Math.min(100, Math.max(20, Math.round(+v / 5) * 5 || 50));
+  }
   const pref = {
     modo: store.get("modo", "vertical"),        // vertical | paginado
-    largura: store.get("largura", "m"),          // p | m | g
+    largura: larguraPct(store.get("largura", 50)), // % da tela no modo vertical
     rtl: store.get("rtl", false),                 // direita → esquerda (estilo mangá)
   };
 
@@ -109,10 +113,11 @@ DT.iniciar(function () {
   }
 
   function aplicarPref() {
-    cont.className = `paginas ${pref.modo} largura-${pref.largura}`;
+    cont.className = `paginas ${pref.modo}`;
+    cont.style.maxWidth = pref.modo === "vertical" ? pref.largura + "%" : "";
     $("btnModo").textContent = pref.modo === "vertical" ? "↕ Vertical" : "▤ Paginado";
-    $("btnLargura").textContent = { p: "Largura: P", m: "Largura: M", g: "Largura: G" }[pref.largura];
-    $("btnLargura").style.display = pref.modo === "vertical" ? "" : "none";
+    $("btnLargura").textContent = `↔ ${pref.largura}%`;
+    $("larguraWrap").style.display = pref.modo === "vertical" ? "" : "none";
     $("btnDirecao").textContent = pref.rtl ? "← Mangá (D→E)" : "→ Ocidental (E→D)";
     $("btnDirecao").style.display = pref.modo === "paginado" ? "" : "none";
     if (pref.modo === "paginado") irPara(atual);
@@ -123,7 +128,28 @@ DT.iniciar(function () {
   }
 
   $("btnModo").onclick = () => { pref.modo = pref.modo === "vertical" ? "paginado" : "vertical"; conta.salvarPref("modo", pref.modo); aplicarPref(); };
-  $("btnLargura").onclick = () => { pref.largura = { p: "m", m: "g", g: "p" }[pref.largura]; conta.salvarPref("largura", pref.largura); aplicarPref(); };
+  /* largura: slider em % (mantém a mesma página na tela enquanto arrasta) */
+  const painelLarg = $("painelLargura"), slider = $("sliderLargura");
+  $("btnLargura").onclick = (e) => {
+    e.stopPropagation();
+    painelLarg.hidden = !painelLarg.hidden;
+    slider.value = pref.largura; $("valLargura").textContent = pref.largura + "%";
+  };
+  document.addEventListener("click", (e) => { if (!painelLarg.hidden && !e.target.closest("#larguraWrap")) painelLarg.hidden = true; });
+  function mudarLargura(v) {
+    const img = imgs[atual], r = img && img.getBoundingClientRect();
+    const frac = r && r.height ? -r.top / r.height : 0;
+    pref.largura = larguraPct(v);
+    cont.style.maxWidth = pref.largura + "%";
+    $("btnLargura").textContent = `↔ ${pref.largura}%`;
+    $("valLargura").textContent = pref.largura + "%";
+    if (img) scrollTo(0, img.offsetTop + frac * img.offsetHeight);
+  }
+  slider.oninput = () => mudarLargura(slider.value);
+  slider.onchange = () => conta.salvarPref("largura", pref.largura);
+  painelLarg.querySelectorAll("[data-larg]").forEach((b) => (b.onclick = () => {
+    slider.value = b.dataset.larg; mudarLargura(b.dataset.larg); conta.salvarPref("largura", pref.largura);
+  }));
   $("btnDirecao").onclick = () => { pref.rtl = !pref.rtl; conta.salvarPref("rtl", pref.rtl); aplicarPref(); };
 
   /* clique no modo paginado: laterais viram a página, centro mostra/esconde a barra */

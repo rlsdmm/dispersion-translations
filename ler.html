@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=11" />
+  <link rel="stylesheet" href="css/style.css?v=12" />
   <link rel="stylesheet" href="css/temas.css?v=4" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -24,7 +24,14 @@
     </div>
     <div class="ctrl">
       <button id="btnModo" title="Alternar modo de leitura (M)"></button>
-      <button id="btnLargura" class="so-desk" title="Largura das páginas"></button>
+      <span class="largura-wrap so-desk" id="larguraWrap">
+        <button id="btnLargura" title="Largura das páginas"></button>
+        <div class="painel-largura" id="painelLargura" hidden>
+          <div class="pl-topo"><span>Largura das páginas</span><b id="valLargura"></b></div>
+          <input type="range" id="sliderLargura" min="20" max="100" step="5" aria-label="Largura das páginas em porcentagem da tela" />
+          <div class="pl-atalhos"><button data-larg="35">35%</button><button data-larg="50">50%</button><button data-larg="75">75%</button><button data-larg="100">100%</button></div>
+        </div>
+      </span>
       <button id="btnDirecao" title="Direção da leitura no modo paginado"></button>
       <button id="btnBalao" title="Mostrar/esconder os comentários passando na tela (C)" hidden></button>
     </div>
@@ -48,6 +55,6 @@
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
   <script src="js/app.js?v=3"></script>
-  <script src="js/leitor.js?v=5"></script>
+  <script src="js/leitor.js?v=6"></script>
 </body>
 </html>
