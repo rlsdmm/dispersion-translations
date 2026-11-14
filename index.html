@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=37" />
+  <link rel="stylesheet" href="css/style.css?v=38" />
   <link rel="stylesheet" href="css/temas.css?v=10" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -73,6 +73,11 @@
     <section id="rankingSec" hidden>
       <div class="titulo-sec"><h2>Ranking dos leitores</h2><a class="sub" href="conta.html">quem tem mais XP · ver o seu →</a></div>
       <ol class="podio" id="listaRanking"></ol>
+    </section>
+
+    <section id="comentsSec" hidden>
+      <div class="titulo-sec"><h2>Últimos comentários</h2><span class="sub">o que o pessoal tá falando dos capítulos</span></div>
+      <div class="ult-coments" id="listaComents"></div>
     </section>
 
     <section id="obras">
@@ -337,6 +342,35 @@
         document.getElementById("obras").scrollIntoView({ behavior: "smooth" });
       };
     }
+
+    // últimos comentários do site (com link pro capítulo)
+    if (DT.sb) DT.sb.from("comentarios").select("id,texto,criado_em,user_id,serie_id,numero,pagina,perfis(apelido,vip_ate,selos)")
+      .order("criado_em", { ascending: false }).limit(12).then(({ data }) => {
+        const lista = (data || []).filter((c) => DT.serie(c.serie_id)).slice(0, 6);
+        if (!lista.length) return;
+        const quando = (iso) => {
+          const min = Math.floor((Date.now() - new Date(iso)) / 6e4);
+          if (min < 1) return "agora";
+          if (min < 60) return `há ${min} min`;
+          if (min < 1440) return `há ${Math.floor(min / 60)} h`;
+          if (min < 10080) return `há ${Math.floor(min / 1440)} d`;
+          return new Date(iso).toLocaleDateString("pt-BR");
+        };
+        document.getElementById("comentsSec").hidden = false;
+        document.getElementById("listaComents").innerHTML = lista.map((c) => {
+          const s = DT.serie(c.serie_id), p = c.perfis || {};
+          const vip = p.vip_ate && new Date(p.vip_ate) > new Date();
+          return `<article class="ult-coment">
+            <div class="uc-cab">
+              <a href="${DT.linkPerfil(c.user_id)}" class="uc-autor">${DT.avatar(p.apelido, c.user_id)}<b class="${vip ? "nome-vip" : ""}">${esc(p.apelido || "leitor")}</b></a>${DT.selosEspeciais(p.selos)}
+              <span class="uc-quando">${quando(c.criado_em)}</span>
+            </div>
+            <p class="uc-texto">${esc(c.texto)}</p>
+            <a class="uc-onde" href="ler.html?s=${encodeURIComponent(s.id)}&c=${c.numero}"><img src="${capa(s)}" alt="" loading="lazy" />
+              <span><b>${esc(s.titulo)}</b><small>Capítulo ${c.numero}${c.pagina != null ? ` · página ${c.pagina + 1}` : ""}</small></span></a>
+          </article>`;
+        }).join("");
+      });
 
     // pódio de leitores (quem tem mais XP)
     if (DT.sb) DT.sb.rpc("top_xp", { p_limite: 5 }).then(({ data }) => {
