@@ -362,7 +362,17 @@
   }
 
   /* atualiza o topo quando a conta termina de carregar */
+  function marcarNavNovidade() {
+    const nav = document.getElementById("navNov");
+    if (!nav || !sb || nav.dataset.ok) return;
+    nav.dataset.ok = "1";
+    sb.from("novidades").select("id").order("criado_em", { ascending: false }).limit(1).then(({ data }) => {
+      const id = data && data[0] && data[0].id;
+      if (id && id > novidadeVista() && !nav.querySelector(".ponto-nov")) nav.insertAdjacentHTML("beforeend", `<span class="ponto-nov" title="Tem novidade"></span>`);
+    });
+  }
   function atualizarNav() {
+    marcarNavNovidade();
     const el = document.getElementById("navConta");
     const bib = document.getElementById("navBib");
     if (!el) return;
@@ -444,6 +454,7 @@
         <a href="index.html#obras" class="so-desk-nav">Obras</a>
         <a href="biblioteca.html" id="navBib" class="${ativo === "biblioteca" ? "on" : ""}" title="Minha biblioteca">📚<span class="so-desk-nav"> Biblioteca</span></a>
         <a href="mensagens.html" id="navMsg" class="nav-msg ${ativo === "mensagens" ? "on" : ""}" title="Mensagens" hidden>✉️</a>
+        <a href="novidades.html" id="navNov" class="nav-nov ${ativo === "novidades" ? "on" : ""}" title="Novidades do site">🆕<span class="so-desk-nav"> Novidades</span></a>
         <a href="apoie.html" class="btn-apoie ${ativo === "apoie" ? "on" : ""}" title="Apoie o grupo">💙<span class="so-desk-nav"> Apoie</span></a>
         <a href="${esc(D.grupo.discord)}" target="_blank" rel="noopener" class="btn-discord">Discord</a>
         <span class="tema-wrap"><button type="button" id="btnTema" class="btn-tema" title="Mudar o visual do site" aria-label="Mudar o visual do site">🎨</button>
@@ -477,7 +488,10 @@
     return `<div class="nov-texto">${html}</div>`;
   }
   const novidadeVista = () => Number(store.get("novidadeVista", 0)) || 0;
-  const marcarNovidadesVistas = (id) => { if (id > novidadeVista()) store.set("novidadeVista", id); };
+  const marcarNovidadesVistas = (id) => {
+    if (id > novidadeVista()) store.set("novidadeVista", id);
+    document.querySelector("#navNov .ponto-nov")?.remove();
+  };
   // faixinha na página inicial quando tem novidade que a pessoa ainda não viu
   async function avisoNovidade(el) {
     if (!sb || !el) return;

@@ -1147,3 +1147,7 @@ a.tag.status:hover { filter: brightness(1.12); background: var(--grad); }
 .aviso-nov-x { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; border: 0; background: none; color: var(--sub); cursor: pointer; font-size: 14px; }
 .aviso-nov-x:hover { background: var(--bg2); color: var(--txt); }
 @media (max-width: 560px) { .aviso-nov-ver { display: none; } .aviso-nov-link { font-size: 13px; } }
+
+/* ícone de novidades no topo */
+#navNov { position: relative; }
+.ponto-nov { position: absolute; top: 5px; right: 5px; width: 9px; height: 9px; border-radius: 50%; background: var(--acc2); box-shadow: 0 0 0 2px var(--bg); }
