@@ -128,10 +128,25 @@
       let desc = store.get("ordemDesc", true);
       // capítulos antecipados que a pessoa ainda não pode ler aparecem com cadeado
       const todosCaps = [...caps, ...(s.antecipados || []).map((a) => ({ ...a, travado: true }))].sort((a, b) => a.numero - b.numero);
-      // obras longas: a lista é dividida em abas de 50 capítulos
-      const TAM = 50, comFaixas = todosCaps.length > 60;
+      // obras longas: a lista é dividida em abas de ~50 capítulos.
+      // Onde falta um trecho (ex: Initial D tem 1–35 e depois 415–464), começa uma aba nova,
+      // pra aba não dizer "1–429" escondendo o buraco.
+      const TAM = 50, BURACO = 10, comFaixas = todosCaps.length > 60;
+      // 1) separa em trechos onde faltam mais de 10 capítulos seguidos
+      const trechos = [];
+      for (const c of todosCaps) {
+        const t = trechos[trechos.length - 1], ant = t && t[t.length - 1];
+        if (!ant || Math.floor(c.numero) - Math.floor(ant.numero) > BURACO + 1) trechos.push([c]);
+        else t.push(c);
+      }
+      // 2) trechos longos viram abas de 50 (a última aba de um trecho junta até 60 pra não sobrar uma minúscula)
       const blocos = [];
-      for (let i = 0; i < todosCaps.length; i += TAM) blocos.push(todosCaps.slice(i, i + TAM));
+      for (const t of trechos)
+        for (let i = 0; i < t.length;) {
+          const n = t.length - i <= TAM + 10 ? t.length - i : TAM;
+          blocos.push(t.slice(i, i + n));
+          i += n;
+        }
       const blocoDe = (num) => blocos.findIndex((b) => b.some((c) => c.numero === num));
       let bloco = comFaixas ? (cont && blocoDe(cont.cap.numero) >= 0 ? blocoDe(cont.cap.numero) : blocos.length - 1) : 0;
       function renderFaixas() {
