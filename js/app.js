@@ -366,7 +366,7 @@
     const nav = document.getElementById("navNov");
     if (!nav || !sb || nav.dataset.ok) return;
     nav.dataset.ok = "1";
-    sb.from("novidades").select("id").order("criado_em", { ascending: false }).limit(1).then(({ data }) => {
+    sb.from("novidades").select("id").order("id", { ascending: false }).limit(1).then(({ data }) => {
       const id = data && data[0] && data[0].id;
       if (id && id > novidadeVista() && !nav.querySelector(".ponto-nov")) nav.insertAdjacentHTML("beforeend", `<span class="ponto-nov" title="Tem novidade"></span>`);
     });
@@ -508,7 +508,7 @@
   // faixinha na página inicial quando tem novidade que a pessoa ainda não viu
   async function avisoNovidade(el) {
     if (!sb || !el) return;
-    const { data } = await sb.from("novidades").select("id,titulo,tipo").order("criado_em", { ascending: false }).limit(1);
+    const { data } = await sb.from("novidades").select("id,titulo,tipo").order("id", { ascending: false }).limit(1);
     const n = data && data[0];
     if (!n || n.id <= novidadeVista()) return;
     const [emoji] = TIPOS_NOVIDADE[n.tipo] || TIPOS_NOVIDADE.novo;
