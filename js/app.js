@@ -457,8 +457,38 @@
     return `<footer class="rodape">
       <p><b>${esc(D.grupo.nome)}</b> — ${esc(D.grupo.slogan)}</p>
       <p class="aviso">Projeto de fãs, sem fins lucrativos. Todos os direitos das obras pertencem aos seus autores e editoras. Apoie o lançamento oficial quando disponível.</p>
-      <p class="aviso"><a href="index.html#sobre">Sobre</a> · <a href="privacidade.html">Privacidade</a> · <a href="admin.html">Área do grupo</a></p>
+      <p class="aviso"><a href="index.html#sobre">Sobre</a> · <a href="novidades.html">Novidades</a> · <a href="privacidade.html">Privacidade</a> · <a href="admin.html">Área do grupo</a></p>
     </footer>`;
+  }
+
+  /* ---------- novidades (changelog) ---------- */
+  const TIPOS_NOVIDADE = { novo: ["🆕", "Novo"], melhoria: ["✨", "Melhoria"], correcao: ["🔧", "Correção"], aviso: ["📢", "Aviso"] };
+  // texto simples: linhas começando com "- " viram lista; o resto, parágrafos
+  function textoNovidade(t) {
+    const linhas = String(t || "").split(/\r?\n/);
+    let html = "", lista = [];
+    const fechar = () => { if (lista.length) { html += `<ul>${lista.map((l) => `<li>${esc(l)}</li>`).join("")}</ul>`; lista = []; } };
+    for (const l of linhas) {
+      const m = l.match(/^\s*[-•*]\s+(.*)/);
+      if (m) lista.push(m[1]);
+      else { fechar(); if (l.trim()) html += `<p>${esc(l.trim())}</p>`; }
+    }
+    fechar();
+    return `<div class="nov-texto">${html}</div>`;
+  }
+  const novidadeVista = () => Number(store.get("novidadeVista", 0)) || 0;
+  const marcarNovidadesVistas = (id) => { if (id > novidadeVista()) store.set("novidadeVista", id); };
+  // faixinha na página inicial quando tem novidade que a pessoa ainda não viu
+  async function avisoNovidade(el) {
+    if (!sb || !el) return;
+    const { data } = await sb.from("novidades").select("id,titulo,tipo").order("criado_em", { ascending: false }).limit(1);
+    const n = data && data[0];
+    if (!n || n.id <= novidadeVista()) return;
+    const [emoji] = TIPOS_NOVIDADE[n.tipo] || TIPOS_NOVIDADE.novo;
+    el.innerHTML = `<a class="aviso-nov-link" href="novidades.html#n${n.id}"><span class="aviso-nov-tag">${emoji} Novidade</span><b>${esc(n.titulo)}</b><span class="aviso-nov-ver">ver todas →</span></a>
+      <button type="button" class="aviso-nov-x" aria-label="Dispensar" title="Dispensar">✕</button>`;
+    el.hidden = false;
+    el.querySelector(".aviso-nov-x").onclick = () => { marcarNovidadesVistas(n.id); el.remove(); };
   }
 
   /* barrinha da meta do mês ("já recebemos X de Y") — usada na página Apoie e na inicial */
@@ -550,6 +580,6 @@
 
   window.DT = {
     D, sb, carregar, iniciar, coresDe, esc, store, serie, capsOrdenados, ultimoCap, dataBR, tempoRelativo, capa, paginas,
-    lidos, continuar, novosDesde, conta, avatar, atualizarNav, header, footer, metaDoMes, nivel, seloNivel, NIVEIS, CONQUISTAS, SELOS, selosEspeciais, REDES, limparUsuario, usuarioValido, linkPerfil, trocarFoto,
+    lidos, continuar, novosDesde, conta, avatar, atualizarNav, header, footer, metaDoMes, nivel, seloNivel, NIVEIS, CONQUISTAS, TIPOS_NOVIDADE, textoNovidade, novidadeVista, marcarNovidadesVistas, avisoNovidade, SELOS, selosEspeciais, REDES, limparUsuario, usuarioValido, linkPerfil, trocarFoto,
   };
 })();

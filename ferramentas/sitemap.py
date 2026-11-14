@@ -49,6 +49,7 @@ geral = max(ultima.values(), default=None)
 urls = [
     (f"{SITE}/", geral, "1.0"),
     (f"{SITE}/apoie.html", None, "0.5"),
+    (f"{SITE}/novidades.html", None, "0.4"),
     (f"{SITE}/privacidade.html", None, "0.2"),
 ]
 for s in series:

@@ -74,6 +74,7 @@
     if (nome === "importar") prepararImportador();
     if (nome === "apoios") renderApoios();
     if (nome === "denuncias") renderDenuncias();
+    if (nome === "novidades") renderNovidades();
   }
 
   /* ============ UTILIDADES ============ */
@@ -650,6 +651,60 @@
     const { error } = await sb.rpc("definir_selos", { p_user: contaSelo, p_selos: selos });
     msg("seMsg", error ? "Erro: " + error.message : "Selos salvos!", error ? "erro" : "ok");
   };
+
+  /* ============ NOVIDADES ============ */
+  let editandoNov = null, novidades = [];
+  function limparNov() {
+    editandoNov = null;
+    $("formNov").reset();
+    $("tituloFormNov").textContent = "Nova novidade";
+    $("btnNov").textContent = "Publicar";
+    $("cancelarNov").hidden = true;
+  }
+  $("cancelarNov").onclick = () => { limparNov(); msg("msgNov", ""); };
+  $("formNov").onsubmit = async (e) => {
+    e.preventDefault();
+    const dados = { titulo: $("novTitulo").value.trim(), tipo: $("novTipo").value, texto: $("novTexto").value.trim() || null };
+    if (!dados.titulo) return;
+    $("btnNov").disabled = true;
+    const r = editandoNov
+      ? await sb.from("novidades").update(dados).eq("id", editandoNov)
+      : await sb.from("novidades").insert(dados);
+    $("btnNov").disabled = false;
+    if (r.error) return msg("msgNov", "Erro: " + r.error.message, "erro");
+    msg("msgNov", editandoNov ? "Novidade atualizada!" : "Publicada! Já aparece no site.", "ok");
+    limparNov();
+    renderNovidades();
+  };
+  async function renderNovidades() {
+    const t = $("tabelaNov");
+    t.innerHTML = `<p class="vazio">Carregando…</p>`;
+    const { data, error } = await sb.from("novidades").select("id,titulo,texto,tipo,criado_em").order("criado_em", { ascending: false }).limit(200);
+    if (error) { t.innerHTML = `<p class="msg erro">${esc(error.message)}</p>`; return; }
+    novidades = data || [];
+    t.innerHTML = novidades.length ? novidades.map((n) => `
+      <div class="linha">
+        <div><b>${(DT.TIPOS_NOVIDADE[n.tipo] || ["🆕"])[0]} ${esc(n.titulo)}</b>
+          <div class="sub">${dataHora(n.criado_em)}${n.texto ? " · " + esc(n.texto.slice(0, 90)) + (n.texto.length > 90 ? "…" : "") : ""}</div></div>
+        <div class="acoes">
+          <button class="btn mini-btn" data-editar-nov="${n.id}">Editar</button>
+          <button class="btn mini-btn perigo" data-apagar-nov="${n.id}">Apagar</button>
+        </div>
+      </div>`).join("") : `<p class="vazio">Nenhuma novidade ainda.</p>`;
+    t.querySelectorAll("[data-editar-nov]").forEach((b) => (b.onclick = () => {
+      const n = novidades.find((x) => x.id === Number(b.dataset.editarNov)); if (!n) return;
+      editandoNov = n.id;
+      $("novTitulo").value = n.titulo; $("novTipo").value = n.tipo; $("novTexto").value = n.texto || "";
+      $("tituloFormNov").textContent = "Editar novidade"; $("btnNov").textContent = "Salvar"; $("cancelarNov").hidden = false;
+      $("formNov").scrollIntoView({ behavior: "smooth" });
+    }));
+    t.querySelectorAll("[data-apagar-nov]").forEach((b) => (b.onclick = async () => {
+      if (!confirm("Apagar esta novidade? Ela some do site.")) return;
+      const { error } = await sb.from("novidades").delete().eq("id", Number(b.dataset.apagarNov));
+      if (error) return alert("Erro: " + error.message);
+      renderNovidades();
+    }));
+  }
 
   /* ============ DENÚNCIAS ============ */
   async function renderDenuncias() {

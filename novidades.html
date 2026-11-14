@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Novidades · Dispersion Translations</title>
+  <meta name="description" content="O que mudou no site da Dispersion Translations: recursos novos, melhorias e correções." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Dispersion Translations" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:title" content="Novidades · Dispersion Translations" />
+  <meta property="og:description" content="O que mudou no site da Dispersion Translations: recursos novos, melhorias e correções." />
+  <meta property="og:image" content="https://dispersiontl.com.br/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@DispersionTL" />
+  <meta property="og:url" content="https://dispersiontl.com.br/novidades.html" />
+  <link rel="canonical" href="https://dispersiontl.com.br/novidades.html" />
+  <link rel="icon" href="favicon.ico" sizes="48x48" />
+  <link rel="icon" href="icone-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <meta name="theme-color" content="#070b16" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
+  <link rel="stylesheet" href="css/style.css?v=31" />
+  <link rel="stylesheet" href="css/temas.css?v=7" />
+  <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
+</head>
+<body>
+  <div id="topo"></div>
+
+  <main class="wrap novidades">
+    <header class="nov-topo">
+      <h1>Novidades 🆕</h1>
+      <p class="sub">Tudo que mudou no site, do mais recente pro mais antigo.</p>
+    </header>
+    <div id="lista"><p class="sub">Carregando…</p></div>
+  </main>
+
+  <div id="rodape"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js?v=5"></script>
+  <script src="js/app.js?v=13"></script>
+  <script>
+    const { esc } = DT;
+    document.getElementById("topo").innerHTML = DT.header("novidades");
+    document.getElementById("rodape").innerHTML = DT.footer();
+
+    DT.iniciar(async () => {
+      const el = document.getElementById("lista");
+      if (!DT.sb) { el.innerHTML = `<p class="vazio">Nada por aqui ainda.</p>`; return; }
+      const { data, error } = await DT.sb.from("novidades").select("id,titulo,texto,tipo,criado_em").order("criado_em", { ascending: false }).limit(200);
+      if (error) { el.innerHTML = `<p class="msg erro">Não deu pra carregar as novidades.</p>`; return; }
+      if (!data.length) { el.innerHTML = `<p class="vazio">Nada por aqui ainda.</p>`; return; }
+      const vista = DT.novidadeVista();
+      // agrupa por dia
+      const dias = [];
+      for (const n of data) {
+        const dia = new Date(n.criado_em).toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" });
+        if (!dias.length || dias[dias.length - 1].dia !== dia) dias.push({ dia, itens: [] });
+        dias[dias.length - 1].itens.push(n);
+      }
+      el.innerHTML = dias.map(({ dia, itens }) => `
+        <section class="nov-dia">
+          <h2>${dia}</h2>
+          ${itens.map((n) => {
+            const [emoji, nome] = DT.TIPOS_NOVIDADE[n.tipo] || DT.TIPOS_NOVIDADE.novo;
+            return `<article class="nov-item tipo-${esc(n.tipo)}" id="n${n.id}">
+              <div class="nov-cab"><span class="nov-tipo">${emoji} ${nome}</span>${n.id > vista ? `<span class="nov-nova">nova!</span>` : ""}</div>
+              <h3>${esc(n.titulo)}</h3>
+              ${n.texto ? DT.textoNovidade(n.texto) : ""}
+            </article>`;
+          }).join("")}
+        </section>`).join("");
+      DT.marcarNovidadesVistas(Math.max(...data.map((n) => n.id)));
+      if (location.hash) document.querySelector(location.hash)?.scrollIntoView({ block: "center", behavior: "instant" });
+    });
+  </script>
+  <!-- Cloudflare Web Analytics (contagem anônima de visitas, sem cookies) --><script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "0950cd16f7fa48d592b6e8d109a58805"}'></script>
+</body>
+</html>
