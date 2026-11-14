@@ -112,12 +112,6 @@ html[data-tema="edgy"] .btn.pri:hover { filter: brightness(1.15); }
 html[data-tema="edgy"] .titulo-sec h2 { display: flex; align-items: center; gap: 12px; }
 html[data-tema="edgy"] .titulo-sec h2::before { content: ""; width: 6px; height: 1em; background: var(--acc); transform: skewX(-18deg); flex-shrink: 0; }
 html[data-tema="edgy"] .car-info h2 { text-shadow: 3px 3px 0 rgba(220, 38, 38, .55); }
-/* capas um pouco dessaturadas, ganham cor no hover */
-html[data-tema="edgy"] .obra .capa, html[data-tema="edgy"] .l2-capa img, html[data-tema="edgy"] .pm-capa img, html[data-tema="edgy"] .genero-bloco img {
-  filter: grayscale(.45) contrast(1.1); transition: filter .3s, transform .3s;
-}
-html[data-tema="edgy"] .obra:hover .capa, html[data-tema="edgy"] .lanc2:hover .l2-capa img,
-html[data-tema="edgy"] .pop-mini:hover .pm-capa img, html[data-tema="edgy"] .genero-bloco:hover img { filter: none; }
 html[data-tema="edgy"] .obra .capa, html[data-tema="edgy"] .car-capa img, html[data-tema="edgy"] .serie-topo .capa-g, html[data-tema="edgy"] .pop-card img { clip-path: var(--corte); border-radius: 0; }
 html[data-tema="edgy"] .pop-card.r1 .pc-num { -webkit-text-stroke-color: var(--acc); }
 html[data-tema="edgy"] .lista-caps a:hover { border-color: var(--acc); box-shadow: inset 4px 0 0 var(--acc); }
