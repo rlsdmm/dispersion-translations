@@ -54,7 +54,7 @@ urls = [
 ]
 for s in series:
     data = ultima.get(s["id"]) or (s.get("criado_em") or "")[:10] or None
-    urls.append((f"{SITE}/serie.html?s={s['id']}", data, "0.8"))
+    urls.append((f"{SITE}/obra/{s['id']}.html", data, "0.8"))
 
 xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
 for loc, data, prio in urls:

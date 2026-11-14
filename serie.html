@@ -42,7 +42,8 @@
     document.getElementById("rodape").innerHTML = footer();
 
     DT.iniciar(() => {
-    const id = new URLSearchParams(location.search).get("s");
+    // na página pronta de cada obra (obra/<id>.html) o id vem embutido; aqui no serie.html vem do ?s=
+    const id = window.OBRA_ID || new URLSearchParams(location.search).get("s");
     const s = serie(id);
     const el = document.getElementById("conteudo");
 
@@ -52,7 +53,7 @@
       document.title = `${s.titulo} em Português | Ler Mangá Online · Dispersion Translations`;
       // descrição e prévia de link da obra (Google, Discord, WhatsApp...)
       const meta = (sel, attr, v) => { let m = document.head.querySelector(sel); if (!m) { m = document.createElement(sel.startsWith("link") ? "link" : "meta"); const [, k, n] = sel.match(/\[(\w+)="([^"]+)"/); m.setAttribute(k, n); document.head.appendChild(m); } m.setAttribute(attr, v); };
-      const url = `https://dispersiontl.com.br/serie.html?s=${encodeURIComponent(s.id)}`;
+      const url = `https://dispersiontl.com.br/obra/${encodeURIComponent(s.id)}.html`;
       const alt = (s.nomesAlt || []).find((n) => /^[\x20-\x7EÀ-ÿ’]+$/.test(n) && n.length <= 60);
       const descMeta = `Ler ${s.titulo}${alt ? ` (${alt})` : ""} em português (PT-BR), online e grátis. Mangá${s.autor ? " de " + s.autor : ""} traduzido por fãs, ${capsOrdenados(s).length} ${capsOrdenados(s).length === 1 ? "capítulo" : "capítulos"}. ${(s.sinopse || "").replace(/\s+/g, " ")}`.slice(0, 320);
       meta('meta[name="description"]', "content", descMeta);
@@ -218,7 +219,7 @@
         }
         abas.forEach((b) => (b.onclick = () => {
           abrirAba(b.dataset.aba);
-          history.replaceState(null, "", b.dataset.aba === "capas" ? "#capas" : location.pathname + location.search);
+          history.replaceState(null, "", location.pathname + location.search + (b.dataset.aba === "capas" ? "#capas" : ""));
         }));
         if (location.hash === "#capas") abrirAba("capas");
 

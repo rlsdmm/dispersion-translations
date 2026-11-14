@@ -16,12 +16,12 @@ DT.iniciar(function () {
       <span class="selo-vip grande">VIP</span>
       <h2>Capítulo ${travado.numero} ainda é antecipado</h2>
       <p>Quem apoia o grupo já está lendo. Ele libera pra todo mundo em <b>${libera.toLocaleDateString("pt-BR")}</b> às ${libera.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}.</p>
-      <div class="botoes"><a class="btn pri" href="apoie.html#vip">Quero ser VIP</a><a class="btn" href="serie.html?s=${encodeURIComponent(s.id)}">Voltar pra obra</a></div>
+      <div class="botoes"><a class="btn pri" href="apoie.html#vip">Quero ser VIP</a><a class="btn" href="obra/${encodeURIComponent(s.id)}.html">Voltar pra obra</a></div>
       ${conta.user ? "" : `<p class="sub">Já é VIP? <a href="${conta.linkEntrar()}">Entre na sua conta</a>.</p>`}
     </div>`;
     $("tituloSerie").textContent = s.titulo;
     $("tituloCap").textContent = `Capítulo ${travado.numero} · antecipado VIP`;
-    $("voltar").href = `serie.html?s=${encodeURIComponent(s.id)}`;
+    $("voltar").href = `obra/${encodeURIComponent(s.id)}.html`;
     document.querySelectorAll(".ctrl").forEach((e) => (e.style.display = "none"));
     return;
   }
@@ -61,7 +61,7 @@ DT.iniciar(function () {
     pôr('meta[property="og:image"]', "content", DT.capa(s), "meta");
     pôr('link[rel="canonical"]', "href", url, "link");
   }
-  $("voltar").href = `serie.html?s=${encodeURIComponent(s.id)}`;
+  $("voltar").href = `obra/${encodeURIComponent(s.id)}.html`;
   $("tituloSerie").textContent = s.titulo;
   $("tituloCap").textContent = `Capítulo ${cap.numero}${cap.titulo ? " — " + cap.titulo : ""}`;
   $("selCap").innerHTML = [...caps].reverse()
@@ -87,7 +87,7 @@ DT.iniciar(function () {
     <p>${proximo ? "Bora pro próximo?" : "Você está em dia! Novos capítulos em breve."}</p>
     <div class="botoes">
       ${proximo ? `<a class="btn pri" href="${link(proximo)}">Capítulo ${proximo.numero} →</a>` : ""}
-      <a class="btn" href="serie.html?s=${encodeURIComponent(s.id)}">Lista de capítulos</a>
+      <a class="btn" href="obra/${encodeURIComponent(s.id)}.html">Lista de capítulos</a>
     </div>
     <section class="comentarios" id="comentarios"></section>`;
   lidos.abrir(s.id, cap.numero);

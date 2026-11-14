@@ -73,9 +73,9 @@
         $("aba-favoritos").innerHTML = favs.length ? `<div class="grade">${favs.map(({ s, novos }) => {
           const c = continuar(s);
           return `<div class="obra">
-            <a href="serie.html?s=${encodeURIComponent(s.id)}" class="capa"><img src="${capa(s)}" alt="${esc(s.titulo)}" loading="lazy" />
+            <a href="obra/${encodeURIComponent(s.id)}.html" class="capa"><img src="${capa(s)}" alt="${esc(s.titulo)}" loading="lazy" />
               ${novos ? `<span class="selo novo-selo">${novos} ${novos === 1 ? "novo" : "novos"}</span>` : ""}</a>
-            <h3><a href="serie.html?s=${encodeURIComponent(s.id)}">${esc(s.titulo)}</a></h3>
+            <h3><a href="obra/${encodeURIComponent(s.id)}.html">${esc(s.titulo)}</a></h3>
             ${c ? `<a class="meta link-cont" href="${link(s, c.cap.numero)}">${esc(c.rotulo)} →</a>` : `<div class="meta">Em breve</div>`}
           </div>`;
         }).join("")}</div>` : `<p class="vazio">Você ainda não favoritou nada. Abra uma obra e clique em <b>♡ Favoritar</b> pra ela aparecer aqui, com aviso de capítulo novo.</p>`;
@@ -92,7 +92,7 @@
           const caps = capsOrdenados(s);
           const emDia = lidos.foiLido(s.id, caps[caps.length - 1].numero) && c.cap === caps[caps.length - 1];
           const pag = c.cap.numero === h.numero && !h.concluido && h.total ? ` · página ${h.pagina + 1} de ${h.total}` : "";
-          itens.push(`<a class="lanc" href="${emDia ? "serie.html?s=" + encodeURIComponent(s.id) : link(s, c.cap.numero)}">
+          itens.push(`<a class="lanc" href="${emDia ? "obra/" + encodeURIComponent(s.id) + ".html" : link(s, c.cap.numero)}">
             <img src="${capa(s)}" alt="" loading="lazy" />
             <div class="info">
               <h3>${esc(s.titulo)}</h3>

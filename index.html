@@ -131,7 +131,7 @@
       trilho.innerHTML = itens.map(({ s, data, c }, i) => {
         const novo = (Date.now() - new Date(data + "T12:00:00")) / 864e5 < 7;
         const ler = DT.continuar(s) || { cap: capsOrdenados(s)[0], rotulo: "Começar a ler" };
-        const href = `serie.html?s=${encodeURIComponent(s.id)}`;
+        const href = `obra/${encodeURIComponent(s.id)}.html`;
         return `<article class="car-slide ${i ? "" : "on"}" data-i="${i}" data-sid="${esc(s.id)}" aria-hidden="${i ? "true" : "false"}">
           <div class="car-fundo" style="background-image:url('${capa(s)}')"></div>
           <div class="wrap car-conteudo">
@@ -245,7 +245,7 @@
 
     const ehNovo = (d) => d && (Date.now() - new Date(d + "T12:00:00")) / 864e5 < 7;
     document.getElementById("listaLanc").innerHTML = recentes.map(({ s }) => {
-      const href = `serie.html?s=${encodeURIComponent(s.id)}`;
+      const href = `obra/${encodeURIComponent(s.id)}.html`;
       const ultimos = capsOrdenados(s).slice(-2).reverse();
       return `<div class="lanc2">
         <a class="l2-capa" href="${href}" tabindex="-1"><img src="${capa(s)}" alt="" loading="lazy" /></a>
@@ -269,7 +269,7 @@
       const leit = (n) => `👁 ${n} ${n === 1 ? "leitura" : "leituras"}`;
       document.getElementById("listaPop").innerHTML = top.slice(0, 3).map(({ s, n }, i) => {
         const u = ultimoCap(s);
-        return `<a class="pop-card r${i + 1}" href="serie.html?s=${encodeURIComponent(s.id)}">
+        return `<a class="pop-card r${i + 1}" href="obra/${encodeURIComponent(s.id)}.html">
           <span class="pc-fundo" style="background-image:url('${capa(s)}')"></span>
           <span class="pc-num">${i + 1}</span>
           <img src="${capa(s)}" alt="" loading="lazy" />
@@ -282,7 +282,7 @@
         </a>`;
       }).join("");
       document.getElementById("listaPopResto").innerHTML = top.slice(3).map(({ s, n }, i) => `
-        <li><a class="pop-mini" href="serie.html?s=${encodeURIComponent(s.id)}">
+        <li><a class="pop-mini" href="obra/${encodeURIComponent(s.id)}.html">
           <span class="pm-capa"><img src="${capa(s)}" alt="" loading="lazy" /><span class="pm-num">${i + 4}</span></span>
           <b>${esc(s.titulo)}</b>
           <small>${leit(n)}</small>
@@ -401,7 +401,7 @@
         .sort(ORDENS[selOrdem.value] || ORDENS.az);
       document.getElementById("grade").innerHTML = lista.length ? lista.map((s) => {
         const u = ultimoCap(s);
-        return `<a class="obra" href="serie.html?s=${encodeURIComponent(s.id)}">
+        return `<a class="obra" href="obra/${encodeURIComponent(s.id)}.html">
           <div class="capa"><img src="${capa(s)}" alt="${esc(s.titulo)}" loading="lazy" />
             <span class="selo ${classeStatus(s.status)}">${esc(s.status)}</span></div>
           <h3>${esc(s.titulo)}</h3>
@@ -442,7 +442,7 @@
           return { s, pontos };
         }).filter((x) => x.pontos).sort((a, b) => b.pontos - a.pontos || a.s.titulo.localeCompare(b.s.titulo, "pt")).slice(0, 6).map((x) => x.s);
         lista.innerHTML = achadas.length ? achadas.map((s) => `
-          <a href="serie.html?s=${encodeURIComponent(s.id)}"><img src="${capa(s)}" alt="" loading="lazy" />
+          <a href="obra/${encodeURIComponent(s.id)}.html"><img src="${capa(s)}" alt="" loading="lazy" />
             <span><b>${esc(s.titulo)}</b><small>${esc([s.status, (s.generos || [])[0], s.capitulos.length + " caps"].filter(Boolean).join(" · "))}</small></span></a>`).join("")
           + `<button type="button" class="br-todas">Ver todos os resultados na lista →</button>`
           : `<p class="br-vazio">Nenhuma obra com "${esc(inp.value.trim())}".</p>`;
@@ -456,7 +456,7 @@
       lista.addEventListener("click", (e) => { if (e.target.closest(".br-todas")) irLista(); });
       inp.addEventListener("keydown", (e) => {
         if (e.key === "Escape") { inp.value = ""; fechar(); }
-        if (e.key === "Enter") { e.preventDefault(); if (achadas.length === 1) location.href = `serie.html?s=${encodeURIComponent(achadas[0].id)}`; else irLista(); }
+        if (e.key === "Enter") { e.preventDefault(); if (achadas.length === 1) location.href = `obra/${encodeURIComponent(achadas[0].id)}.html`; else irLista(); }
       });
       document.addEventListener("click", (e) => { if (!e.target.closest("#buscaRapida")) fechar(); });
     }

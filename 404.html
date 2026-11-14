@@ -35,6 +35,13 @@
   <script src="js/data.js?v=5"></script>
   <script src="js/app.js?v=16"></script>
   <script>
+    // obra/<id>.html que ainda não foi gerada (obra recém-cadastrada): abre a versão normal da página
+    (function () {
+      const m = location.pathname.match(/^\/obra\/([a-z0-9-]+?)(?:\.html)?\/?$/);
+      if (m) location.replace("/serie.html?s=" + m[1] + location.hash);
+    })();
+  </script>
+  <script>
     document.getElementById("topo").innerHTML = DT.header();
     document.getElementById("rodape").innerHTML = DT.footer();
   </script>
