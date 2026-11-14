@@ -404,7 +404,7 @@ body.na-ultima .paginas.paginado ~ .fim-cap { display: block; }
   .filtros { flex-wrap: nowrap; overflow-x: auto; margin-inline: -20px; padding: 0 20px 4px; scrollbar-width: none; }
   .chip { flex-shrink: 0; }
   .barra-leitor { flex-wrap: wrap; }
-  .barra-leitor .voltar { flex-basis: 100%; }
+  .barra-leitor .leitor-esq { flex-basis: 100%; }
   .ctrl { flex: 1; justify-content: space-between; }
   .paginas { padding-top: 104px; }
   .paginas.paginado { padding-top: 104px; }
@@ -1192,3 +1192,10 @@ a.tag.status:hover { filter: brightness(1.12); background: var(--grad); }
 .nao-achou .grande { font-size: 84px; font-weight: 900; line-height: 1; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .nao-achou h1 { font-size: 26px; margin: 12px 0 8px; }
 .nao-achou .acoes { justify-content: center; margin-top: 20px; }
+
+/* leitor: botão da página inicial ao lado do nome da obra */
+.leitor-esq { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+.leitor-home { flex-shrink: 0; display: flex; border-radius: 10px; transition: transform .15s; }
+.leitor-home:hover { transform: scale(1.06); }
+.leitor-home .logo { width: 32px; height: 32px; font-size: 16px; }
+.leitor-esq .voltar { padding-left: 12px; border-left: 1px solid var(--borda); }

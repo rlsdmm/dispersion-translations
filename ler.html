@@ -23,16 +23,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=36" />
+  <link rel="stylesheet" href="css/style.css?v=37" />
   <link rel="stylesheet" href="css/temas.css?v=10" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
 <body class="leitor">
   <div class="barra-leitor" id="barra">
-    <a class="voltar" id="voltar" href="index.html">
-      <span class="seta">←</span>
-      <div><strong id="tituloSerie">Carregando…</strong><small id="tituloCap"></small></div>
-    </a>
+    <div class="leitor-esq">
+      <a class="leitor-home" href="index.html" title="Página inicial" aria-label="Ir para a página inicial"><span class="logo">D</span></a>
+      <a class="voltar" id="voltar" href="index.html" title="Voltar pra página da obra">
+        <span class="seta">←</span>
+        <div><strong id="tituloSerie">Carregando…</strong><small id="tituloCap"></small></div>
+      </a>
+    </div>
     <div class="ctrl">
       <button id="ant" title="Capítulo anterior (Q)">‹ Cap. ant.</button>
       <select id="selCap" title="Escolher capítulo"></select>
