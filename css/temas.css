@@ -4,7 +4,7 @@
 html[data-tema="roxo"] {
   --bg: #0d0d14; --bg2: #15151f; --card: #1b1b28; --borda: #2a2a3b;
   --txt: #ecebf5; --sub: #9a98b0; --acc: #8b5cf6; --acc2: #ec4899; --raio: 14px;
-  --on-acc: #fff; --on-acc2: #fff;
+  --on-acc: #fff; --on-acc2: #2a0a1a; --acc-txt: #a78bfa;
 }
 html[data-tema="roxo"] body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 html[data-tema="roxo"] .topo { background: rgba(13, 13, 20, .82); }
@@ -85,7 +85,7 @@ html[data-tema="papel"] .serie-topo .capa-g { box-shadow: 6px 6px 0 rgba(29, 26,
 html[data-tema="edgy"] {
   --bg: #080606; --bg2: #100b0c; --card: #151012; --borda: #2e1b1e;
   --txt: #f3eaea; --sub: #a08c8e; --acc: #dc2626; --acc2: #fb3b55; --raio: 0px;
-  --on-acc: #fff; --on-acc2: #fff;
+  --on-acc: #fff; --on-acc2: #1a0306; --acc-txt: #f05252;
   --corte: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
 }
 html[data-tema="edgy"] body { font-family: "Rubik", system-ui, sans-serif; }
@@ -120,7 +120,7 @@ html[data-tema="edgy"] ::selection { background: var(--acc); color: #fff; }
 /* ---------- 6. Fofinho (claro, rosinha e lilás, tudo redondinho) ---------- */
 html[data-tema="fofinho"] {
   --bg: #fff6fa; --bg2: #ffeef6; --card: #ffffff; --borda: #f7d6e6;
-  --txt: #4b2c4f; --sub: #9b7a9e; --acc: #ff7eb6; --acc2: #b69cff; --raio: 24px;
+  --txt: #4b2c4f; --sub: #7d5e82; --acc: #ff7eb6; --acc-txt: #b8306f; --acc2: #b69cff; --raio: 24px;
   --on-acc: #4a1036; --on-acc2: #2a1a5e;
   --vip1: #e08a00; --vip2: #c2410c;
   color-scheme: light;
@@ -152,7 +152,7 @@ html[data-tema="fofinho"] .tag { background: #ffe6f1; border-color: #f7c8dd; col
 html[data-tema="fofinho"] .sinopse, html[data-tema="fofinho"] .texto-legal p, html[data-tema="fofinho"] .texto-legal li { color: #6a4a6e; }
 html[data-tema="fofinho"] .seletor option { background: #fff; }
 html[data-tema="fofinho"] input, html[data-tema="fofinho"] select, html[data-tema="fofinho"] textarea { color-scheme: light; }
-html[data-tema="fofinho"] .btn.fav.on { color: var(--acc); }
+html[data-tema="fofinho"] .btn.fav.on { color: var(--acc-txt); border-color: var(--acc); }
 html[data-tema="fofinho"] .car-fundo { filter: blur(36px) brightness(1.2) saturate(.7); opacity: .45; }
 html[data-tema="fofinho"] .selo-car, html[data-tema="fofinho"] .car-seta { background: var(--card); border-color: var(--borda); }
 html[data-tema="fofinho"] .selo-car.novo { background: var(--grad); border-color: transparent; color: var(--on-acc); }

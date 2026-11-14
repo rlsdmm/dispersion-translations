@@ -27,8 +27,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=32" />
-  <link rel="stylesheet" href="css/temas.css?v=8" />
+  <link rel="stylesheet" href="css/style.css?v=36" />
+  <link rel="stylesheet" href="css/temas.css?v=10" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
 <body>
@@ -42,6 +42,10 @@
   </section>
 
   <main class="wrap">
+    <div class="busca-rapida" id="buscaRapida">
+      <input type="search" id="buscaTopo" placeholder="🔍 Buscar obra (título, nome em inglês, autor…)" autocomplete="off" aria-label="Buscar obra" />
+      <div class="br-lista" id="brLista" hidden></div>
+    </div>
     <div class="aviso-nov" id="avisoNov" hidden></div>
     <section id="continuarSec" hidden>
       <div class="titulo-sec"><h2>Continuar lendo</h2><a class="sub" href="biblioteca.html">Minha biblioteca →</a></div>
@@ -104,7 +108,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js?v=5"></script>
-  <script src="js/app.js?v=14"></script>
+  <script src="js/app.js?v=15"></script>
   <script>
     const { D, esc, capa, capsOrdenados, ultimoCap, tempoRelativo, header, footer } = DT;
     document.getElementById("topo").innerHTML = header("inicio");
@@ -388,6 +392,40 @@
       [50, 600, 1500, 3000].forEach((ms) => setTimeout(() => !mexeu && document.getElementById("obras").scrollIntoView({ block: "start", behavior: "instant" }), ms));
     }
     document.getElementById("busca").addEventListener("input", (e) => renderGrade(e.target.value));
+
+    // busca rápida do topo: mostra até 6 obras na hora; Enter abre a primeira (ou leva pra lista filtrada)
+    {
+      const inp = document.getElementById("buscaTopo"), lista = document.getElementById("brLista");
+      const norm = (t) => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      let achadas = [];
+      const fechar = () => { lista.hidden = true; };
+      inp.addEventListener("input", () => {
+        const q = norm(inp.value.trim());
+        if (q.length < 2) return fechar();
+        achadas = D.series.map((s) => {
+          const nomes = [s.titulo, s.tituloOriginal, ...(s.nomesAlt || [])].map(norm);
+          const pontos = nomes[0].startsWith(q) ? 3 : nomes.some((n) => n.includes(q)) ? 2 : norm(s.autor).includes(q) ? 1 : 0;
+          return { s, pontos };
+        }).filter((x) => x.pontos).sort((a, b) => b.pontos - a.pontos || a.s.titulo.localeCompare(b.s.titulo, "pt")).slice(0, 6).map((x) => x.s);
+        lista.innerHTML = achadas.length ? achadas.map((s) => `
+          <a href="serie.html?s=${encodeURIComponent(s.id)}"><img src="${capa(s)}" alt="" loading="lazy" />
+            <span><b>${esc(s.titulo)}</b><small>${esc([s.status, (s.generos || [])[0], s.capitulos.length + " caps"].filter(Boolean).join(" · "))}</small></span></a>`).join("")
+          + `<button type="button" class="br-todas">Ver todos os resultados na lista →</button>`
+          : `<p class="br-vazio">Nenhuma obra com "${esc(inp.value.trim())}".</p>`;
+        lista.hidden = false;
+      });
+      const irLista = () => {
+        const b = document.getElementById("busca");
+        b.value = inp.value; renderGrade(b.value); fechar();
+        document.getElementById("obras").scrollIntoView({ block: "start", behavior: "instant" });
+      };
+      lista.addEventListener("click", (e) => { if (e.target.closest(".br-todas")) irLista(); });
+      inp.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") { inp.value = ""; fechar(); }
+        if (e.key === "Enter") { e.preventDefault(); if (achadas.length === 1) location.href = `serie.html?s=${encodeURIComponent(achadas[0].id)}`; else irLista(); }
+      });
+      document.addEventListener("click", (e) => { if (!e.target.closest("#buscaRapida")) fechar(); });
+    }
     if (!D.series.length) document.getElementById("listaLanc").innerHTML = `<p class="vazio">Nenhum capítulo publicado ainda.</p>`;
     });
   </script>

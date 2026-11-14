@@ -464,6 +464,19 @@
     </header>`;
   }
 
+  // botão "voltar ao topo" nas páginas compridas
+  if (!document.body.classList.contains("leitor")) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "voltar-topo"; b.title = "Voltar ao topo"; b.setAttribute("aria-label", "Voltar ao topo"); b.textContent = "↑";
+    b.onclick = () => scrollTo({ top: 0, behavior: "smooth" });
+    document.body.appendChild(b);
+    let pend = false;
+    addEventListener("scroll", () => {
+      if (pend) return; pend = true;
+      requestAnimationFrame(() => { b.classList.toggle("on", scrollY > 1400); pend = false; });
+    }, { passive: true });
+  }
+
   function footer() {
     return `<footer class="rodape">
       <p><b>${esc(D.grupo.nome)}</b> — ${esc(D.grupo.slogan)}</p>
