@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=38" />
+  <link rel="stylesheet" href="css/style.css?v=39" />
   <link rel="stylesheet" href="css/temas.css?v=10" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -42,6 +42,7 @@
     <h2>O que guardamos</h2>
     <p><b>Sem conta:</b> nada sai do seu aparelho. Capítulos lidos e preferências do leitor ficam só no armazenamento do seu navegador.</p>
     <p><b>Estatísticas de visita:</b> usamos o <a class="link" href="https://www.cloudflare.com/web-analytics/" target="_blank" rel="noopener">Cloudflare Web Analytics</a> pra saber quantas pessoas visitam o site, quais páginas são mais vistas e de onde vêm as visitas (ex: Google, Discord). Ele <b>não usa cookies</b>, não guarda seu IP e não identifica nem acompanha ninguém entre sites; só vemos totais.</p>
+    <p><b>Contador do próprio site:</b> como bloqueadores de anúncio escondem parte das visitas da Cloudflare, o site também conta as visitas sozinho. Seu navegador ganha um número aleatório (guardado só nele) e registramos, por dia: quantas páginas foram abertas, se foi pelo celular e de que tipo de site você veio (Google, Discord etc.). Não guardamos IP, nome, e-mail nem quais páginas exatas você viu, e esse número não é ligado à sua conta. A equipe só vê os totais.</p>
     <p><b>Com conta:</b></p>
     <ul>
       <li>seu <b>e-mail</b> (ou os dados básicos do Discord/Google, se entrar por eles) e uma senha criptografada, pra você poder entrar;</li>
@@ -78,7 +79,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js?v=5"></script>
-  <script src="js/app.js?v=16"></script>
+  <script src="js/app.js?v=17"></script>
   <script>
     document.getElementById("topo").innerHTML = DT.header();
     document.getElementById("rodape").innerHTML = DT.footer();

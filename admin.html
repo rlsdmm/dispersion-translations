@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=38" />
+  <link rel="stylesheet" href="css/style.css?v=39" />
   <link rel="stylesheet" href="css/temas.css?v=10" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -72,6 +72,7 @@
         <button data-aba="apoios">💙 Apoios e VIP</button>
         <button data-aba="denuncias">🚩 Denúncias</button>
         <button data-aba="novidades">📢 Novidades</button>
+        <button data-aba="acessos">📈 Acessos</button>
       </div>
 
       <!-- ENVIAR -->
@@ -210,6 +211,18 @@
         </div>
       </section>
 
+      <!-- ACESSOS -->
+      <section class="aba" id="aba-acessos" hidden>
+        <div class="painel-card">
+          <h2>Acessos ao site</h2>
+          <p class="sub">Contagem do próprio site: funciona mesmo com bloqueador de anúncio. "Visitantes" = navegadores diferentes (a mesma pessoa no PC e no celular conta 2). "Leituras" = capítulos abertos (1 por capítulo por dia em cada navegador).</p>
+          <div class="abas-painel" id="periodoAcessos">
+            <button data-dias="7" class="on">7 dias</button><button data-dias="30">30 dias</button><button data-dias="90">90 dias</button>
+          </div>
+          <div id="resumoAcessos"></div>
+        </div>
+      </section>
+
       <!-- DENÚNCIAS -->
       <section class="aba" id="aba-denuncias" hidden>
         <div class="painel-card">
@@ -256,7 +269,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js?v=5"></script>
-  <script src="js/app.js?v=16"></script>
-  <script src="js/admin.js?v=4"></script>
+  <script src="js/app.js?v=17"></script>
+  <script src="js/admin.js?v=5"></script>
 </body>
 </html>

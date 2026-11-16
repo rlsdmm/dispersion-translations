@@ -75,6 +75,7 @@
     if (nome === "apoios") renderApoios();
     if (nome === "denuncias") renderDenuncias();
     if (nome === "novidades") renderNovidades();
+    if (nome === "acessos") renderAcessos();
   }
 
   /* ============ UTILIDADES ============ */
@@ -704,6 +705,45 @@
       if (error) return alert("Erro: " + error.message);
       renderNovidades();
     }));
+  }
+
+  /* ============ ACESSOS ============ */
+  let diasAcessos = 7;
+  document.querySelectorAll("#periodoAcessos button").forEach((b) => (b.onclick = () => {
+    diasAcessos = Number(b.dataset.dias);
+    document.querySelectorAll("#periodoAcessos button").forEach((x) => x.classList.toggle("on", x === b));
+    renderAcessos();
+  }));
+  async function renderAcessos() {
+    const t = $("resumoAcessos");
+    t.innerHTML = `<p class="vazio">Carregando…</p>`;
+    const { data, error } = await sb.rpc("estatisticas_acessos", { p_dias: diasAcessos });
+    if (error) { t.innerHTML = `<p class="msg erro">${esc(error.message)}</p>`; return; }
+    const dias = data.dias || [], soma = (k) => dias.reduce((a, d) => a + Number(d[k] || 0), 0);
+    const visitas = soma("visitantes"), n = Math.max(dias.length, 1);
+    const maior = Math.max(1, ...dias.map((d) => Number(d.visitantes)));
+    const nomesOrigem = { direto: "Direto / link salvo", google: "Google", discord: "Discord", twitter: "Twitter/X", reddit: "Reddit", facebook: "Facebook/Instagram", outro: "Outros sites" };
+    const origens = Object.entries(data.origens || {}).sort((a, b) => b[1] - a[1]);
+    const totOrig = origens.reduce((a, o) => a + o[1], 0) || 1;
+    const fmt = (x) => Number(x).toLocaleString("pt-BR");
+    t.innerHTML = `
+      <div class="acessos-nums">
+        <div><b>${fmt(data.unicos)}</b><span>visitantes diferentes</span></div>
+        <div><b>${fmt(Math.round(visitas / n))}</b><span>por dia (média)</span></div>
+        <div><b>${fmt(soma("paginas"))}</b><span>páginas vistas</span></div>
+        <div><b>${fmt(soma("leituras"))}</b><span>capítulos lidos</span></div>
+        <div><b>${fmt(soma("novos"))}</b><span>primeira visita</span></div>
+        <div><b>${visitas ? Math.round(soma("celular") / visitas * 100) : 0}%</b><span>no celular</span></div>
+      </div>
+      <h3>Por dia</h3>
+      <div class="acessos-dias">${dias.map((d) => `
+        <div class="acessos-dia"><span class="sub">${d.dia.slice(8, 10)}/${d.dia.slice(5, 7)}</span>
+          <div class="barra"><i style="width:${Number(d.visitantes) / maior * 100}%"></i></div>
+          <span><b>${fmt(d.visitantes)}</b> <span class="sub">· ${fmt(d.paginas)} pág. · ${fmt(d.leituras)} caps</span></span></div>`).join("")}</div>
+      <h3>De onde vêm</h3>
+      <div class="tabela">${origens.length ? origens.map(([o, q]) => `<div class="linha"><div>${esc(nomesOrigem[o] || o)}</div><div class="sub">${fmt(q)} · ${Math.round(q / totOrig * 100)}%</div></div>`).join("") : `<p class="vazio">Ainda sem dados.</p>`}</div>
+      <h3>Obras mais lidas</h3>
+      <div class="tabela">${(data.obras || []).length ? data.obras.map((o) => `<div class="linha"><div>${esc(o.titulo || o.serie_id)}</div><div class="sub">${fmt(o.leituras)} leituras</div></div>`).join("") : `<p class="vazio">Ainda sem dados.</p>`}</div>`;
   }
 
   /* ============ DENÚNCIAS ============ */

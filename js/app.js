@@ -605,6 +605,26 @@
     el.hidden = false;
   }
 
+  /* ---------- Contador de visitas próprio (funciona com bloqueador de anúncio) ----------
+     Número aleatório guardado só neste navegador; sem nome, e-mail nem IP. */
+  try {
+    const robo = navigator.webdriver || /bot|crawl|spider|slurp|lighthouse|headless|preview|facebookexternalhit/i.test(navigator.userAgent);
+    if (sb && !robo && location.hostname === "dispersiontl.com.br" && !/\/(404|admin)\.html$/.test(location.pathname)) {
+      let id = localStorage.getItem("dt:visitante"), novo = false;
+      if (!id || !/^[0-9a-f-]{36}$/.test(id)) {
+        id = crypto.randomUUID ? crypto.randomUUID() : "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
+        localStorage.setItem("dt:visitante", id); novo = true;
+      }
+      let ref = ""; try { ref = document.referrer ? new URL(document.referrer).hostname : ""; } catch {}
+      const origem = !ref || ref === location.hostname ? "direto"
+        : /google\./.test(ref) || ref.includes("googlequicksearchbox") ? "google"
+        : /discord/.test(ref) ? "discord" : /(^|\.)(t\.co|twitter\.com|x\.com)$/.test(ref) ? "twitter"
+        : /reddit/.test(ref) ? "reddit" : /facebook|fb\.|instagram/.test(ref) ? "facebook" : "outro";
+      const celular = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+      setTimeout(() => sb.rpc("registrar_acesso", { p_visitante: id, p_celular: celular, p_origem: origem, p_novo: novo }).then(() => {}), 1500);
+    }
+  } catch {}
+
   window.DT = {
     D, sb, carregar, iniciar, coresDe, esc, store, serie, capsOrdenados, ultimoCap, dataBR, tempoRelativo, capa, paginas,
     lidos, continuar, novosDesde, conta, avatar, atualizarNav, header, footer, metaDoMes, nivel, seloNivel, NIVEIS, CONQUISTAS, TIPOS_NOVIDADE, textoNovidade, novidadeVista, marcarNovidadesVistas, avisoNovidade, SELOS, selosEspeciais, REDES, limparUsuario, usuarioValido, linkPerfil, trocarFoto,
