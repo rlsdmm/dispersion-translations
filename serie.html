@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>/* endereço antigo (serie.html?s=obra) vai pra página pronta da obra; "novo" = obra que ainda não tem página */(function(){var p=new URLSearchParams(location.search),s=p.get("s");if(s&&!p.has("novo")&&/^[a-z0-9-]+$/.test(s))location.replace("obra/"+s+".html"+location.hash)})()</script>
   <title>Obra · Dispersion Translations</title>
   <meta name="description" content="Leia mangás traduzidos para o português de graça na Dispersion Translations: Black Paradox, Houseki no Kuni, Yuusha ga Shinda!, Hinowa ga Yuku! e muito mais, feitos por fãs." />
   <meta property="og:type" content="website" />

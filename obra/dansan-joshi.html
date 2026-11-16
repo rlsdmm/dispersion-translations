@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <base href="/" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>/* endereço antigo (serie.html?s=obra) vai pra página pronta da obra; "novo" = obra que ainda não tem página */(function(){var p=new URLSearchParams(location.search),s=p.get("s");if(s&&!p.has("novo")&&/^[a-z0-9-]+$/.test(s))location.replace("obra/"+s+".html"+location.hash)})()</script>
   <title>Dansan Joshi em Português | Ler Mangá Online · Dispersion Translations</title>
   <meta name="description" content="Ler Dansan Joshi (Dansanjoshi) em português (PT-BR), online e grátis. Mangá de Mizu Asato traduzido por fãs, 12 capítulos. Três garotos e quatro garotas da mesma turma do primeiro ano, cada um com um jeito mais estranho de pensar que o outro. Das discussões mais absurdas às piadas mais sem vergonha," />
   <meta property="og:type" content="website" />

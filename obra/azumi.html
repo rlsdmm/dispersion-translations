@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <base href="/" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>/* endereço antigo (serie.html?s=obra) vai pra página pronta da obra; "novo" = obra que ainda não tem página */(function(){var p=new URLSearchParams(location.search),s=p.get("s");if(s&&!p.has("novo")&&/^[a-z0-9-]+$/.test(s))location.replace("obra/"+s+".html"+location.hash)})()</script>
   <title>Azumi em Português | Ler Mangá Online · Dispersion Translations</title>
   <meta name="description" content="Ler Azumi em português (PT-BR), online e grátis. Mangá de Koyama Yuu traduzido por fãs, 13 capítulos. No Japão feudal, a jovem Azumi foi criada desde pequena junto com outros órfãos para ser uma assassina. Sua missão é eliminar senhores da guerra que ameaçam a paz, mas cada morte a faz questionar o " />
   <meta property="og:type" content="website" />
