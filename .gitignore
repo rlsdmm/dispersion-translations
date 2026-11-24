@@ -6,3 +6,4 @@ __pycache__/
 supabase/importar/
 supabase/importacao.sql
 ferramentas/vigiar.log
+.chave-avisos

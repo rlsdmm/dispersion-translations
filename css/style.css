@@ -1229,3 +1229,16 @@ a.tag.status:hover { filter: brightness(1.12); background: var(--grad); }
 .acessos-dia .barra { height: 10px; background: var(--borda); border-radius: 99px; overflow: hidden; }
 .acessos-dia .barra i { display: block; height: 100%; background: var(--acc); border-radius: 99px; }
 @media (max-width: 520px) { .acessos-dia { grid-template-columns: 40px minmax(0, 1fr); } .acessos-dia > span:last-child { grid-column: 2; } }
+
+/* pet: aviso por e-mail + lembrete na tela */
+.pet-aviso { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; font-size: 14px; cursor: pointer; line-height: 1.4; }
+.pet-aviso input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--acc); flex: none; }
+.pet-aviso small { display: block; }
+#navPet { position: relative; }
+.pet-lembrete { position: fixed; left: 16px; bottom: 18px; z-index: 61; display: flex; gap: 12px; align-items: center; max-width: min(340px, calc(100vw - 32px)); padding: 12px 12px 12px 14px; background: var(--card); color: var(--txt); border: 1px solid var(--borda); border-left: 4px solid var(--acc); border-radius: 14px; box-shadow: 0 10px 28px rgba(0, 0, 0, .4); opacity: 0; transform: translateY(12px); transition: opacity .3s, transform .3s; }
+.pet-lembrete.on { opacity: 1; transform: none; }
+.pet-lembrete .pl-emoji { font-size: 30px; line-height: 1; }
+.pet-lembrete b { display: block; font-size: 14px; }
+.pet-lembrete a { font-size: 13px; font-weight: 700; color: var(--acc-txt, var(--acc)); }
+.pet-lembrete button { align-self: flex-start; background: none; border: 0; color: var(--sub); font-size: 20px; line-height: 1; cursor: pointer; padding: 0 2px; }
+@media (max-width: 600px) { .pet-lembrete { bottom: 74px; } }

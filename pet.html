@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&amp;display=swap" />
-  <link rel="stylesheet" href="css/style.css?v=39" />
+  <link rel="stylesheet" href="css/style.css?v=40" />
   <link rel="stylesheet" href="css/temas.css?v=10" />
   <script>try{var q=new URLSearchParams(location.search).get("tema");if(q!==null)localStorage.setItem("dt:tema",JSON.stringify(q));localStorage.removeItem("tema-previa");var t=JSON.parse(localStorage.getItem("dt:tema")||"null");if(t&&t!=="padrao"&&t!=="azul"){document.documentElement.dataset.tema=t;document.write('<link rel="stylesheet" id="fontesTemas" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700&amp;family=Space+Grotesk:wght@400;600;700&amp;family=Nunito:wght@400;600;800;900&amp;family=Oswald:wght@500;700&amp;family=Rubik:wght@400;500;700&amp;family=Fredoka:wght@400;500;600;700&amp;display=swap">')}}catch(e){}</script>
 </head>
@@ -44,7 +44,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js?v=5"></script>
-  <script src="js/app.js?v=17"></script>
+  <script src="js/app.js?v=18"></script>
   <script src="js/pets.js?v=3"></script>
   <script>
     const { esc, conta, sb } = DT;
@@ -159,6 +159,8 @@
               <div class="gr-linha"><small>Rosto e pescoço</small><div class="gr-itens" id="grRosto"></div></div>
               <p class="msg" id="msgRoupa"></p>
             </div>
+            <label class="pet-aviso"><input type="checkbox" id="avisoEmail" disabled />
+              <span>📧 Me mandar um e-mail quando ${esc(pet.nome || nome)} estiver com fome ou tristinho <small class="sub">(no máximo 1 a cada 2 dias)</small></span></label>
             <details class="pet-sobre">
               <summary>Sobre ${esc(pet.nome || nome)} e nome</summary>
               <p>${desc}</p>
@@ -174,6 +176,20 @@
         if (!pet.nome || nasceuAgora) $("petCard").querySelector(".pet-sobre").open = true;
         renderStatus();
         renderRoupas();
+        sb.rpc("pet_status").then(({ data }) => {
+          if (!data) return;
+          $("avisoEmail").checked = data.avisar_email !== false;
+          $("avisoEmail").disabled = false;
+        });
+        $("avisoEmail").onchange = async () => {
+          const cb = $("avisoEmail");
+          cb.disabled = true;
+          const { data, error } = await sb.rpc("avisos_pet", { p_ligado: cb.checked });
+          cb.disabled = false;
+          if (error) { cb.checked = !cb.checked; return msg("msgComida", "Não deu pra salvar: " + esc(error.message), "erro"); }
+          cb.checked = !!data;
+          msg("msgComida", data ? "📧 Combinado! Te aviso por e-mail quando precisar." : "Tudo bem, sem e-mails. Dá pra ligar de novo aqui quando quiser.", "ok");
+        };
 
         $("palco").onclick = async (e) => {
           coracao(e);
@@ -206,6 +222,7 @@
 
       // barras, humor e botões (sem redesenhar a página toda)
       function renderStatus() {
+        try { sessionStorage.removeItem("dt:petStatus"); } catch {} // o 🐾 do topo busca de novo
         const humor = humorForcado || PETS.humorDe(pet);
         const [he, hn] = PETS.HUMORES[humor];
         const corBarra = (v) => (v < 20 ? "#f87171" : v < 50 ? "#fbbf24" : "#34d399");

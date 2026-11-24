@@ -390,10 +390,50 @@
           if (data > 0) msg.insertAdjacentHTML("beforeend", `<span class="bolinha" title="Mensagens não lidas">${data > 99 ? "99+" : data}</span>`);
         });
       }
+      avisoPet();
     } else {
       el.textContent = "Entrar";
       el.href = conta.linkEntrar();
     }
+  }
+
+  /* ---------- aviso do pet (ícone 🐾 do topo + lembrete) ---------- */
+  async function avisoPet() {
+    const nav = document.getElementById("navPet");
+    if (!nav || !sb) return;
+    nav.hidden = false;
+    let st = null;
+    try {
+      const c = JSON.parse(sessionStorage.getItem("dt:petStatus") || "null");
+      if (c && Date.now() - c.t < 5 * 60e3) st = c.d;
+    } catch {}
+    if (!st) {
+      const { data, error } = await sb.rpc("pet_status");
+      if (error) return;
+      st = data || { vazio: true };
+      try { sessionStorage.setItem("dt:petStatus", JSON.stringify({ t: Date.now(), d: st })); } catch {}
+    }
+    if (st.vazio) return;
+    const nome = st.nome || "Seu pet";
+    const fome = st.nasceu && st.saciedade < 20, triste = st.nasceu && st.felicidade < 30;
+    const ovo = !st.nasceu && !st.aqueceu_hoje;
+    nav.querySelector(".bolinha")?.remove();
+    if (!fome && !triste && !ovo) return;
+    const txt = ovo ? "Seu ovo ainda não foi aquecido hoje" : fome && triste ? `${nome} está com fome e tristinho` : fome ? `${nome} está com fome` : `${nome} está tristinho`;
+    nav.title = txt;
+    nav.insertAdjacentHTML("beforeend", `<span class="bolinha" title="${esc(txt)}">!</span>`);
+    // lembrete na tela (pet nascido precisando de cuidado), no máximo a cada 12h
+    if (ovo || /\/pet\.html$/.test(location.pathname) || document.body.classList.contains("leitor")) return;
+    try {
+      if (Date.now() - Number(localStorage.getItem("dt:petLembrete") || 0) < 12 * 3600e3) return;
+      localStorage.setItem("dt:petLembrete", String(Date.now()));
+    } catch { return; }
+    const el = document.createElement("div");
+    el.className = "pet-lembrete";
+    el.innerHTML = `<span class="pl-emoji">${fome ? "🍙" : "🥺"}</span><div><b>${esc(txt)}!</b><a href="pet.html">Cuidar agora →</a></div><button type="button" aria-label="Fechar">×</button>`;
+    el.querySelector("button").onclick = () => el.remove();
+    document.body.appendChild(el);
+    setTimeout(() => el.classList.add("on"), 50);
   }
 
   /* ---------- tema (visual) escolhido pelo leitor ---------- */
@@ -453,6 +493,7 @@
         <a href="index.html" class="so-desk-nav ${ativo === "inicio" ? "on" : ""}">Início</a>
         <a href="index.html#obras" class="so-desk-nav">Obras</a>
         <a href="biblioteca.html" id="navBib" class="${ativo === "biblioteca" ? "on" : ""}" title="Minha biblioteca">📚<span class="so-desk-nav"> Biblioteca</span></a>
+        <a href="pet.html" id="navPet" class="nav-msg ${ativo === "pet" ? "on" : ""}" title="Meu pet" hidden>🐾</a>
         <a href="mensagens.html" id="navMsg" class="nav-msg ${ativo === "mensagens" ? "on" : ""}" title="Mensagens" hidden>✉️</a>
         <a href="novidades.html" id="navNov" class="nav-nov ${ativo === "novidades" ? "on" : ""}" title="Novidades do site">🆕<span class="so-desk-nav"> Novidades</span></a>
         <a href="apoie.html" class="btn-apoie ${ativo === "apoie" ? "on" : ""}" title="Apoie o grupo">💙<span class="so-desk-nav"> Apoie</span></a>
@@ -626,7 +667,7 @@
   } catch {}
 
   window.DT = {
-    D, sb, carregar, iniciar, coresDe, esc, store, serie, capsOrdenados, ultimoCap, dataBR, tempoRelativo, capa, paginas,
+    D, sb, avisoPet, carregar, iniciar, coresDe, esc, store, serie, capsOrdenados, ultimoCap, dataBR, tempoRelativo, capa, paginas,
     lidos, continuar, novosDesde, conta, avatar, atualizarNav, header, footer, metaDoMes, nivel, seloNivel, NIVEIS, CONQUISTAS, TIPOS_NOVIDADE, textoNovidade, novidadeVista, marcarNovidadesVistas, avisoNovidade, SELOS, selosEspeciais, REDES, limparUsuario, usuarioValido, linkPerfil, trocarFoto,
   };
 })();
