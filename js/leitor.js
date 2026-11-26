@@ -26,6 +26,8 @@ DT.iniciar(function () {
     return;
   }
   if (!s || !cap) {
+    // endereço inválido: avisa o Google pra não indexar
+    document.head.insertAdjacentHTML("beforeend", '<meta name="robots" content="noindex" />');
     $("paginas").innerHTML = `<p class="erro-pag">Capítulo não encontrado. <a href="index.html" style="color:var(--acc)">Voltar ao início</a></p>`;
     $("tituloSerie").textContent = "Dispersion Translations";
     document.querySelectorAll(".ctrl").forEach((e) => (e.style.display = "none"));
@@ -88,6 +90,11 @@ DT.iniciar(function () {
     <div class="botoes">
       ${proximo ? `<a class="btn pri" href="${link(proximo)}">Capítulo ${proximo.numero} →</a>` : ""}
       <a class="btn" href="obra/${encodeURIComponent(s.id)}.html">Lista de capítulos</a>
+    </div>
+    <div class="sobre-cap">
+      <h1>${esc(s.titulo)} — Capítulo ${cap.numero}${cap.titulo ? ": " + esc(cap.titulo) : ""}</h1>
+      <p>Você está lendo o capítulo ${cap.numero} de <a href="obra/${encodeURIComponent(s.id)}.html">${esc(s.titulo)}</a>${s.autor ? `, de ${esc(s.autor)}` : ""}, em português (PT-BR). Tradução feita por fãs na Dispersion Translations${caps.length > 1 ? `: são ${caps.length} capítulos disponíveis pra ler online e de graça` : ""}.</p>
+      ${s.sinopse ? `<p><b>Sinopse:</b> ${esc(s.sinopse)}</p>` : ""}
     </div>
     <section class="comentarios" id="comentarios"></section>`;
   lidos.abrir(s.id, cap.numero);

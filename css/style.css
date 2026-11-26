@@ -220,6 +220,10 @@ body.leitor { background: #05080f; }
 .fim-cap h3 { font-size: 20px; margin-bottom: 6px; }
 .fim-cap p { color: var(--sub); margin-bottom: 18px; }
 .fim-cap .botoes { justify-content: center; }
+.sobre-cap { margin: 28px 0 8px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.08); text-align: left; }
+.sobre-cap h1 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.fim-cap .sobre-cap p { font-size: 13px; line-height: 1.55; margin-bottom: 8px; }
+.sobre-cap a { color: var(--acc); }
 .paginas.paginado ~ .fim-cap { display: none; }
 .erro-pag { color: var(--sub); text-align: center; padding: 80px 20px; }
 
