@@ -220,6 +220,15 @@ body.leitor { background: #05080f; }
 .fim-cap h3 { font-size: 20px; margin-bottom: 6px; }
 .fim-cap p { color: var(--sub); margin-bottom: 18px; }
 .fim-cap .botoes { justify-content: center; }
+.relacionadas { margin-top: 8px; margin-bottom: 40px; }
+.rel-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 14px; }
+.rel-lista a { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; line-height: 1.3; }
+.rel-lista img { width: 100%; aspect-ratio: 2/3; object-fit: cover; border-radius: 10px; background: rgba(255,255,255,.05); }
+.rel-lista a:hover span { color: var(--acc); }
+.catalogo-az { margin-top: 40px; }
+.az-lista { columns: 4 200px; column-gap: 24px; font-size: 13px; }
+.az-lista a { display: block; padding: 3px 0; color: var(--sub); break-inside: avoid; }
+.az-lista a:hover { color: var(--acc); }
 .sobre-cap { margin: 28px 0 8px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.08); text-align: left; }
 .sobre-cap h1 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
 .fim-cap .sobre-cap p { font-size: 13px; line-height: 1.55; margin-bottom: 8px; }

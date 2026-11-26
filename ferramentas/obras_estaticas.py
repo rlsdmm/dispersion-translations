@@ -54,7 +54,31 @@ def data_br(d):
     return f"{d[8:10]}/{d[5:7]}/{d[0:4]}" if d and len(d) >= 10 else ""
 
 
-def pagina(modelo, s, caps):
+def parecidas(s, series, por_obra, n=8):
+    """Obras com mais gêneros em comum (desempate: mais capítulos). Ajuda o Google a achar
+    e ligar as páginas das obras entre si."""
+    g = set(s.get("generos") or [])
+    outras = [o for o in series if o["id"] != s["id"] and por_obra.get(o["id"])]
+    outras.sort(key=lambda o: (-len(g & set(o.get("generos") or [])), -len(por_obra.get(o["id"], [])), o["titulo"].lower()))
+    itens = "".join(
+        f'<a href="obra/{e(o["id"])}.html"><img src="{e(o.get("capa_url") or SITE + "/og.png")}" alt="" loading="lazy" />'
+        f'<span>{e(o["titulo"])}</span></a>' for o in outras[:n])
+    if not itens:
+        return ""
+    return (f'\n  <section class="wrap relacionadas"><div class="titulo-sec"><h2>Obras parecidas com {e(s["titulo"])}</h2>'
+            f'<a class="sub" href="index.html#obras">ver todas →</a></div><div class="rel-lista">{itens}</div></section>')
+
+
+def catalogo(series, por_obra):
+    """Lista A–Z de todas as obras, escrita direto no index.html."""
+    itens = "".join(
+        f'<a href="obra/{e(s["id"])}.html">{e(s["titulo"])}</a>'
+        for s in sorted(series, key=lambda s: s["titulo"].lower()) if por_obra.get(s["id"]))
+    return (f'<section class="catalogo-az"><div class="titulo-sec"><h2>Todas as obras de A a Z</h2></div>'
+            f'<nav class="az-lista" aria-label="Todas as obras">{itens}</nav></section>')
+
+
+def pagina(modelo, s, caps, rel=""):
     sid, titulo = s["id"], s["titulo"]
     nomes = [n for n in (s.get("nomes_alt") or []) if n]
     latino = next((n for n in nomes if re.fullmatch(r"[\x20-\x7EÀ-ÿ’]+", n) and len(n) <= 60), None)
@@ -119,7 +143,7 @@ def pagina(modelo, s, caps):
       </section>
     </main>
   </div>'''
-    h = re.sub(r'<div id="conteudo"></div>', lambda m: pronto, h, 1)
+    h = re.sub(r'<div id="conteudo"></div>', lambda m: pronto + rel, h, 1)
     h = h.replace("  <script>\n    const { esc, serie,", f'  <script>window.OBRA_ID = {json.dumps(sid)};</script>\n  <script>\n    const {{ esc, serie,', 1)
     assert "window.OBRA_ID" in h, "não achei onde colocar o OBRA_ID"
     return h
@@ -136,8 +160,15 @@ def main():
     feitos = set()
     for s in series:
         arq = PASTA / f"{s['id']}.html"
-        arq.write_text(pagina(modelo, s, por_obra.get(s["id"], [])), encoding="utf-8", newline="\n")
+        arq.write_text(pagina(modelo, s, por_obra.get(s["id"], []), parecidas(s, series, por_obra)), encoding="utf-8", newline="\n")
         feitos.add(arq.name)
+    # catálogo A–Z no index.html, entre as marcas <!-- catalogo --> ... <!-- /catalogo -->
+    idx = RAIZ / "index.html"
+    ih = idx.read_text(encoding="utf-8").replace("\r\n", "\n")
+    novo = re.sub(r"<!-- catalogo -->.*?<!-- /catalogo -->",
+                  lambda m: f"<!-- catalogo -->{catalogo(series, por_obra)}<!-- /catalogo -->", ih, 1, flags=re.S)
+    assert novo != ih or "<!-- catalogo -->" in ih, "não achei a marca do catálogo no index.html"
+    idx.write_text(novo, encoding="utf-8", newline="\n")
     # obra que saiu do site: apaga a página dela
     for velho in PASTA.glob("*.html"):
         if velho.name not in feitos:
